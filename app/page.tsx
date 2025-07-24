@@ -338,7 +338,6 @@ function SpendOptimizerView() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({
                     amount: spendAmount,
@@ -436,10 +435,12 @@ function SpendOptimizerView() {
 }
 
 function AICardAdvisorView() {
+    const supabase = createClient();
     const [messages, setMessages] = useState<ChatMessage[]>([
         { from: 'ai', text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else." }
     ]);
     const [input, setInput] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -448,19 +449,40 @@ function AICardAdvisorView() {
 
     useEffect(scrollToBottom, [messages]);
 
-    const handleSend = (e: React.FormEvent) => {
+    const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (input.trim() === '') return;
-        
+        if (input.trim() === '' || isThinking) return;
+
         const userMessage: ChatMessage = { from: 'user', text: input };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setInput('');
+        setIsThinking(true);
 
-        setTimeout(() => {
-            const aiMessage: ChatMessage = { from: 'ai', text: "That's a great question! Based on your HDFC Millennia card, you get 5 reward points for every ₹150 spent on dining. For your SBI SimplyCLICK, the reward rate is lower for offline dining." };
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ messages: newMessages }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to get a response from the advisor.");
+            }
+
+            const data = await response.json();
+            const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
             setMessages(prev => [...prev, aiMessage]);
-        }, 1500);
+
+        } catch (error) {
+            console.error(error);
+            const errorMessage: ChatMessage = { from: 'ai', text: "Sorry, I'm having trouble connecting right now." };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsThinking(false);
+        }
     };
 
     return (
@@ -471,11 +493,23 @@ function AICardAdvisorView() {
                     {messages.map((msg, index) => (
                         <div key={index} className={`flex items-end gap-2 ${msg.from === 'user' ? 'justify-end' : ''}`}>
                             {msg.from === 'ai' && <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0"><SparklesIcon className="w-5 h-5"/></div>}
-                            <div className={`max-w-md p-3 rounded-lg ${msg.from === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                            <div className={`max-w-xl p-3 rounded-lg ${msg.from === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
                                 <p>{msg.text}</p>
                             </div>
                         </div>
                     ))}
+                    {isThinking && (
+                        <div className="flex items-end gap-2">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0"><SparklesIcon className="w-5 h-5"/></div>
+                            <div className="max-w-md p-3 rounded-lg bg-gray-200 text-gray-800">
+                                <div className="flex items-center space-x-1">
+                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-0"></span>
+                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
+                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-300"></span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div ref={chatEndRef} />
                 </div>
                 <form onSubmit={handleSend} className="mt-4 flex items-center gap-2">
@@ -485,8 +519,9 @@ function AICardAdvisorView() {
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Ask about rewards, fees, benefits..."
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        disabled={isThinking}
                     />
-                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200">
+                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300" disabled={isThinking}>
                         <SendIcon />
                     </button>
                 </form>
