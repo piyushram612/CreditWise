@@ -41,11 +41,9 @@ const formatCardForPrompt = (card: any) => {
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Suitability: ${card.suitability}
-Benefits Summary: ${card.benefits}
+Benefits Summary: ${card.benefits || card.welcome_benefits}
 Reward Rates:
 ${rewardDetails}
-Welcome Benefit: ${card.welcome_benefits}
-Lounge Access: Domestic: ${card.lounge_access.domestic}, International: ${card.lounge_access.international}
 `;
 };
 

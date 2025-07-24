@@ -13,7 +13,7 @@ interface ChatRequestBody {
 
 // Helper function to format card data cleanly for the AI prompt
 const formatCardForPrompt = (card: any) => {
-  const rewardDetails = Object.entries(card.reward_rates || {})
+    const rewardDetails = Object.entries(card.reward_rates || {})
     .map(([key, value]: [string, any]) => `  - ${key.replace(/_/g, ' ')}: ${value.rate}${value.type.includes('%') ? '%' : 'x'} (${value.notes})`)
     .join('\n');
 
@@ -21,11 +21,9 @@ const formatCardForPrompt = (card: any) => {
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Suitability: ${card.suitability}
-Benefits Summary: ${card.benefits}
+Benefits Summary: ${card.benefits || card.welcome_benefits}
 Reward Rates:
 ${rewardDetails}
-Welcome Benefit: ${card.welcome_benefits}
-Lounge Access: Domestic: ${card.lounge_access.domestic}, International: ${card.lounge_access.international}
 `;
 };
 
