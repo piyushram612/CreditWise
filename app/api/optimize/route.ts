@@ -1,23 +1,129 @@
+// app/api/optimize/route.ts
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+// Define the structure of the data we expect from the frontend
+interface OptimizeRequestBody {
+  amount: string;
+  category: string;
+}
+
+// Define the structure for the AI's JSON response
+const GEMINI_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    bestCard: {
+      type: "OBJECT",
+      properties: {
+        name: { type: "STRING" },
+        issuer: { type: "STRING" },
+      },
+    },
+    reason: { type: "STRING" },
+    alternatives: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          name: { type: "STRING" },
+          reason: { type: "STRING" },
+        },
+      },
+    },
+  },
+};
+
+
 export async function POST(request: Request) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { amount, category }: OptimizeRequestBody = await request.json();
+    if (!amount || !category) {
+        return NextResponse.json({ error: 'Amount and category are required.' }, { status: 400 });
+    }
+
+    // 1. Fetch the user's cards from Supabase
+    const { data: userCards, error: dbError } = await supabase
+      .from('user_owned_cards')
+      .select('cards(*)')
+      .eq('user_id', user.id);
+
+    if (dbError) {
+      console.error('Supabase DB Error:', dbError);
+      return NextResponse.json({ error: 'Could not fetch user cards.' }, { status: 500 });
+    }
+
+    if (!userCards || userCards.length === 0) {
+      return NextResponse.json({ error: 'You have no cards in your wallet to optimize.' }, { status: 400 });
+    }
+
+    // 2. Construct a detailed prompt for the Gemini AI
+    const cardsInfo = userCards.map(c => c.cards).map(card => 
+        `- Card: ${card.card_name}, Issuer: ${card.issuer}, Benefits: ${card.benefits}, Reward Rates: ${JSON.stringify(card.reward_rates)}`
+    ).join('\n');
+
+    const prompt = `
+      You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
+
+      User's Purchase Details:
+      - Amount: ₹${amount}
+      - Category: ${category}
+
+      User's Wallet (their available cards):
+      ${cardsInfo}
+
+      Your Task:
+      1. Analyze the user's cards and their benefits/reward rates.
+      2. Determine which card offers the absolute best value for this specific purchase. Consider cashback, reward points, and special offers like Gyftr vouchers.
+      3. Provide a concise reason for your choice.
+      4. Suggest one or two other good alternatives if they exist.
+      5. You MUST respond in a valid JSON format that adheres to the provided schema. Do not include any text outside of the JSON structure.
+    `;
+
+    // 3. Call the Gemini API
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
+    }
+    
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+
+    const requestBody = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        response_mime_type: "application/json",
+        response_schema: GEMINI_RESPONSE_SCHEMA,
+      },
+    };
+
+    const geminiResponse = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error('Gemini API Error:', errorText);
+        return NextResponse.json({ error: 'Failed to get a response from the AI model.' }, { status: 500 });
+    }
+
+    const geminiResult = await geminiResponse.json();
+    
+    // 4. Parse and return the AI's response
+    const responseText = geminiResult.candidates[0].content.parts[0].text;
+    const parsedResponse = JSON.parse(responseText);
+
+    return NextResponse.json(parsedResponse);
+
+  } catch (error) {
+    console.error('API Route Error:', error);
+    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
-
-  // For now, we'll just return a mock response.
-  // In the next step, we'll add the Gemini AI logic here.
-  const mockResponse = {
-    bestCard: { name: 'HDFC Millennia (from API)', issuer: 'hdfc' },
-    reason: "This is a test response from the API. It proves that the frontend is correctly calling the backend.",
-    alternatives: [
-      { name: 'ICICI Amazon Pay (from API)', reason: "This is a test alternative." }
-    ]
-  };
-
-  return NextResponse.json(mockResponse);
 }
