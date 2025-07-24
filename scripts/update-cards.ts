@@ -32,9 +32,7 @@ const GEMINI_CARD_SCHEMA = {
         issuer: { type: "STRING" },
         benefits: { type: "STRING" },
         reward_rates: {
-          type: "OBJECT",
-          properties: {},
-          additionalProperties: true,
+          type: "OBJECT", // Corrected schema: Simplified to just an object type
         },
       },
       required: ["card_name", "issuer", "benefits"]
