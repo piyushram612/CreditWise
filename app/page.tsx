@@ -37,6 +37,14 @@ interface Card {
     annual_fee?: number;
     reward_rates?: any;
     benefits?: string;
+    card_type?: string[];
+    joining_fee?: number;
+    fee_waiver?: string;
+    welcome_benefits?: string;
+    milestone_benefits?: any;
+    lounge_access?: any;
+    other_benefits?: string[];
+    suitability?: string;
 }
 
 interface UserOwnedCard {
@@ -265,6 +273,9 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
             case 'hdfc': return 'from-blue-500 to-indigo-600';
             case 'sbi': return 'from-cyan-500 to-blue-500';
             case 'icici': return 'from-orange-500 to-red-600';
+            case 'axis': return 'from-purple-500 to-indigo-600';
+            case 'amex': return 'from-blue-700 to-gray-900';
+            case 'idfc': return 'from-red-500 to-purple-600';
             default: return 'from-gray-500 to-gray-700';
         }
     };
@@ -530,44 +541,74 @@ function AICardAdvisorView() {
     );
 }
 
-function DashboardView() {
+function DashboardView({ user, setActiveView }: { user: User | null, setActiveView: (view: string) => void }) {
+    const supabase = createClient();
+    const [stats, setStats] = useState({ cardCount: 0, totalLimit: 0 });
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            const fetchStats = async () => {
+                setIsLoading(true);
+                const { data, error } = await supabase
+                    .from('user_owned_cards')
+                    .select('credit_limit')
+                    .eq('user_id', user.id);
+
+                if (error) {
+                    console.error("Error fetching dashboard stats:", error);
+                } else if (data) {
+                    const cardCount = data.length;
+                    const totalLimit = data.reduce((sum, card) => sum + (card.credit_limit || 0), 0);
+                    setStats({ cardCount, totalLimit });
+                }
+                setIsLoading(false);
+            };
+            fetchStats();
+        } else {
+            setIsLoading(false);
+        }
+    }, [user, supabase]);
+
     return (
         <div>
             <h2 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {/* Card for Optimizer */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center text-blue-500 mb-3">
-                        <SparklesIcon />
-                        <h3 className="font-bold text-lg ml-2">Quick Optimize</h3>
-                    </div>
-                    <p className="text-gray-600 mb-4 text-sm">Find the best card for a quick purchase.</p>
-                    <div className="flex gap-2">
-                        <input type="number" placeholder="Amount" className="w-1/2 p-2 border rounded-md"/>
-                        <button className="w-1/2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition">Find</button>
-                    </div>
-                </div>
-                {/* Card for My Cards */}
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <div className="flex items-center text-green-500 mb-3">
                         <CreditCardIcon />
-                        <h3 className="font-bold text-lg ml-2">Your Cards</h3>
+                        <h3 className="font-bold text-lg ml-2">Your Wallet</h3>
                     </div>
-                    <p className="text-gray-600 mb-4 text-sm">You have 3 cards in your wallet.</p>
-                    <div className="flex -space-x-2">
-                         <div className="w-10 h-10 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white font-bold">H</div>
-                         <div className="w-10 h-10 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-white font-bold">S</div>
-                         <div className="w-10 h-10 rounded-full bg-orange-500 border-2 border-white flex items-center justify-center text-white font-bold">I</div>
-                    </div>
+                    {isLoading ? <p className="text-gray-600 text-sm">Loading stats...</p> : user ? (
+                        <>
+                            <p className="text-gray-600 text-sm">You have <span className="font-bold text-green-600">{stats.cardCount}</span> cards.</p>
+                            <p className="text-gray-600 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p>
+                        </>
+                    ) : (
+                        <p className="text-gray-600 text-sm">Log in to see your wallet summary.</p>
+                    )}
                 </div>
-                 {/* Card for AI Advisor */}
+                
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center text-blue-500 mb-3">
+                        <SparklesIcon />
+                        <h3 className="font-bold text-lg ml-2">Spend Optimizer</h3>
+                    </div>
+                    <p className="text-gray-600 mb-4 text-sm">Find the best card for your next purchase.</p>
+                    <button onClick={() => setActiveView('optimizer')} className="w-full bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition p-2">
+                        Optimize Now
+                    </button>
+                </div>
+
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <div className="flex items-center text-purple-500 mb-3">
                         <ChatBubbleIcon />
                         <h3 className="font-bold text-lg ml-2">AI Advisor</h3>
                     </div>
                     <p className="text-gray-600 mb-4 text-sm">Have a question? Ask our AI for help.</p>
-                    <button className="w-full bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition p-2">Ask Now</button>
+                    <button onClick={() => setActiveView('advisor')} className="w-full bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition p-2">
+                        Ask Now
+                    </button>
                 </div>
             </div>
         </div>
@@ -594,7 +635,7 @@ export default function App() {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
-            setIsAuthModalOpen(false); // Close modal on successful login/signup
+            setIsAuthModalOpen(false);
         });
 
         return () => {
@@ -603,7 +644,6 @@ export default function App() {
     }, [supabase]);
 
     const handleCardAdded = () => {
-        // Increment key to force MyCardsView to re-fetch data
         setKey(prevKey => prevKey + 1);
     };
 
@@ -623,7 +663,7 @@ export default function App() {
 
         switch (activeView) {
             case 'dashboard':
-                return <DashboardView />;
+                return <DashboardView user={user} setActiveView={setActiveView} />;
             case 'my-cards':
                 return user ? <MyCardsView key={key} user={user} onAddCardClick={() => setIsAddCardModalOpen(true)} /> : null;
             case 'optimizer':
@@ -631,7 +671,7 @@ export default function App() {
             case 'advisor':
                 return <AICardAdvisorView />;
             default:
-                return <DashboardView />;
+                return <DashboardView user={user} setActiveView={setActiveView} />;
         }
     };
 
