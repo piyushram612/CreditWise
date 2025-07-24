@@ -261,13 +261,17 @@ function AICardAdvisorView() {
         e.preventDefault();
         if (input.trim() === '') return;
 
-        const newMessages = [...messages, { from: 'user', text: input }];
+        // THIS IS THE FIX: Explicitly type the new message object
+        const userMessage: ChatMessage = { from: 'user', text: input };
+        const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setInput('');
 
         // Simulate AI response
         setTimeout(() => {
-            setMessages(prev => [...prev, { from: 'ai', text: "That's a great question! Based on your HDFC Millennia card, you get 5 reward points for every ₹150 spent on dining. For your SBI SimplyCLICK, the reward rate is lower for offline dining." }]);
+            // THIS IS THE FIX: Explicitly type the AI message object
+            const aiMessage: ChatMessage = { from: 'ai', text: "That's a great question! Based on your HDFC Millennia card, you get 5 reward points for every ₹150 spent on dining. For your SBI SimplyCLICK, the reward rate is lower for offline dining." };
+            setMessages(prev => [...prev, aiMessage]);
         }, 1500);
     };
 
