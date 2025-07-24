@@ -2,13 +2,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
-// Define the structure of the data we expect from the frontend
 interface OptimizeRequestBody {
   amount: string;
   category: string;
 }
 
-// Define the structure for the AI's JSON response
 const GEMINI_RESPONSE_SCHEMA = {
   type: "OBJECT",
   properties: {
@@ -33,6 +31,24 @@ const GEMINI_RESPONSE_SCHEMA = {
   },
 };
 
+// Helper function to format card data cleanly for the AI prompt
+const formatCardForPrompt = (card: any) => {
+  const rewardDetails = Object.entries(card.reward_rates || {})
+    .map(([key, value]: [string, any]) => `  - ${key.replace(/_/g, ' ')}: ${value.rate}${value.type.includes('%') ? '%' : 'x'} (${value.notes})`)
+    .join('\n');
+
+  return `
+Card Name: ${card.card_name}
+Issuer: ${card.issuer}
+Suitability: ${card.suitability}
+Benefits Summary: ${card.benefits}
+Reward Rates:
+${rewardDetails}
+Welcome Benefit: ${card.welcome_benefits}
+Lounge Access: Domestic: ${card.lounge_access.domestic}, International: ${card.lounge_access.international}
+`;
+};
+
 
 export async function POST(request: Request) {
   try {
@@ -48,7 +64,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Amount and category are required.' }, { status: 400 });
     }
 
-    // 1. Fetch the user's cards from Supabase
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
       .select('cards(*)')
@@ -63,10 +78,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You have no cards in your wallet to optimize.' }, { status: 400 });
     }
 
-    // 2. Construct a detailed prompt for the Gemini AI
-    const cardsInfo = userCards.map(c => c.cards).map(card => 
-        `- Card: ${card.card_name}, Issuer: ${card.issuer}, Benefits: ${card.benefits}, Reward Rates: ${JSON.stringify(card.reward_rates)}`
-    ).join('\n');
+    const cardsInfo = userCards.map(c => c.cards).map(formatCardForPrompt).join('\n---\n');
 
     const prompt = `
       You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
@@ -75,18 +87,17 @@ export async function POST(request: Request) {
       - Amount: ₹${amount}
       - Category: ${category}
 
-      User's Wallet (their available cards):
+      Here is the user's wallet of available cards:
       ${cardsInfo}
 
       Your Task:
       1. Analyze the user's cards and their benefits/reward rates.
-      2. Determine which card offers the absolute best value for this specific purchase. Consider cashback, reward points, and special offers like Gyftr vouchers.
+      2. Determine which card offers the absolute best value for this specific purchase.
       3. Provide a concise reason for your choice.
       4. Suggest one or two other good alternatives if they exist.
       5. You MUST respond in a valid JSON format that adheres to the provided schema. Do not include any text outside of the JSON structure.
     `;
 
-    // 3. Call the Gemini API
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
@@ -116,7 +127,6 @@ export async function POST(request: Request) {
 
     const geminiResult = await geminiResponse.json();
     
-    // 4. Parse and return the AI's response
     const responseText = geminiResult.candidates[0].content.parts[0].text;
     const parsedResponse = JSON.parse(responseText);
 
