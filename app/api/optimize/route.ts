@@ -34,8 +34,14 @@ const GEMINI_RESPONSE_SCHEMA = {
 // Helper function to format card data cleanly for the AI prompt
 const formatCardForPrompt = (card: any) => {
   const rewardDetails = Object.entries(card.reward_rates || {})
-    .map(([key, value]: [string, any]) => `  - ${key.replace(/_/g, ' ')}: ${value.rate}${value.type.includes('%') ? '%' : 'x'} (${value.notes})`)
-    .join('\n');
+    .map(([key, value]: [string, any]) => {
+        if (typeof value !== 'object' || value === null) return `  - ${key.replace(/_/g, ' ')}: ${value}`;
+        const rate = value.rate ?? 'N/A';
+        const type = value.type ?? '';
+        const notes = value.notes ?? '';
+        const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
+        return `  - ${key.replace(/_/g, ' ')}: ${rateDisplay} (${notes})`;
+    }).join('\n');
 
   return `
 Card Name: ${card.card_name}

@@ -29,8 +29,8 @@ const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12
 const XMarkIcon = () => <Icon path="M6 18L18 6M6 6l12 12" />;
 const SunIcon = () => <Icon path="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />;
 const MoonIcon = () => <Icon path="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />;
-const TrashIcon = () => <Icon path="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.718c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" />;
-const PencilSquareIcon = () => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />;
+const TrashIcon = ({ className }: { className?: string }) => <Icon path="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.718c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" className={className} />;
+const PencilSquareIcon = ({ className }: { className?: string }) => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" className={className} />;
 
 
 // --- Data Structures and Types ---
@@ -175,6 +175,107 @@ function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean,
     );
 }
 
+function EditCardModal({ isOpen, onClose, card, onCardUpdated }: { isOpen: boolean, onClose: () => void, card: UserOwnedCard | null, onCardUpdated: () => void }) {
+    const supabase = createClient();
+    const [creditLimit, setCreditLimit] = useState('');
+    const [customBenefits, setCustomBenefits] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (card) {
+            setCreditLimit(card.credit_limit?.toString() || '');
+            setCustomBenefits(card.custom_benefits || '');
+        }
+    }, [card]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!card) return;
+        
+        setIsLoading(true);
+        setError(null);
+
+        const { error: updateError } = await supabase
+            .from('user_owned_cards')
+            .update({
+                credit_limit: parseInt(creditLimit, 10),
+                custom_benefits: customBenefits,
+            })
+            .eq('id', card.id);
+
+        setIsLoading(false);
+        if (updateError) {
+            setError(updateError.message);
+        } else {
+            onCardUpdated();
+            onClose();
+        }
+    };
+
+    if (!isOpen || !card) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative flex flex-col max-h-[90vh]">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <XMarkIcon />
+                </button>
+                <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Edit {card.cards.card_name}</h3>
+                <form onSubmit={handleSubmit} className="overflow-y-auto">
+                    <div className="mb-4">
+                        <label htmlFor="edit-limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Limit (₹)</label>
+                        <input
+                            type="number"
+                            id="edit-limit"
+                            placeholder="e.g., 150000"
+                            value={creditLimit}
+                            onChange={(e) => setCreditLimit(e.target.value)}
+                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
+                        />
+                    </div>
+                    <div className="mb-6">
+                        <label htmlFor="custom-benefits" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Custom Notes / Benefits</label>
+                        <textarea
+                            id="custom-benefits"
+                            rows={4}
+                            placeholder="e.g., Got a special 10% discount offer on this card until December."
+                            value={customBenefits}
+                            onChange={(e) => setCustomBenefits(e.target.value)}
+                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
+                        />
+                    </div>
+                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300">
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+function ConfirmDeleteModal({ isOpen, onClose, onConfirm, cardName }: { isOpen: boolean, onClose: () => void, onConfirm: () => void, cardName: string }) {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative">
+                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Confirm Deletion</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to remove the <span className="font-semibold">{cardName}</span> from your wallet?</p>
+                <div className="flex justify-end gap-4">
+                    <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                        Cancel
+                    </button>
+                    <button onClick={onConfirm} className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: () => void, supabase: SupabaseClient }) {
     if (!isOpen) return null;
 
@@ -254,7 +355,7 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme
     );
 }
 
-function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick: () => void, key: number }) {
+function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { user: User, onAddCardClick: () => void, onEditCard: (card: UserOwnedCard) => void, onDeleteCard: (card: UserOwnedCard) => void, key: number }) {
     const supabase = createClient();
     const [userCards, setUserCards] = useState<UserOwnedCard[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -264,7 +365,7 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
             setIsLoading(true);
             const { data, error } = await supabase
                 .from('user_owned_cards')
-                .select('id, credit_limit, cards(*)')
+                .select('id, credit_limit, custom_benefits, cards(*)')
                 .eq('user_id', user.id);
 
             if (error) {
@@ -310,7 +411,7 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {userCards.map(ownedCard => (
-                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.cards.issuer)}`}>
+                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.cards.issuer)} relative group`}>
                             <div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-semibold">{ownedCard.cards.issuer.toUpperCase()}</span>
@@ -321,6 +422,14 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
                             <div className="mt-8">
                                 <p className="text-sm opacity-80">Credit Limit</p>
                                 <p className="font-mono text-lg tracking-wider">₹ {ownedCard.credit_limit?.toLocaleString('en-IN')}</p>
+                            </div>
+                            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
+                                    <PencilSquareIcon className="w-4 h-4 text-white" />
+                                </button>
+                                <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
+                                    <TrashIcon className="w-4 h-4 text-white" />
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -632,6 +741,9 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+    const [isEditCardModalOpen, setIsEditCardModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedCard, setSelectedCard] = useState<UserOwnedCard | null>(null);
     const [key, setKey] = useState(0); // Key to force re-render
     const [theme, setTheme] = useState('light');
     const supabase = createClient();
@@ -669,6 +781,32 @@ export default function App() {
     const handleCardAdded = () => {
         setKey(prevKey => prevKey + 1);
     };
+    
+    const handleCardUpdated = () => {
+        setKey(prevKey => prevKey + 1);
+    };
+    
+    const handleCardDeleted = () => {
+        setKey(prevKey => prevKey + 1);
+    };
+
+    const handleEditCard = (card: UserOwnedCard) => {
+        setSelectedCard(card);
+        setIsEditCardModalOpen(true);
+    };
+
+    const handleDeleteCard = (card: UserOwnedCard) => {
+        setSelectedCard(card);
+        setIsDeleteModalOpen(true);
+    };
+    
+    const confirmDelete = async () => {
+        if (!selectedCard) return;
+        await supabase.from('user_owned_cards').delete().eq('id', selectedCard.id);
+        handleCardDeleted();
+        setIsDeleteModalOpen(false);
+        setSelectedCard(null);
+    };
 
     const renderView = () => {
         if (!user && activeView !== 'dashboard') {
@@ -688,7 +826,7 @@ export default function App() {
             case 'dashboard':
                 return <DashboardView user={user} setActiveView={setActiveView} />;
             case 'my-cards':
-                return user ? <MyCardsView key={key} user={user} onAddCardClick={() => setIsAddCardModalOpen(true)} /> : null;
+                return user ? <MyCardsView key={key} user={user} onAddCardClick={() => setIsAddCardModalOpen(true)} onEditCard={handleEditCard} onDeleteCard={handleDeleteCard} /> : null;
             case 'optimizer':
                 return <SpendOptimizerView />;
             case 'advisor':
@@ -718,12 +856,26 @@ export default function App() {
                 supabase={supabase}
             />
             {user && (
-                <AddCardModal
-                    isOpen={isAddCardModalOpen}
-                    onClose={() => setIsAddCardModalOpen(false)}
-                    user={user}
-                    onCardAdded={handleCardAdded}
-                />
+                <>
+                    <AddCardModal
+                        isOpen={isAddCardModalOpen}
+                        onClose={() => setIsAddCardModalOpen(false)}
+                        user={user}
+                        onCardAdded={handleCardAdded}
+                    />
+                    <EditCardModal
+                        isOpen={isEditCardModalOpen}
+                        onClose={() => setIsEditCardModalOpen(false)}
+                        card={selectedCard}
+                        onCardUpdated={handleCardUpdated}
+                    />
+                    <ConfirmDeleteModal
+                        isOpen={isDeleteModalOpen}
+                        onClose={() => setIsDeleteModalOpen(false)}
+                        onConfirm={confirmDelete}
+                        cardName={selectedCard?.cards.card_name || ''}
+                    />
+                </>
             )}
         </div>
     );
