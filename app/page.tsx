@@ -28,14 +28,21 @@ const PlusIcon = ({ className }: { className?: string }) => <Icon path="M12 4.5v
 const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" className="w-5 h-5" />;
 const XMarkIcon = () => <Icon path="M6 18L18 6M6 6l12 12" />;
 
-
 // --- Data Structures and Types ---
-interface MockCard {
-    id: number;
-    name: string;
-    limit: number;
-    last4: string;
+interface Card {
+    id: string;
+    card_name: string;
     issuer: string;
+    network?: string;
+    annual_fee?: number;
+    reward_rates?: any;
+    benefits?: string;
+}
+
+interface UserOwnedCard {
+    id: string;
+    credit_limit?: number;
+    cards: Card;
 }
 
 interface CardSuggestion {
@@ -58,17 +65,102 @@ interface ChatMessage {
 }
 
 // --- Mock Data ---
-const mockUserCards: MockCard[] = [
-    { id: 1, name: 'HDFC Millennia', limit: 150000, last4: '1234', issuer: 'hdfc' },
-    { id: 2, name: 'SBI SimplyCLICK', limit: 80000, last4: '5678', issuer: 'sbi' },
-    { id: 3, name: 'ICICI Amazon Pay', limit: 200000, last4: '9012', issuer: 'icici' },
-];
-
 const mockSpendCategories: string[] = [
     'Dining & Restaurants', 'Online Shopping', 'Fuel', 'Utility Bills', 'Travel & Flights', 'Groceries', 'EMI Payments', 'Education Fees'
 ];
 
-// --- Auth Modal Component ---
+// --- New Components ---
+function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean, onClose: () => void, user: User, onCardAdded: () => void }) {
+    const supabase = createClient();
+    const [allCards, setAllCards] = useState<Card[]>([]);
+    const [selectedCardId, setSelectedCardId] = useState<string>('');
+    const [creditLimit, setCreditLimit] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchAllCards = async () => {
+                const { data, error } = await supabase.from('cards').select('*');
+                if (error) {
+                    console.error('Error fetching cards:', error);
+                } else {
+                    setAllCards(data || []);
+                }
+            };
+            fetchAllCards();
+        }
+    }, [isOpen, supabase]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedCardId || !creditLimit) {
+            setError("Please select a card and enter a credit limit.");
+            return;
+        }
+        setIsLoading(true);
+        setError(null);
+
+        const { error: insertError } = await supabase.from('user_owned_cards').insert({
+            user_id: user.id,
+            card_id: selectedCardId,
+            credit_limit: parseInt(creditLimit, 10),
+        });
+
+        setIsLoading(false);
+        if (insertError) {
+            setError(insertError.message);
+        } else {
+            onCardAdded();
+            onClose();
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full relative">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <XMarkIcon />
+                </button>
+                <h3 className="text-2xl font-bold mb-4">Add a New Card</h3>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="card" className="block text-sm font-medium text-gray-700 mb-1">Credit Card</label>
+                        <select
+                            id="card"
+                            value={selectedCardId}
+                            onChange={(e) => setSelectedCardId(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                            <option value="" disabled>Select a card</option>
+                            {allCards.map(card => (
+                                <option key={card.id} value={card.id}>{card.card_name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="mb-6">
+                        <label htmlFor="limit" className="block text-sm font-medium text-gray-700 mb-1">Credit Limit (₹)</label>
+                        <input
+                            type="number"
+                            id="limit"
+                            placeholder="e.g., 150000"
+                            value={creditLimit}
+                            onChange={(e) => setCreditLimit(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                    </div>
+                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300">
+                        {isLoading ? 'Adding...' : 'Add Card'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: () => void, supabase: SupabaseClient }) {
     if (!isOpen) return null;
 
@@ -88,7 +180,6 @@ function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: ()
         </div>
     );
 }
-
 
 // --- Main App Components ---
 
@@ -145,9 +236,32 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { a
     );
 }
 
-function MyCardsView() {
+function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick: () => void, key: number }) {
+    const supabase = createClient();
+    const [userCards, setUserCards] = useState<UserOwnedCard[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserCards = async () => {
+            setIsLoading(true);
+            const { data, error } = await supabase
+                .from('user_owned_cards')
+                .select('id, credit_limit, cards(*)')
+                .eq('user_id', user.id);
+
+            if (error) {
+                console.error("Error fetching user cards:", error);
+            } else {
+                setUserCards(data as UserOwnedCard[]);
+            }
+            setIsLoading(false);
+        };
+
+        fetchUserCards();
+    }, [user, supabase, key]);
+
     const getIssuerColor = (issuer: string) => {
-        switch (issuer) {
+        switch (issuer.toLowerCase()) {
             case 'hdfc': return 'from-blue-500 to-indigo-600';
             case 'sbi': return 'from-cyan-500 to-blue-500';
             case 'icici': return 'from-orange-500 to-red-600';
@@ -159,55 +273,92 @@ function MyCardsView() {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800">My Cards</h2>
-                <button className="flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 transform hover:scale-105">
+                <button onClick={onAddCardClick} className="flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 transform hover:scale-105">
                     <PlusIcon />
                     <span className="ml-2">Add New Card</span>
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockUserCards.map(card => (
-                    <div key={card.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(card.issuer)}`}>
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-semibold">{card.issuer.toUpperCase()}</span>
-                                <CreditCardIcon className="w-8 h-8 opacity-70" />
-                            </div>
-                            <h3 className="text-2xl font-bold mt-4">{card.name}</h3>
-                        </div>
-                        <div className="mt-8">
-                            <p className="text-sm opacity-80">Card Number</p>
-                            <p className="font-mono text-lg tracking-wider">**** **** **** {card.last4}</p>
-                        </div>
-                    </div>
-                ))}
-                 <div className="p-6 rounded-xl border-2 border-dashed border-gray-300 flex flex-col justify-center items-center text-gray-500 hover:bg-gray-100 cursor-pointer transition-colors">
-                    <PlusIcon className="w-8 h-8 mb-2"/>
-                    <span className="font-semibold">Add a new card</span>
+
+            {isLoading ? (
+                <div className="text-center py-10">Loading your cards...</div>
+            ) : userCards.length === 0 ? (
+                <div className="text-center py-10 bg-gray-100 rounded-lg">
+                    <p className="text-gray-600">You haven't added any cards yet.</p>
+                    <button onClick={onAddCardClick} className="mt-4 text-blue-500 font-semibold">Add your first card</button>
                 </div>
-            </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {userCards.map(ownedCard => (
+                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.cards.issuer)}`}>
+                            <div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-semibold">{ownedCard.cards.issuer.toUpperCase()}</span>
+                                    <CreditCardIcon className="w-8 h-8 opacity-70" />
+                                </div>
+                                <h3 className="text-2xl font-bold mt-4">{ownedCard.cards.card_name}</h3>
+                            </div>
+                            <div className="mt-8">
+                                <p className="text-sm opacity-80">Credit Limit</p>
+                                <p className="font-mono text-lg tracking-wider">₹ {ownedCard.credit_limit?.toLocaleString('en-IN')}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
 
 function SpendOptimizerView() {
+    const supabase = createClient();
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<OptimizationResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const formRef = useRef<HTMLFormElement>(null);
 
-    const handleOptimization = (e: React.FormEvent) => {
+    const handleOptimization = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setResult(null);
-        // Simulate API call to Gemini
-        setTimeout(() => {
-            setResult({
-                bestCard: { name: 'HDFC Millennia', issuer: 'hdfc' },
-                reason: "It offers 5% cashback on online purchases, including gift cards via Gyftr. You can buy a Zomato voucher to maximize your rewards for this dining expense.",
-                alternatives: [
-                    { name: 'ICICI Amazon Pay', reason: "Offers 2% for Prime members on offline spends." }
-                ]
-            });
+        setError(null);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            setError("You must be logged in to use the optimizer.");
             setIsLoading(false);
-        }, 2000);
+            return;
+        }
+
+        const formData = new FormData(formRef.current!);
+        const spendAmount = formData.get('amount');
+        const spendCategory = formData.get('category');
+
+        try {
+            const response = await fetch('/api/optimize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    amount: spendAmount,
+                    category: spendCategory,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Something went wrong');
+            }
+
+            const data = await response.json();
+            setResult(data);
+
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -215,16 +366,16 @@ function SpendOptimizerView() {
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Spend Optimizer</h2>
             <p className="text-gray-500 mb-6">Find the best card for your next purchase.</p>
             
-            <form onSubmit={handleOptimization} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <form ref={formRef} onSubmit={handleOptimization} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Spend Amount (₹)</label>
-                        <input type="number" id="amount" placeholder="e.g., 2500" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                     </div>
                     <div>
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Spend Category</label>
-                        <select id="category" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            {mockSpendCategories.map(cat => <option key={cat}>{cat}</option>)}
+                        <select name="category" id="category" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            {mockSpendCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                     </div>
                 </div>
@@ -247,6 +398,8 @@ function SpendOptimizerView() {
                     </button>
                 </div>
             </form>
+
+            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
 
             {result && (
                 <div className="mt-8 animate-fade-in">
@@ -365,7 +518,7 @@ function DashboardView() {
                         <CreditCardIcon />
                         <h3 className="font-bold text-lg ml-2">Your Cards</h3>
                     </div>
-                    <p className="text-gray-600 mb-4 text-sm">You have {mockUserCards.length} cards in your wallet.</p>
+                    <p className="text-gray-600 mb-4 text-sm">You have 3 cards in your wallet.</p>
                     <div className="flex -space-x-2">
                          <div className="w-10 h-10 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white font-bold">H</div>
                          <div className="w-10 h-10 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-white font-bold">S</div>
@@ -392,6 +545,8 @@ export default function App() {
     const [activeView, setActiveView] = useState('dashboard');
     const [user, setUser] = useState<User | null>(null);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+    const [key, setKey] = useState(0); // Key to force re-render
     const supabase = createClient();
 
     useEffect(() => {
@@ -412,6 +567,10 @@ export default function App() {
         };
     }, [supabase]);
 
+    const handleCardAdded = () => {
+        // Increment key to force MyCardsView to re-fetch data
+        setKey(prevKey => prevKey + 1);
+    };
 
     const renderView = () => {
         if (!user && activeView !== 'dashboard') {
@@ -431,7 +590,7 @@ export default function App() {
             case 'dashboard':
                 return <DashboardView />;
             case 'my-cards':
-                return <MyCardsView />;
+                return user ? <MyCardsView key={key} user={user} onAddCardClick={() => setIsAddCardModalOpen(true)} /> : null;
             case 'optimizer':
                 return <SpendOptimizerView />;
             case 'advisor':
@@ -458,6 +617,14 @@ export default function App() {
                 onClose={() => setIsAuthModalOpen(false)}
                 supabase={supabase}
             />
+            {user && (
+                <AddCardModal
+                    isOpen={isAddCardModalOpen}
+                    onClose={() => setIsAddCardModalOpen(false)}
+                    user={user}
+                    onCardAdded={handleCardAdded}
+                />
+            )}
         </div>
     );
 }
