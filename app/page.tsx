@@ -27,6 +27,9 @@ const UserCircleIcon = () => <Icon path="M17.982 18.725A7.488 7.488 0 0012 15.75
 const PlusIcon = ({ className }: { className?: string }) => <Icon path="M12 4.5v15m7.5-7.5h-15" className={className || "w-5 h-5"} />;
 const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" className="w-5 h-5" />;
 const XMarkIcon = () => <Icon path="M6 18L18 6M6 6l12 12" />;
+const SunIcon = () => <Icon path="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />;
+const MoonIcon = () => <Icon path="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />;
+
 
 // --- Data Structures and Types ---
 interface Card {
@@ -89,7 +92,7 @@ function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean,
     useEffect(() => {
         if (isOpen) {
             const fetchAllCards = async () => {
-                const { data, error } = await supabase.from('cards').select('*');
+                const { data, error } = await supabase.from('cards').select('*').order('card_name', { ascending: true });
                 if (error) {
                     console.error('Error fetching cards:', error);
                 } else {
@@ -127,20 +130,20 @@ function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean,
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full relative">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative flex flex-col max-h-[90vh]">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <XMarkIcon />
                 </button>
-                <h3 className="text-2xl font-bold mb-4">Add a New Card</h3>
-                <form onSubmit={handleSubmit}>
+                <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Add a New Card</h3>
+                <form onSubmit={handleSubmit} className="overflow-y-auto">
                     <div className="mb-4">
-                        <label htmlFor="card" className="block text-sm font-medium text-gray-700 mb-1">Credit Card</label>
+                        <label htmlFor="card" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Card</label>
                         <select
                             id="card"
                             value={selectedCardId}
                             onChange={(e) => setSelectedCardId(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         >
                             <option value="" disabled>Select a card</option>
                             {allCards.map(card => (
@@ -149,14 +152,14 @@ function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean,
                         </select>
                     </div>
                     <div className="mb-6">
-                        <label htmlFor="limit" className="block text-sm font-medium text-gray-700 mb-1">Credit Limit (₹)</label>
+                        <label htmlFor="limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Limit (₹)</label>
                         <input
                             type="number"
                             id="limit"
                             placeholder="e.g., 150000"
                             value={creditLimit}
                             onChange={(e) => setCreditLimit(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400 dark:placeholder-gray-500"
                         />
                     </div>
                     {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -191,7 +194,7 @@ function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: ()
 
 // --- Main App Components ---
 
-function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { activeView: string, setActiveView: (view: string) => void, user: User | null, onAuthClick: () => void, supabase: SupabaseClient }) {
+function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme, toggleTheme }: { activeView: string, setActiveView: (view: string) => void, user: User | null, onAuthClick: () => void, supabase: SupabaseClient, theme: string, toggleTheme: () => void }) {
     const navItems = [
         { name: 'Dashboard', icon: <DashboardIcon />, view: 'dashboard' },
         { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
@@ -204,7 +207,7 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { a
     }
 
     return (
-        <aside className="w-64 bg-gray-50 text-gray-800 p-4 flex flex-col">
+        <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 flex flex-col">
             <div className="flex items-center mb-8">
                 <SparklesIcon />
                 <h1 className="text-xl font-bold ml-2">CreditWise</h1>
@@ -216,7 +219,7 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { a
                             <a
                                 href="#"
                                 onClick={(e) => { e.preventDefault(); setActiveView(item.view); }}
-                                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${activeView === item.view ? 'bg-blue-500 text-white shadow' : 'hover:bg-gray-200'}`}
+                                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${activeView === item.view ? 'bg-blue-500 text-white shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                             >
                                 {item.icon}
                                 <span className="ml-4">{item.name}</span>
@@ -229,16 +232,20 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { a
                  {user ? (
                     <div className="text-sm">
                         <p className="truncate px-3" title={user.email || 'User'}>{user.email}</p>
-                        <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold">
+                        <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-semibold">
                            Logout
                         </button>
                     </div>
                 ) : (
-                    <a href="#" onClick={(e) => { e.preventDefault(); onAuthClick(); }} className="flex items-center p-3 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    <a href="#" onClick={(e) => { e.preventDefault(); onAuthClick(); }} className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
                         <UserCircleIcon />
                         <span className="ml-4">Login / Sign Up</span>
                     </a>
                 )}
+                <button onClick={toggleTheme} className="w-full flex items-center mt-4 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                    {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+                    <span className="ml-4">Toggle Theme</span>
+                </button>
             </div>
         </aside>
     );
@@ -283,7 +290,7 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">My Cards</h2>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">My Cards</h2>
                 <button onClick={onAddCardClick} className="flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 transform hover:scale-105">
                     <PlusIcon />
                     <span className="ml-2">Add New Card</span>
@@ -291,10 +298,10 @@ function MyCardsView({ user, onAddCardClick, key }: { user: User, onAddCardClick
             </div>
 
             {isLoading ? (
-                <div className="text-center py-10">Loading your cards...</div>
+                <div className="text-center py-10 text-gray-600 dark:text-gray-400">Loading your cards...</div>
             ) : userCards.length === 0 ? (
-                <div className="text-center py-10 bg-gray-100 rounded-lg">
-                    <p className="text-gray-600">You haven't added any cards yet.</p>
+                <div className="text-center py-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <p className="text-gray-600 dark:text-gray-400">You haven't added any cards yet.</p>
                     <button onClick={onAddCardClick} className="mt-4 text-blue-500 font-semibold">Add your first card</button>
                 </div>
             ) : (
@@ -373,18 +380,18 @@ function SpendOptimizerView() {
 
     return (
         <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Spend Optimizer</h2>
-            <p className="text-gray-500 mb-6">Find the best card for your next purchase.</p>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Spend Optimizer</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">Find the best card for your next purchase.</p>
             
-            <form ref={formRef} onSubmit={handleOptimization} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <form ref={formRef} onSubmit={handleOptimization} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Spend Amount (₹)</label>
-                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Amount (₹)</label>
+                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
                     </div>
                     <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Spend Category</label>
-                        <select name="category" id="category" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Category</label>
+                        <select name="category" id="category" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                             {mockSpendCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                     </div>
@@ -413,27 +420,27 @@ function SpendOptimizerView() {
 
             {result && (
                 <div className="mt-8 animate-fade-in">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Recommendation</h3>
-                    <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Recommendation</h3>
+                    <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-6 rounded-r-lg">
                         <div className="flex items-center">
                              <div className="bg-green-500 p-2 rounded-full">
                                 <CreditCardIcon className="w-6 h-6 text-white"/>
                              </div>
                              <div className="ml-4">
-                                <p className="text-sm text-green-700">Best Option</p>
-                                <p className="font-bold text-lg text-green-900">{result.bestCard.name}</p>
+                                <p className="text-sm text-green-700 dark:text-green-300">Best Option</p>
+                                <p className="font-bold text-lg text-green-900 dark:text-green-100">{result.bestCard.name}</p>
                              </div>
                         </div>
-                        <p className="mt-4 text-gray-700">{result.reason}</p>
+                        <p className="mt-4 text-gray-700 dark:text-gray-300">{result.reason}</p>
                     </div>
                     {result.alternatives.length > 0 && (
                          <div className="mt-6">
-                             <h4 className="font-semibold text-gray-700 mb-3">Other Good Options:</h4>
+                             <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Other Good Options:</h4>
                              <ul className="space-y-3">
                                 {result.alternatives.map((alt: CardSuggestion, index: number) => (
-                                    <li key={index} className="bg-white p-4 rounded-lg border border-gray-200">
-                                        <p className="font-bold text-gray-800">{alt.name}</p>
-                                        <p className="text-sm text-gray-600 mt-1">{alt.reason}</p>
+                                    <li key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                                        <p className="font-bold text-gray-800 dark:text-gray-100">{alt.name}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{alt.reason}</p>
                                     </li>
                                 ))}
                              </ul>
@@ -498,13 +505,13 @@ function AICardAdvisorView() {
 
     return (
         <div className="flex flex-col h-full">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">AI Card Advisor</h2>
-            <div className="flex-grow bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col p-4">
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">AI Card Advisor</h2>
+            <div className="flex-grow bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col p-4">
                 <div className="flex-grow space-y-4 overflow-y-auto pr-2">
                     {messages.map((msg, index) => (
                         <div key={index} className={`flex items-end gap-2 ${msg.from === 'user' ? 'justify-end' : ''}`}>
                             {msg.from === 'ai' && <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0"><SparklesIcon className="w-5 h-5"/></div>}
-                            <div className={`max-w-xl p-3 rounded-lg ${msg.from === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                            <div className={`max-w-xl p-3 rounded-lg ${msg.from === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>
                                 <p>{msg.text}</p>
                             </div>
                         </div>
@@ -512,7 +519,7 @@ function AICardAdvisorView() {
                     {isThinking && (
                         <div className="flex items-end gap-2">
                             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0"><SparklesIcon className="w-5 h-5"/></div>
-                            <div className="max-w-md p-3 rounded-lg bg-gray-200 text-gray-800">
+                            <div className="max-w-md p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                                 <div className="flex items-center space-x-1">
                                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-0"></span>
                                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
@@ -529,7 +536,7 @@ function AICardAdvisorView() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Ask about rewards, fees, benefits..."
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
                         disabled={isThinking}
                     />
                     <button type="submit" className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300" disabled={isThinking}>
@@ -572,40 +579,40 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
 
     return (
         <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Dashboard</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center text-green-500 mb-3">
                         <CreditCardIcon />
-                        <h3 className="font-bold text-lg ml-2">Your Wallet</h3>
+                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Your Wallet</h3>
                     </div>
-                    {isLoading ? <p className="text-gray-600 text-sm">Loading stats...</p> : user ? (
+                    {isLoading ? <p className="text-gray-600 dark:text-gray-400 text-sm">Loading stats...</p> : user ? (
                         <>
-                            <p className="text-gray-600 text-sm">You have <span className="font-bold text-green-600">{stats.cardCount}</span> cards.</p>
-                            <p className="text-gray-600 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">You have <span className="font-bold text-green-600 dark:text-green-400">{stats.cardCount}</span> cards.</p>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600 dark:text-green-400">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p>
                         </>
                     ) : (
-                        <p className="text-gray-600 text-sm">Log in to see your wallet summary.</p>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Log in to see your wallet summary.</p>
                     )}
                 </div>
                 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center text-blue-500 mb-3">
                         <SparklesIcon />
-                        <h3 className="font-bold text-lg ml-2">Spend Optimizer</h3>
+                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Spend Optimizer</h3>
                     </div>
-                    <p className="text-gray-600 mb-4 text-sm">Find the best card for your next purchase.</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">Find the best card for your next purchase.</p>
                     <button onClick={() => setActiveView('optimizer')} className="w-full bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition p-2">
                         Optimize Now
                     </button>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center text-purple-500 mb-3">
                         <ChatBubbleIcon />
-                        <h3 className="font-bold text-lg ml-2">AI Advisor</h3>
+                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">AI Advisor</h3>
                     </div>
-                    <p className="text-gray-600 mb-4 text-sm">Have a question? Ask our AI for help.</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">Have a question? Ask our AI for help.</p>
                     <button onClick={() => setActiveView('advisor')} className="w-full bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition p-2">
                         Ask Now
                     </button>
@@ -623,7 +630,20 @@ export default function App() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
     const [key, setKey] = useState(0); // Key to force re-render
+    const [theme, setTheme] = useState('light');
     const supabase = createClient();
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(theme === 'light' ? 'dark' : 'light');
+    };
 
     useEffect(() => {
         const getSession = async () => {
@@ -650,8 +670,8 @@ export default function App() {
     const renderView = () => {
         if (!user && activeView !== 'dashboard') {
              return <div className="flex flex-col items-center justify-center h-full text-center">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Please log in to continue</h2>
-                <p className="text-gray-500 mb-6">This feature is available for registered users.</p>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Please log in to continue</h2>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">This feature is available for registered users.</p>
                 <button 
                     onClick={() => setIsAuthModalOpen(true)}
                     className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200"
@@ -676,13 +696,15 @@ export default function App() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 font-sans">
+        <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100">
             <Sidebar 
                 activeView={activeView} 
                 setActiveView={setActiveView} 
                 user={user}
                 onAuthClick={() => setIsAuthModalOpen(true)}
                 supabase={supabase}
+                theme={theme}
+                toggleTheme={toggleTheme}
             />
             <main className="flex-1 p-8 overflow-y-auto">
                 {renderView()}
