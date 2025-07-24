@@ -26,15 +26,42 @@ const PlusIcon = ({ className }: { className?: string }) => <Icon path="M12 4.5v
 const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" className="w-5 h-5" />;
 
 
+// --- Data Structures and Types ---
+interface MockCard {
+    id: number;
+    name: string;
+    limit: number;
+    last4: string;
+    issuer: string;
+}
+
+interface CardSuggestion {
+  name: string;
+  reason: string;
+}
+
+interface OptimizationResult {
+  bestCard: {
+    name: string;
+    issuer: string;
+  };
+  reason: string;
+  alternatives: CardSuggestion[];
+}
+
+interface ChatMessage {
+    from: 'ai' | 'user';
+    text: string;
+}
+
 // --- Mock Data ---
-// This simulates the data we'll eventually get from Supabase
-const mockUserCards = [
+const mockUserCards: MockCard[] = [
     { id: 1, name: 'HDFC Millennia', limit: 150000, last4: '1234', issuer: 'hdfc' },
     { id: 2, name: 'SBI SimplyCLICK', limit: 80000, last4: '5678', issuer: 'sbi' },
     { id: 3, name: 'ICICI Amazon Pay', limit: 200000, last4: '9012', issuer: 'icici' },
 ];
 
-const mockSpendCategories = [
+const mockSpendCategories: string[] = [
     'Dining & Restaurants', 'Online Shopping', 'Fuel', 'Utility Bills', 'Travel & Flights', 'Groceries', 'EMI Payments', 'Education Fees'
 ];
 
@@ -126,7 +153,7 @@ function MyCardsView() {
 
 function SpendOptimizerView() {
     const [isLoading, setIsLoading] = useState(false);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<OptimizationResult | null>(null);
 
     const handleOptimization = (e: React.FormEvent) => {
         e.preventDefault();
@@ -202,7 +229,7 @@ function SpendOptimizerView() {
                          <div className="mt-6">
                              <h4 className="font-semibold text-gray-700 mb-3">Other Good Options:</h4>
                              <ul className="space-y-3">
-                                {result.alternatives.map((alt: any, index: number) => (
+                                {result.alternatives.map((alt: CardSuggestion, index: number) => (
                                     <li key={index} className="bg-white p-4 rounded-lg border border-gray-200">
                                         <p className="font-bold text-gray-800">{alt.name}</p>
                                         <p className="text-sm text-gray-600 mt-1">{alt.reason}</p>
@@ -218,7 +245,7 @@ function SpendOptimizerView() {
 }
 
 function AICardAdvisorView() {
-    const [messages, setMessages] = useState([
+    const [messages, setMessages] = useState<ChatMessage[]>([
         { from: 'ai', text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else." }
     ]);
     const [input, setInput] = useState('');
