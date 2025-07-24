@@ -1,24 +1,29 @@
-"use client"; // <--- THIS IS THE FIX
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 
 // --- Helper Components & Icons ---
 
-// A simple, reusable icon component
-const Icon = ({ path, className = "w-6 h-6" }) => (
+// Define the type for the Icon component's props
+interface IconProps {
+  path: string;
+  className?: string;
+}
+
+// A simple, reusable icon component with TypeScript props
+const Icon = ({ path, className = "w-6 h-6" }: IconProps) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
     <path strokeLinecap="round" strokeLinejoin="round" d={path} />
   </svg>
 );
 
-const CreditCardIcon = () => <Icon path="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21z" />;
+const CreditCardIcon = ({ className }: { className?: string }) => <Icon path="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21z" className={className} />;
 const DashboardIcon = () => <Icon path="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" />;
-const SparklesIcon = () => <Icon path="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.553L16.5 21.75l-.398-1.197a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.197-.398a2.25 2.25 0 001.423-1.423l.398-1.197.398 1.197a2.25 2.25 0 001.423 1.423l1.197.398-1.197.398a2.25 2.25 0 00-1.423 1.423z" />;
+const SparklesIcon = ({ className }: { className?: string }) => <Icon path="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.553L16.5 21.75l-.398-1.197a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.197-.398a2.25 2.25 0 001.423-1.423l.398-1.197.398 1.197a2.25 2.25 0 001.423 1.423l1.197.398-1.197.398a2.25 2.25 0 00-1.423 1.423z" className={className} />;
 const ChatBubbleIcon = () => <Icon path="M8.625 12a.375.375 0 01.375.375v3.375c0 .207.168.375.375.375h3.375a.375.375 0 01.375.375v1.5a.375.375 0 01-.375.375h-7.5a.375.375 0 01-.375-.375v-1.5a.375.375 0 01.375.375h3.375a.375.375 0 01.375-.375v-3.375a.375.375 0 01-.375-.375h-3.375a.375.375 0 01-.375-.375v-1.5a.375.375 0 01.375-.375h7.5a.375.375 0 01.375.375v1.5a.375.375 0 01-.375.375h-3.375a.375.375 0 01-.375.375z" />;
 const UserCircleIcon = () => <Icon path="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />;
-const PlusIcon = () => <Icon path="M12 4.5v15m7.5-7.5h-15" className="w-5 h-5" />;
+const PlusIcon = ({ className }: { className?: string }) => <Icon path="M12 4.5v15m7.5-7.5h-15" className={className || "w-5 h-5"} />;
 const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" className="w-5 h-5" />;
-const SearchIcon = () => <Icon path="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" className="w-5 h-5" />;
 
 
 // --- Mock Data ---
@@ -35,7 +40,7 @@ const mockSpendCategories = [
 
 // --- Main App Components ---
 
-function Sidebar({ activeView, setActiveView }) {
+function Sidebar({ activeView, setActiveView }: { activeView: string, setActiveView: (view: string) => void }) {
     const navItems = [
         { name: 'Dashboard', icon: <DashboardIcon />, view: 'dashboard' },
         { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
@@ -76,7 +81,7 @@ function Sidebar({ activeView, setActiveView }) {
 }
 
 function MyCardsView() {
-    const getIssuerColor = (issuer) => {
+    const getIssuerColor = (issuer: string) => {
         switch (issuer) {
             case 'hdfc': return 'from-blue-500 to-indigo-600';
             case 'sbi': return 'from-cyan-500 to-blue-500';
@@ -121,9 +126,9 @@ function MyCardsView() {
 
 function SpendOptimizerView() {
     const [isLoading, setIsLoading] = useState(false);
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState<any>(null);
 
-    const handleOptimization = (e) => {
+    const handleOptimization = (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setResult(null);
@@ -197,7 +202,7 @@ function SpendOptimizerView() {
                          <div className="mt-6">
                              <h4 className="font-semibold text-gray-700 mb-3">Other Good Options:</h4>
                              <ul className="space-y-3">
-                                {result.alternatives.map((alt, index) => (
+                                {result.alternatives.map((alt: any, index: number) => (
                                     <li key={index} className="bg-white p-4 rounded-lg border border-gray-200">
                                         <p className="font-bold text-gray-800">{alt.name}</p>
                                         <p className="text-sm text-gray-600 mt-1">{alt.reason}</p>
@@ -217,7 +222,7 @@ function AICardAdvisorView() {
         { from: 'ai', text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else." }
     ]);
     const [input, setInput] = useState('');
-    const chatEndRef = useRef(null);
+    const chatEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -225,7 +230,7 @@ function AICardAdvisorView() {
 
     useEffect(scrollToBottom, [messages]);
 
-    const handleSend = (e) => {
+    const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
         if (input.trim() === '') return;
 
