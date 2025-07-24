@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createClient } from '../lib/supabaseClient';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import type { User, SupabaseClient } from '@supabase/supabase-js';
 
 // --- Helper Components & Icons ---
 
-// Define the type for the Icon component's props
 interface IconProps {
   path: string;
   className?: string;
 }
 
-// A simple, reusable icon component with TypeScript props
 const Icon = ({ path, className = "w-6 h-6" }: IconProps) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
     <path strokeLinecap="round" strokeLinejoin="round" d={path} />
@@ -24,6 +26,7 @@ const ChatBubbleIcon = () => <Icon path="M8.625 12a.375.375 0 01.375.375v3.375c0
 const UserCircleIcon = () => <Icon path="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />;
 const PlusIcon = ({ className }: { className?: string }) => <Icon path="M12 4.5v15m7.5-7.5h-15" className={className || "w-5 h-5"} />;
 const SendIcon = () => <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" className="w-5 h-5" />;
+const XMarkIcon = () => <Icon path="M6 18L18 6M6 6l12 12" />;
 
 
 // --- Data Structures and Types ---
@@ -65,15 +68,41 @@ const mockSpendCategories: string[] = [
     'Dining & Restaurants', 'Online Shopping', 'Fuel', 'Utility Bills', 'Travel & Flights', 'Groceries', 'EMI Payments', 'Education Fees'
 ];
 
+// --- Auth Modal Component ---
+function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: () => void, supabase: SupabaseClient }) {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full relative">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <XMarkIcon />
+                </button>
+                <Auth
+                    supabaseClient={supabase}
+                    appearance={{ theme: ThemeSupa }}
+                    providers={['google', 'github']}
+                    theme="light"
+                />
+            </div>
+        </div>
+    );
+}
+
+
 // --- Main App Components ---
 
-function Sidebar({ activeView, setActiveView }: { activeView: string, setActiveView: (view: string) => void }) {
+function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase }: { activeView: string, setActiveView: (view: string) => void, user: User | null, onAuthClick: () => void, supabase: SupabaseClient }) {
     const navItems = [
         { name: 'Dashboard', icon: <DashboardIcon />, view: 'dashboard' },
         { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
         { name: 'Spend Optimizer', icon: <SparklesIcon />, view: 'optimizer' },
         { name: 'AI Card Advisor', icon: <ChatBubbleIcon />, view: 'advisor' },
     ];
+    
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    }
 
     return (
         <aside className="w-64 bg-gray-50 text-gray-800 p-4 flex flex-col">
@@ -98,10 +127,19 @@ function Sidebar({ activeView, setActiveView }: { activeView: string, setActiveV
                 </ul>
             </nav>
             <div className="mt-auto">
-                <a href="#" className="flex items-center p-3 rounded-lg hover:bg-gray-200 transition-colors duration-200">
-                    <UserCircleIcon />
-                    <span className="ml-4">My Account</span>
-                </a>
+                 {user ? (
+                    <div className="text-sm">
+                        <p className="truncate px-3" title={user.email || 'User'}>{user.email}</p>
+                        <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold">
+                           Logout
+                        </button>
+                    </div>
+                ) : (
+                    <a href="#" onClick={(e) => { e.preventDefault(); onAuthClick(); }} className="flex items-center p-3 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                        <UserCircleIcon />
+                        <span className="ml-4">Login / Sign Up</span>
+                    </a>
+                )}
             </div>
         </aside>
     );
@@ -260,16 +298,13 @@ function AICardAdvisorView() {
     const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
         if (input.trim() === '') return;
-
-        // THIS IS THE FIX: Explicitly type the new message object
+        
         const userMessage: ChatMessage = { from: 'user', text: input };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setInput('');
 
-        // Simulate AI response
         setTimeout(() => {
-            // THIS IS THE FIX: Explicitly type the AI message object
             const aiMessage: ChatMessage = { from: 'ai', text: "That's a great question! Based on your HDFC Millennia card, you get 5 reward points for every ₹150 spent on dining. For your SBI SimplyCLICK, the reward rate is lower for offline dining." };
             setMessages(prev => [...prev, aiMessage]);
         }, 1500);
@@ -355,8 +390,43 @@ function DashboardView() {
 // --- The Main App Component ---
 export default function App() {
     const [activeView, setActiveView] = useState('dashboard');
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const supabase = createClient();
+
+    useEffect(() => {
+        const getSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setUser(session?.user ?? null);
+        };
+
+        getSession();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setIsAuthModalOpen(false); // Close modal on successful login/signup
+        });
+
+        return () => {
+            subscription?.unsubscribe();
+        };
+    }, [supabase]);
+
 
     const renderView = () => {
+        if (!user && activeView !== 'dashboard') {
+             return <div className="flex flex-col items-center justify-center h-full text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Please log in to continue</h2>
+                <p className="text-gray-500 mb-6">This feature is available for registered users.</p>
+                <button 
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200"
+                >
+                    Login / Sign Up
+                </button>
+            </div>
+        }
+
         switch (activeView) {
             case 'dashboard':
                 return <DashboardView />;
@@ -373,10 +443,21 @@ export default function App() {
 
     return (
         <div className="flex h-screen bg-gray-100 font-sans">
-            <Sidebar activeView={activeView} setActiveView={setActiveView} />
+            <Sidebar 
+                activeView={activeView} 
+                setActiveView={setActiveView} 
+                user={user}
+                onAuthClick={() => setIsAuthModalOpen(true)}
+                supabase={supabase}
+            />
             <main className="flex-1 p-8 overflow-y-auto">
                 {renderView()}
             </main>
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)}
+                supabase={supabase}
+            />
         </div>
     );
 }
