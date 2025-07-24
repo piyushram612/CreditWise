@@ -1,14 +1,10 @@
 // scripts/update-cards.ts
 
-import puppeteer from 'puppeteer';
-import { createClient } from '@supabase/supabase-js';
-import * as dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// ES Module-compatible way to get directory name
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Using CommonJS require statements for better compatibility with ts-node
+const puppeteer = require('puppeteer');
+const { createClient } = require('@supabase/supabase-js');
+const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables from the .env file in the scripts directory
 dotenv.config({ path: path.resolve(__dirname, './.env') });
