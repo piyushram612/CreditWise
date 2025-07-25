@@ -32,7 +32,7 @@ const MoonIcon = () => <Icon path="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.38
 const TrashIcon = ({ className }: { className?: string }) => <Icon path="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.718c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" className={className} />;
 const PencilSquareIcon = ({ className }: { className?: string }) => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" className={className} />;
 const Bars3Icon = () => <Icon path="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />;
-const Cog6ToothIcon = () => <Icon path="M10.343 3.94c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM4.504 8.187c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM16.157 8.187a2.25 2.25 0 011.31 1.228l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128c-.248-.635-.22-1.334.076-1.95l.026-.052c.558-.27 1.003-.74 1.228-1.311l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026zM10.343 15.94c.09.542.56 1.008 1.11 1.227l.128.052c.635.248 1.334.22 1.95-.076l.052-.026c.558-.27 1.003-.74 1.228-1.311l.052-.128c.248-.635.22-1.334-.076-1.95l-.026-.052c-.27-.558-.74 1.003-1.31-1.228l-.128.052c-.635-.248-1.334-.22-1.95.076l-.052.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026.052z" />;
+const Cog6ToothIcon = () => <Icon path="M10.343 3.94c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM4.504 8.187c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM16.157 8.187a2.25 2.25 0 011.31 1.228l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128c-.248-.635-.22-1.334.076-1.95l.026-.052c.558-.27 1.003-.74 1.228-1.311l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026zM10.343 15.94c.09.542.56 1.008 1.11 1.227l.128.052c.635.248 1.334.22 1.95-.076l.052-.026c.558-.27 1.003-.74 1.228-1.311l.052-.128c.248-.635.22 1.334-.076-1.95l-.026-.052c-.27-.558-.74 1.003-1.31-1.228l-.128.052c-.635.248-1.334-.22-1.95.076l-.052.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026.052z" />;
 
 
 // --- Data Structures and Types ---
@@ -65,6 +65,7 @@ interface Card {
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
+    used_amount?: number; // New field for utilization
     card_name: string;
     issuer: string;
     card_type?: string;
@@ -101,6 +102,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
     const [issuer, setIssuer] = useState('');
     const [cardType, setCardType] = useState('Points');
     const [creditLimit, setCreditLimit] = useState('');
+    const [usedAmount, setUsedAmount] = useState(''); // New state for used amount
     const [benefits, setBenefits] = useState([{ key: '', value: '' }]);
     const [fees, setFees] = useState([{ key: '', value: '' }]);
     const [isLoading, setIsLoading] = useState(false);
@@ -120,6 +122,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
             setIssuer(existingCard.issuer || '');
             setCardType(existingCard.card_type || 'Points');
             setCreditLimit(existingCard.credit_limit?.toString() || '');
+            setUsedAmount(existingCard.used_amount?.toString() || '0'); // Populate used amount
             setBenefits(existingCard.benefits && Object.keys(existingCard.benefits).length > 0 ? Object.entries(existingCard.benefits).map(([key, value]) => ({ key, value: String(value) })) : [{ key: '', value: '' }]);
             setFees(existingCard.fees && Object.keys(existingCard.fees).length > 0 ? Object.entries(existingCard.fees).map(([key, value]) => ({ key, value: String(value) })) : [{ key: '', value: '' }]);
         } else if (isOpen) {
@@ -127,6 +130,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
             setIssuer('');
             setCardType('Points');
             setCreditLimit('');
+            setUsedAmount(''); // Reset used amount
             setBenefits([{ key: '', value: '' }]);
             setFees([{ key: '', value: '' }]);
             setError(null);
@@ -215,6 +219,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
             issuer: issuer,
             card_type: cardType,
             credit_limit: parseInt(creditLimit, 10),
+            used_amount: parseInt(usedAmount, 10) || 0, // Add used amount to data
             benefits: benefitsAsObject,
             fees: feesAsObject,
         };
@@ -273,6 +278,11 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
                             <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                        </div>
+                         {/* New Input for Used Amount */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Used Amount (Current Statement)</label>
+                            <input type="number" value={usedAmount} onChange={e => setUsedAmount(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                         </div>
                     </div>
                     
@@ -411,18 +421,6 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
         fetchUserCards();
     }, [user, supabase, key]);
 
-    const getIssuerColor = (issuer: string) => {
-        switch (issuer?.toLowerCase()) {
-            case 'hdfc': return 'from-blue-500 to-indigo-600';
-            case 'sbi': return 'from-cyan-500 to-blue-500';
-            case 'icici': return 'from-orange-500 to-red-600';
-            case 'axis': return 'from-purple-500 to-indigo-600';
-            case 'amex': return 'from-blue-700 to-gray-900';
-            case 'idfc': return 'from-red-500 to-purple-600';
-            default: return 'from-gray-500 to-gray-700';
-        }
-    };
-
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -441,24 +439,43 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {userCards.map(ownedCard => (
-                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.issuer)} relative group min-h-[220px]`}>
-                            <div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold">{ownedCard.issuer?.toUpperCase()}</span>
-                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40"><PencilSquareIcon className="w-4 h-4 text-white" /></button>
-                                        <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40"><TrashIcon className="w-4 h-4 text-white" /></button>
+                    {userCards.map(ownedCard => {
+                        const limit = ownedCard.credit_limit || 0;
+                        const used = ownedCard.used_amount || 0;
+                        const utilization = limit > 0 ? Math.round((used / limit) * 100) : 0;
+                        const utilizationWidth = Math.min(utilization, 100); // Cap at 100%
+
+                        return (
+                            <div key={ownedCard.id} className={`p-6 rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group`}>
+                                <div>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ownedCard.card_name}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">{ownedCard.issuer}</p>
+                                        </div>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"><PencilSquareIcon className="w-4 h-4 text-gray-700 dark:text-gray-200" /></button>
+                                            <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"><TrashIcon className="w-4 h-4 text-red-500" /></button>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Utilization Section */}
+                                    <div className="mt-4">
+                                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Utilization</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${utilizationWidth}%` }}></div>
+                                            </div>
+                                            <p className="font-semibold text-blue-500">{utilization}%</p>
+                                        </div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            ₹{used.toLocaleString('en-IN')} used of ₹{limit.toLocaleString('en-IN')}
+                                        </p>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold mt-4">{ownedCard.card_name}</h3>
                             </div>
-                            <div className="mt-8">
-                                <p className="text-sm opacity-80">Credit Limit</p>
-                                <p className="font-mono text-lg tracking-wider">₹ {ownedCard.credit_limit?.toLocaleString('en-IN')}</p>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
