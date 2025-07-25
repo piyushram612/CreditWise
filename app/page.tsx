@@ -33,21 +33,32 @@ const TrashIcon = ({ className }: { className?: string }) => <Icon path="M14.74 
 const PencilSquareIcon = ({ className }: { className?: string }) => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" className={className} />;
 
 
-// --- Data Structures and Types ---
+// --- Data Structures and Types (FIXED) ---
+interface RewardValue {
+    rate: number;
+    type: string;
+    notes: string;
+}
+
+interface LoungeAccess {
+    domestic?: string;
+    international?: string;
+}
+
 interface Card {
     id: string;
     card_name: string;
     issuer: string;
     network?: string;
     annual_fee?: number;
-    reward_rates?: any;
+    reward_rates?: Record<string, RewardValue>;
     benefits?: string;
     card_type?: string[];
     joining_fee?: number;
     fee_waiver?: string;
     welcome_benefits?: string;
-    milestone_benefits?: any;
-    lounge_access?: any;
+    milestone_benefits?: Record<string, unknown>[];
+    lounge_access?: LoungeAccess;
     other_benefits?: string[];
     suitability?: string;
 }
@@ -58,8 +69,8 @@ interface UserOwnedCard {
     card_name: string;
     issuer: string;
     card_type?: string;
-    benefits?: any;
-    fees?: any;
+    benefits?: Record<string, string>;
+    fees?: Record<string, string>;
 }
 
 interface CardSuggestion {
@@ -135,7 +146,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
             
             const newBenefits = [];
             if (template.reward_rates) {
-                for (const [key, value] of Object.entries(template.reward_rates as any)) {
+                for (const [key, value] of Object.entries(template.reward_rates)) {
                     const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     const rate = value.rate ?? 'N/A';
                     const type = value.type ?? '';
@@ -171,7 +182,9 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
     
     const handleDynamicFieldChange = (index: number, event: React.ChangeEvent<HTMLInputElement>, fieldType: 'benefits' | 'fees') => {
         const list = fieldType === 'benefits' ? [...benefits] : [...fees];
-        list[index][event.target.name as 'key' | 'value'] = event.target.value;
+        const updatedItem = { ...list[index], [event.target.name]: event.target.value };
+        list[index] = updatedItem as { key: string; value: string; };
+
         if (fieldType === 'benefits') setBenefits(list);
         else setFees(list);
     };
@@ -383,7 +396,7 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme
                     <div className="text-sm">
                         <p className="truncate px-3" title={user.email || 'User'}>{user.email}</p>
                         <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-semibold">
-                           Logout
+                            Logout
                         </button>
                     </div>
                 ) : (
@@ -451,7 +464,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                 <div className="text-center py-10 text-gray-600 dark:text-gray-400">Loading your cards...</div>
             ) : userCards.length === 0 ? (
                 <div className="text-center py-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                    <p className="text-gray-600 dark:text-gray-400">You haven't added any cards yet.</p>
+                    <p className="text-gray-600 dark:text-gray-400">You haven&apos;t added any cards yet.</p>
                     <button onClick={onAddCardClick} className="mt-4 text-blue-500 font-semibold">Add your first card</button>
                 </div>
             ) : (
@@ -528,8 +541,12 @@ function SpendOptimizerView() {
             const data = await response.json();
             setResult(data);
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unknown error occurred.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -564,7 +581,7 @@ function SpendOptimizerView() {
                                 Optimizing...
                             </>
                         ) : (
-                             <>
+                            <>
                                 <SparklesIcon className="w-5 h-5" />
                                 <span className="ml-2">Find Best Card</span>
                             </>
@@ -580,27 +597,27 @@ function SpendOptimizerView() {
                     <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Recommendation</h3>
                     <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-6 rounded-r-lg">
                         <div className="flex items-center">
-                             <div className="bg-green-500 p-2 rounded-full">
+                           <div className="bg-green-500 p-2 rounded-full">
                                 <CreditCardIcon className="w-6 h-6 text-white"/>
-                             </div>
-                             <div className="ml-4">
+                           </div>
+                           <div className="ml-4">
                                 <p className="text-sm text-green-700 dark:text-green-300">Best Option</p>
                                 <p className="font-bold text-lg text-green-900 dark:text-green-100">{result.bestCard.name}</p>
-                             </div>
+                           </div>
                         </div>
                         <p className="mt-4 text-gray-700 dark:text-gray-300">{result.reason}</p>
                     </div>
                     {result.alternatives.length > 0 && (
                          <div className="mt-6">
-                             <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Other Good Options:</h4>
-                             <ul className="space-y-3">
+                            <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Other Good Options:</h4>
+                            <ul className="space-y-3">
                                 {result.alternatives.map((alt: CardSuggestion, index: number) => (
                                     <li key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                                         <p className="font-bold text-gray-800 dark:text-gray-100">{alt.name}</p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{alt.reason}</p>
                                     </li>
                                 ))}
-                             </ul>
+                            </ul>
                          </div>
                     )}
                 </div>
@@ -610,7 +627,6 @@ function SpendOptimizerView() {
 }
 
 function AICardAdvisorView() {
-    const supabase = createClient();
     const [messages, setMessages] = useState<ChatMessage[]>([
         { from: 'ai', text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else." }
     ]);
