@@ -11,25 +11,18 @@ interface ChatRequestBody {
   messages: ChatMessage[];
 }
 
-// Helper function to format card data cleanly for the AI prompt
 const formatCardForPrompt = (card: any) => {
-    const rewardDetails = Object.entries(card.reward_rates || {})
-    .map(([key, value]: [string, any]) => {
-        if (typeof value !== 'object' || value === null) return `  - ${key.replace(/_/g, ' ')}: ${value}`;
-        const rate = value.rate ?? 'N/A';
-        const type = value.type ?? '';
-        const notes = value.notes ?? '';
-        const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
-        return `  - ${key.replace(/_/g, ' ')}: ${rateDisplay} (${notes})`;
-    }).join('\n');
+  const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
+  const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
 
   return `
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
-Suitability: ${card.suitability}
-Benefits Summary: ${card.benefits || card.welcome_benefits}
-Reward Rates:
-${rewardDetails}
+Card Type: ${card.card_type}
+Benefits:
+${benefits}
+Fees:
+${fees}
 `;
 };
 
@@ -49,7 +42,7 @@ export async function POST(request: Request) {
 
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
-      .select('cards(*)')
+      .select('*')
       .eq('user_id', user.id);
 
     if (dbError) {
@@ -57,7 +50,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Could not fetch user cards.' }, { status: 500 });
     }
 
-    const cardsInfo = userCards?.map(c => c.cards).map(formatCardForPrompt).join('\n---\n') || "The user has not added any cards to their wallet yet.";
+    const cardsInfo = userCards?.map(formatCardForPrompt).join('\n---\n') || "The user has not added any cards to their wallet yet.";
 
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
@@ -105,8 +98,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: responseText });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Route Error:', error);
-    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'An unexpected error occurred.' }, { status: 500 });
   }
 }

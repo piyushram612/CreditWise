@@ -31,25 +31,19 @@ const GEMINI_RESPONSE_SCHEMA = {
   },
 };
 
-// Helper function to format card data cleanly for the AI prompt
+// Helper function to format the user's custom card data for the AI prompt
 const formatCardForPrompt = (card: any) => {
-  const rewardDetails = Object.entries(card.reward_rates || {})
-    .map(([key, value]: [string, any]) => {
-        if (typeof value !== 'object' || value === null) return `  - ${key.replace(/_/g, ' ')}: ${value}`;
-        const rate = value.rate ?? 'N/A';
-        const type = value.type ?? '';
-        const notes = value.notes ?? '';
-        const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
-        return `  - ${key.replace(/_/g, ' ')}: ${rateDisplay} (${notes})`;
-    }).join('\n');
+  const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
+  const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
 
   return `
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
-Suitability: ${card.suitability}
-Benefits Summary: ${card.benefits || card.welcome_benefits}
-Reward Rates:
-${rewardDetails}
+Card Type: ${card.card_type}
+Benefits:
+${benefits}
+Fees:
+${fees}
 `;
 };
 
@@ -68,9 +62,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Amount and category are required.' }, { status: 400 });
     }
 
+    // Fetch all fields directly from the user_owned_cards table
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
-      .select('cards(*)')
+      .select('*') 
       .eq('user_id', user.id);
 
     if (dbError) {
@@ -82,7 +77,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You have no cards in your wallet to optimize.' }, { status: 400 });
     }
 
-    const cardsInfo = userCards.map(c => c.cards).map(formatCardForPrompt).join('\n---\n');
+    const cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
 
     const prompt = `
       You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
@@ -95,7 +90,7 @@ export async function POST(request: Request) {
       ${cardsInfo}
 
       Your Task:
-      1. Analyze the user's cards and their benefits/reward rates.
+      1. Analyze the user's cards and their benefits.
       2. Determine which card offers the absolute best value for this specific purchase.
       3. Provide a concise reason for your choice.
       4. Suggest one or two other good alternatives if they exist.
@@ -136,8 +131,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(parsedResponse);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Route Error:', error);
-    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'An unexpected error occurred.' }, { status: 500 });
   }
 }

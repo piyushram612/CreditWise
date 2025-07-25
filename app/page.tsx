@@ -55,8 +55,11 @@ interface Card {
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
-    cards: Card;
-    custom_benefits?: string;
+    card_name: string;
+    issuer: string;
+    card_type?: string;
+    benefits?: any;
+    fees?: any;
 }
 
 interface CardSuggestion {
@@ -84,48 +87,138 @@ const mockSpendCategories: string[] = [
 ];
 
 // --- New Components ---
-function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean, onClose: () => void, user: User, onCardAdded: () => void }) {
+function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { isOpen: boolean, onClose: () => void, user: User, onCardSaved: () => void, existingCard?: UserOwnedCard | null }) {
     const supabase = createClient();
     const [allCards, setAllCards] = useState<Card[]>([]);
-    const [selectedCardId, setSelectedCardId] = useState<string>('');
-    const [creditLimit, setCreditLimit] = useState<string>('');
+    const [cardName, setCardName] = useState('');
+    const [issuer, setIssuer] = useState('');
+    const [cardType, setCardType] = useState('Points');
+    const [creditLimit, setCreditLimit] = useState('');
+    const [benefits, setBenefits] = useState([{ key: '', value: '' }]);
+    const [fees, setFees] = useState([{ key: '', value: '' }]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (isOpen) {
-            const fetchAllCards = async () => {
-                const { data, error } = await supabase.from('cards').select('*').order('card_name', { ascending: true });
-                if (error) {
-                    console.error('Error fetching cards:', error);
-                } else {
-                    setAllCards(data || []);
-                }
-            };
-            fetchAllCards();
+        const fetchAllCards = async () => {
+            const { data, error } = await supabase.from('cards').select('*').order('card_name', { ascending: true });
+            if (!error) setAllCards(data || []);
+        };
+        fetchAllCards();
+    }, [supabase]);
+
+    useEffect(() => {
+        if (isOpen && existingCard) {
+            setCardName(existingCard.card_name || '');
+            setIssuer(existingCard.issuer || '');
+            setCardType(existingCard.card_type || 'Points');
+            setCreditLimit(existingCard.credit_limit?.toString() || '');
+            setBenefits(existingCard.benefits && Object.keys(existingCard.benefits).length > 0 ? Object.entries(existingCard.benefits).map(([key, value]) => ({ key, value: String(value) })) : [{ key: '', value: '' }]);
+            setFees(existingCard.fees && Object.keys(existingCard.fees).length > 0 ? Object.entries(existingCard.fees).map(([key, value]) => ({ key, value: String(value) })) : [{ key: '', value: '' }]);
+        } else if (isOpen) {
+            setCardName('');
+            setIssuer('');
+            setCardType('Points');
+            setCreditLimit('');
+            setBenefits([{ key: '', value: '' }]);
+            setFees([{ key: '', value: '' }]);
+            setError(null);
         }
-    }, [isOpen, supabase]);
+    }, [existingCard, isOpen]);
+
+
+    const handleTemplateSelect = (cardId: string) => {
+        const template = allCards.find(c => c.id === cardId);
+        if (template) {
+            setCardName(template.card_name);
+            setIssuer(template.issuer);
+            
+            const newBenefits = [];
+            if (template.reward_rates) {
+                for (const [key, value] of Object.entries(template.reward_rates as any)) {
+                    const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    const rate = value.rate ?? 'N/A';
+                    const type = value.type ?? '';
+                    const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
+                    newBenefits.push({ key: formattedKey, value: `${rateDisplay} (${value.notes})` });
+                }
+            }
+            if(template.welcome_benefits && template.welcome_benefits !== "None.") {
+                newBenefits.push({ key: 'Welcome Benefit', value: template.welcome_benefits });
+            }
+            if(template.lounge_access?.domestic && template.lounge_access.domestic !== "None.") {
+                newBenefits.push({ key: 'Domestic Lounge Access', value: template.lounge_access.domestic });
+            }
+            if(template.lounge_access?.international && template.lounge_access.international !== "None.") {
+                newBenefits.push({ key: 'International Lounge Access', value: template.lounge_access.international });
+            }
+
+            setBenefits(newBenefits.length > 0 ? newBenefits : [{ key: '', value: '' }]);
+
+            const newFees = [];
+            if(template.joining_fee) {
+                newFees.push({ key: 'Joining Fee', value: `₹${template.joining_fee}` });
+            }
+            if(template.annual_fee) {
+                newFees.push({ key: 'Annual Fee', value: `₹${template.annual_fee}` });
+            }
+            if(template.fee_waiver && template.fee_waiver !== "None.") {
+                newFees.push({ key: 'Fee Waiver', value: template.fee_waiver });
+            }
+            setFees(newFees.length > 0 ? newFees : [{ key: '', value: '' }]);
+        }
+    };
+    
+    const handleDynamicFieldChange = (index: number, event: React.ChangeEvent<HTMLInputElement>, fieldType: 'benefits' | 'fees') => {
+        const list = fieldType === 'benefits' ? [...benefits] : [...fees];
+        list[index][event.target.name as 'key' | 'value'] = event.target.value;
+        if (fieldType === 'benefits') setBenefits(list);
+        else setFees(list);
+    };
+
+    const addDynamicField = (fieldType: 'benefits' | 'fees') => {
+        if (fieldType === 'benefits') setBenefits([...benefits, { key: '', value: '' }]);
+        else setFees([...fees, { key: '', value: '' }]);
+    };
+
+    const removeDynamicField = (index: number, fieldType: 'benefits' | 'fees') => {
+        const list = fieldType === 'benefits' ? [...benefits] : [...fees];
+        list.splice(index, 1);
+        if (fieldType === 'benefits') setBenefits(list);
+        else setFees(list);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedCardId || !creditLimit) {
-            setError("Please select a card and enter a credit limit.");
+        if (!cardName || !issuer || !creditLimit) {
+            setError("Card Name, Issuer, and Credit Limit are required.");
             return;
         }
         setIsLoading(true);
         setError(null);
 
-        const { error: insertError } = await supabase.from('user_owned_cards').insert({
+        const benefitsAsObject = benefits.reduce((obj, item) => item.key ? ({ ...obj, [item.key]: item.value }) : obj, {});
+        const feesAsObject = fees.reduce((obj, item) => item.key ? ({ ...obj, [item.key]: item.value }) : obj, {});
+
+        const cardData = {
             user_id: user.id,
-            card_id: selectedCardId,
+            card_name: cardName,
+            issuer: issuer,
+            card_type: cardType,
             credit_limit: parseInt(creditLimit, 10),
-        });
+            benefits: benefitsAsObject,
+            fees: feesAsObject,
+        };
+
+        const { error: upsertError } = existingCard 
+            ? await supabase.from('user_owned_cards').update(cardData).eq('id', existingCard.id)
+            : await supabase.from('user_owned_cards').insert(cardData);
 
         setIsLoading(false);
-        if (insertError) {
-            setError(insertError.message);
+        if (upsertError) {
+            setError(upsertError.message);
         } else {
-            onCardAdded();
+            onCardSaved();
             onClose();
         }
     };
@@ -134,120 +227,73 @@ function AddCardModal({ isOpen, onClose, user, onCardAdded }: { isOpen: boolean,
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative flex flex-col max-h-[90vh]">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-lg w-full relative flex flex-col max-h-[90vh]">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <XMarkIcon />
                 </button>
-                <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Add a New Card</h3>
-                <form onSubmit={handleSubmit} className="overflow-y-auto">
-                    <div className="mb-4">
-                        <label htmlFor="card" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Card</label>
-                        <select
-                            id="card"
-                            value={selectedCardId}
-                            onChange={(e) => setSelectedCardId(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        >
-                            <option value="" disabled>Select a card</option>
-                            {allCards.map(card => (
-                                <option key={card.id} value={card.id}>{card.card_name}</option>
-                            ))}
-                        </select>
+                <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{existingCard ? 'Edit Credit Card' : 'Add a New Credit Card'}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Select a card from the list to autofill details, or enter them manually.</p>
+                
+                <form onSubmit={handleSubmit} className="overflow-y-auto space-y-4 pr-2">
+                    <select onChange={(e) => handleTemplateSelect(e.target.value)} className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4">
+                        <option value="">Or select a template to start...</option>
+                        {allCards.map(card => (
+                            <option key={card.id} value={card.id}>{card.card_name}</option>
+                        ))}
+                    </select>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Card Name</label>
+                            <input type="text" value={cardName} onChange={e => setCardName(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Issuer</label>
+                            <input type="text" value={issuer} onChange={e => setIssuer(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Card Type</label>
+                            <select value={cardType} onChange={e => setCardType(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md">
+                                <option>Points</option>
+                                <option>Cashback</option>
+                                <option>Miles</option>
+                                <option>Travel</option>
+                                <option>Lifestyle</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
+                            <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                        </div>
                     </div>
-                    <div className="mb-6">
-                        <label htmlFor="limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Limit (₹)</label>
-                        <input
-                            type="number"
-                            id="limit"
-                            placeholder="e.g., 150000"
-                            value={creditLimit}
-                            onChange={(e) => setCreditLimit(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
-                        />
+                    
+                    <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-4">Benefits</h4>
+                        {benefits.map((b, index) => (
+                            <div key={index} className="flex items-center gap-2 mt-2">
+                                <input name="key" placeholder="Benefit (e.g., Retail Spends)" value={b.key} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="value" placeholder="Value (e.g., 4 Reward Points per ₹150)" value={b.value} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <button type="button" onClick={() => removeDynamicField(index, 'benefits')} className="p-2 text-red-500 hover:text-red-700"><TrashIcon className="w-5 h-5"/></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => addDynamicField('benefits')} className="mt-2 text-sm text-blue-500 font-semibold flex items-center gap-1"><PlusIcon className="w-4 h-4"/> Add Benefit</button>
                     </div>
-                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                    <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300">
-                        {isLoading ? 'Adding...' : 'Add Card'}
-                    </button>
-                </form>
-            </div>
-        </div>
-    );
-}
 
-function EditCardModal({ isOpen, onClose, card, onCardUpdated }: { isOpen: boolean, onClose: () => void, card: UserOwnedCard | null, onCardUpdated: () => void }) {
-    const supabase = createClient();
-    const [creditLimit, setCreditLimit] = useState('');
-    const [customBenefits, setCustomBenefits] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (card) {
-            setCreditLimit(card.credit_limit?.toString() || '');
-            setCustomBenefits(card.custom_benefits || '');
-        }
-    }, [card]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!card) return;
-        
-        setIsLoading(true);
-        setError(null);
-
-        const { error: updateError } = await supabase
-            .from('user_owned_cards')
-            .update({
-                credit_limit: parseInt(creditLimit, 10),
-                custom_benefits: customBenefits,
-            })
-            .eq('id', card.id);
-
-        setIsLoading(false);
-        if (updateError) {
-            setError(updateError.message);
-        } else {
-            onCardUpdated();
-            onClose();
-        }
-    };
-
-    if (!isOpen || !card) return null;
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative flex flex-col max-h-[90vh]">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <XMarkIcon />
-                </button>
-                <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Edit {card.cards.card_name}</h3>
-                <form onSubmit={handleSubmit} className="overflow-y-auto">
-                    <div className="mb-4">
-                        <label htmlFor="edit-limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Limit (₹)</label>
-                        <input
-                            type="number"
-                            id="edit-limit"
-                            placeholder="e.g., 150000"
-                            value={creditLimit}
-                            onChange={(e) => setCreditLimit(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
-                        />
+                    <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-4">Fees</h4>
+                        {fees.map((f, index) => (
+                            <div key={index} className="flex items-center gap-2 mt-2">
+                                <input name="key" placeholder="Fee Type (e.g., Annual Fee)" value={f.key} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="value" placeholder="Value (e.g., ₹2500)" value={f.value} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <button type="button" onClick={() => removeDynamicField(index, 'fees')} className="p-2 text-red-500 hover:text-red-700"><TrashIcon className="w-5 h-5"/></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => addDynamicField('fees')} className="mt-2 text-sm text-blue-500 font-semibold flex items-center gap-1"><PlusIcon className="w-4 h-4"/> Add Fee</button>
                     </div>
-                    <div className="mb-6">
-                        <label htmlFor="custom-benefits" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Custom Notes / Benefits</label>
-                        <textarea
-                            id="custom-benefits"
-                            rows={4}
-                            placeholder="e.g., Got a special 10% discount offer on this card until December."
-                            value={customBenefits}
-                            onChange={(e) => setCustomBenefits(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
-                        />
-                    </div>
-                    {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                    <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300">
-                        {isLoading ? 'Saving...' : 'Save Changes'}
+
+                    {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+                    <button type="submit" disabled={isLoading} className="w-full mt-6 flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300">
+                        {isLoading ? 'Saving...' : 'Save Card'}
                     </button>
                 </form>
             </div>
@@ -365,7 +411,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
             setIsLoading(true);
             const { data, error } = await supabase
                 .from('user_owned_cards')
-                .select('id, credit_limit, custom_benefits, cards(*)')
+                .select('*')
                 .eq('user_id', user.id);
 
             if (error) {
@@ -380,7 +426,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
     }, [user, supabase, key]);
 
     const getIssuerColor = (issuer: string) => {
-        switch (issuer.toLowerCase()) {
+        switch (issuer?.toLowerCase()) {
             case 'hdfc': return 'from-blue-500 to-indigo-600';
             case 'sbi': return 'from-cyan-500 to-blue-500';
             case 'icici': return 'from-orange-500 to-red-600';
@@ -411,25 +457,24 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {userCards.map(ownedCard => (
-                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.cards.issuer)} relative group`}>
+                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.issuer)} relative group`}>
                             <div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold">{ownedCard.cards.issuer.toUpperCase()}</span>
-                                    <CreditCardIcon className="w-8 h-8 opacity-70" />
+                                    <span className="text-lg font-semibold">{ownedCard.issuer?.toUpperCase()}</span>
+                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
+                                            <PencilSquareIcon className="w-4 h-4 text-white" />
+                                        </button>
+                                        <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
+                                            <TrashIcon className="w-4 h-4 text-white" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <h3 className="text-2xl font-bold mt-4">{ownedCard.cards.card_name}</h3>
+                                <h3 className="text-2xl font-bold mt-4">{ownedCard.card_name}</h3>
                             </div>
                             <div className="mt-8">
                                 <p className="text-sm opacity-80">Credit Limit</p>
                                 <p className="font-mono text-lg tracking-wider">₹ {ownedCard.credit_limit?.toLocaleString('en-IN')}</p>
-                            </div>
-                            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
-                                    <PencilSquareIcon className="w-4 h-4 text-white" />
-                                </button>
-                                <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
-                                    <TrashIcon className="w-4 h-4 text-white" />
-                                </button>
                             </div>
                         </div>
                     ))}
@@ -740,10 +785,10 @@ export default function App() {
     const [activeView, setActiveView] = useState('dashboard');
     const [user, setUser] = useState<User | null>(null);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
-    const [isEditCardModalOpen, setIsEditCardModalOpen] = useState(false);
+    const [isCardFormModalOpen, setIsCardFormModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState<UserOwnedCard | null>(null);
+    const [cardToEdit, setCardToEdit] = useState<UserOwnedCard | null>(null);
+    const [cardToDelete, setCardToDelete] = useState<UserOwnedCard | null>(null);
     const [key, setKey] = useState(0); // Key to force re-render
     const [theme, setTheme] = useState('light');
     const supabase = createClient();
@@ -778,11 +823,7 @@ export default function App() {
         };
     }, [supabase]);
 
-    const handleCardAdded = () => {
-        setKey(prevKey => prevKey + 1);
-    };
-    
-    const handleCardUpdated = () => {
+    const handleCardSaved = () => {
         setKey(prevKey => prevKey + 1);
     };
     
@@ -790,22 +831,27 @@ export default function App() {
         setKey(prevKey => prevKey + 1);
     };
 
-    const handleEditCard = (card: UserOwnedCard) => {
-        setSelectedCard(card);
-        setIsEditCardModalOpen(true);
+    const handleAddCardClick = () => {
+        setCardToEdit(null);
+        setIsCardFormModalOpen(true);
     };
 
-    const handleDeleteCard = (card: UserOwnedCard) => {
-        setSelectedCard(card);
+    const handleEditCardClick = (card: UserOwnedCard) => {
+        setCardToEdit(card);
+        setIsCardFormModalOpen(true);
+    };
+
+    const handleDeleteCardClick = (card: UserOwnedCard) => {
+        setCardToDelete(card);
         setIsDeleteModalOpen(true);
     };
     
     const confirmDelete = async () => {
-        if (!selectedCard) return;
-        await supabase.from('user_owned_cards').delete().eq('id', selectedCard.id);
+        if (!cardToDelete) return;
+        await supabase.from('user_owned_cards').delete().eq('id', cardToDelete.id);
         handleCardDeleted();
         setIsDeleteModalOpen(false);
-        setSelectedCard(null);
+        setCardToDelete(null);
     };
 
     const renderView = () => {
@@ -826,7 +872,7 @@ export default function App() {
             case 'dashboard':
                 return <DashboardView user={user} setActiveView={setActiveView} />;
             case 'my-cards':
-                return user ? <MyCardsView key={key} user={user} onAddCardClick={() => setIsAddCardModalOpen(true)} onEditCard={handleEditCard} onDeleteCard={handleDeleteCard} /> : null;
+                return user ? <MyCardsView key={key} user={user} onAddCardClick={handleAddCardClick} onEditCard={handleEditCardClick} onDeleteCard={handleDeleteCardClick} /> : null;
             case 'optimizer':
                 return <SpendOptimizerView />;
             case 'advisor':
@@ -857,23 +903,18 @@ export default function App() {
             />
             {user && (
                 <>
-                    <AddCardModal
-                        isOpen={isAddCardModalOpen}
-                        onClose={() => setIsAddCardModalOpen(false)}
+                    <CardFormModal
+                        isOpen={isCardFormModalOpen}
+                        onClose={() => setIsCardFormModalOpen(false)}
                         user={user}
-                        onCardAdded={handleCardAdded}
-                    />
-                    <EditCardModal
-                        isOpen={isEditCardModalOpen}
-                        onClose={() => setIsEditCardModalOpen(false)}
-                        card={selectedCard}
-                        onCardUpdated={handleCardUpdated}
+                        onCardSaved={handleCardSaved}
+                        existingCard={cardToEdit}
                     />
                     <ConfirmDeleteModal
                         isOpen={isDeleteModalOpen}
                         onClose={() => setIsDeleteModalOpen(false)}
                         onConfirm={confirmDelete}
-                        cardName={selectedCard?.cards.card_name || ''}
+                        cardName={cardToDelete?.card_name || ''}
                     />
                 </>
             )}

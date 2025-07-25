@@ -5,7 +5,7 @@
   --foreground: #171717;
 }
 
-/* This is the key change: It applies dark mode colors when the .dark class is on the html tag, which is controlled by our toggle button. */
+/* This is the key change: It applies dark mode colors when the .dark class is on the html tag */
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
@@ -21,7 +21,7 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  /* This uses the correct font defined in layout.tsx for consistency */
+  /* This uses the correct font defined in layout.tsx to fix scaling */
   font-family: var(--font-sans);
   transition: background-color 0.2s, color 0.2s;
 }
