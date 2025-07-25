@@ -2,9 +2,49 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+// Explicitly set the runtime to Node.js to support Supabase server-side operations
+export const runtime = 'nodejs';
+
+// --- Type Definitions ---
+// These types ensure type safety and prevent ESLint errors.
+
+interface UserOwnedCard {
+    id: string;
+    credit_limit?: number;
+    card_name: string;
+    issuer: string;
+    card_type?: string;
+    benefits?: Record<string, string>;
+    fees?: Record<string, string>;
+}
+
 interface OptimizeRequestBody {
   amount: string;
   category: string;
+}
+
+// Defines the expected structure of the JSON response from the Gemini API
+interface OptimizationResult {
+  bestCard: {
+    name: string;
+    issuer: string;
+  };
+  reason: string;
+  alternatives: {
+    name: string;
+    reason: string;
+  }[];
+}
+
+// Defines the expected structure of the raw Gemini API response
+interface GeminiResponse {
+    candidates: {
+        content: {
+            parts: {
+                text: string;
+            }[];
+        };
+    }[];
 }
 
 const GEMINI_RESPONSE_SCHEMA = {
@@ -16,6 +56,7 @@ const GEMINI_RESPONSE_SCHEMA = {
         name: { type: "STRING" },
         issuer: { type: "STRING" },
       },
+      required: ["name", "issuer"]
     },
     reason: { type: "STRING" },
     alternatives: {
@@ -26,20 +67,26 @@ const GEMINI_RESPONSE_SCHEMA = {
           name: { type: "STRING" },
           reason: { type: "STRING" },
         },
+        required: ["name", "reason"]
       },
     },
   },
+  required: ["bestCard", "reason", "alternatives"]
 };
 
-// Helper function to format the user's custom card data for the AI prompt
-const formatCardForPrompt = (card: any) => {
+/**
+ * Formats a user's card details into a string for the AI prompt.
+ * @param card - The user-owned card object.
+ * @returns A formatted string detailing the card's properties.
+ */
+const formatCardForPrompt = (card: UserOwnedCard): string => {
   const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
   const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
 
   return `
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
-Card Type: ${card.card_type}
+Card Type: ${card.card_type || 'N/A'}
 Benefits:
 ${benefits}
 Fees:
@@ -47,7 +94,11 @@ ${fees}
 `;
 };
 
-
+/**
+ * API route handler for the Spend Optimizer.
+ * It takes a spend amount and category, fetches user card data,
+ * and calls the Gemini API to get a structured JSON recommendation.
+ */
 export async function POST(request: Request) {
   try {
     const supabase = createClient();
@@ -62,7 +113,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Amount and category are required.' }, { status: 400 });
     }
 
-    // Fetch all fields directly from the user_owned_cards table
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
       .select('*') 
@@ -124,15 +174,21 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to get a response from the AI model.' }, { status: 500 });
     }
 
-    const geminiResult = await geminiResponse.json();
+    const geminiResult: GeminiResponse = await geminiResponse.json();
     
-    const responseText = geminiResult.candidates[0].content.parts[0].text;
-    const parsedResponse = JSON.parse(responseText);
+    const responseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!responseText) {
+        return NextResponse.json({ error: 'AI model returned an invalid response format.' }, { status: 500 });
+    }
+
+    const parsedResponse: OptimizationResult = JSON.parse(responseText);
 
     return NextResponse.json(parsedResponse);
 
-  } catch (error: any) {
+  } catch (error: unknown) { // Use 'unknown' for better type safety
     console.error('API Route Error:', error);
-    return NextResponse.json({ error: error.message || 'An unexpected error occurred.' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
