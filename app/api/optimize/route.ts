@@ -6,8 +6,6 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 // --- Type Definitions ---
-// These types ensure type safety and prevent ESLint errors.
-
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
@@ -23,7 +21,6 @@ interface OptimizeRequestBody {
   category: string;
 }
 
-// Defines the expected structure of the JSON response from the Gemini API
 interface OptimizationResult {
   bestCard: {
     name: string;
@@ -36,7 +33,6 @@ interface OptimizationResult {
   }[];
 }
 
-// Defines the expected structure of the raw Gemini API response
 interface GeminiResponse {
     candidates: {
         content: {
@@ -74,11 +70,6 @@ const GEMINI_RESPONSE_SCHEMA = {
   required: ["bestCard", "reason", "alternatives"]
 };
 
-/**
- * Formats a user's card details into a string for the AI prompt.
- * @param card - The user-owned card object.
- * @returns A formatted string detailing the card's properties.
- */
 const formatCardForPrompt = (card: UserOwnedCard): string => {
   const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
   const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
@@ -94,14 +85,10 @@ ${fees}
 `;
 };
 
-/**
- * API route handler for the Spend Optimizer.
- * It takes a spend amount and category, fetches user card data,
- * and calls the Gemini API to get a structured JSON recommendation.
- */
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
+    // FIX: Await the createClient() call
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -131,14 +118,11 @@ export async function POST(request: Request) {
 
     const prompt = `
       You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
-
       User's Purchase Details:
       - Amount: ₹${amount}
       - Category: ${category}
-
       Here is the user's wallet of available cards:
       ${cardsInfo}
-
       Your Task:
       1. Analyze the user's cards and their benefits.
       2. Determine which card offers the absolute best value for this specific purchase.
@@ -175,7 +159,6 @@ export async function POST(request: Request) {
     }
 
     const geminiResult: GeminiResponse = await geminiResponse.json();
-    
     const responseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!responseText) {
@@ -186,7 +169,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(parsedResponse);
 
-  } catch (error: unknown) { // Use 'unknown' for better type safety
+  } catch (error: unknown) {
     console.error('API Route Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
