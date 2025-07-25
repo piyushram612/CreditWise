@@ -32,7 +32,7 @@ const MoonIcon = () => <Icon path="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.38
 const TrashIcon = ({ className }: { className?: string }) => <Icon path="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.718c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" className={className} />;
 const PencilSquareIcon = ({ className }: { className?: string }) => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" className={className} />;
 const Bars3Icon = () => <Icon path="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />;
-const Cog6ToothIcon = () => <Icon path="M10.343 3.94c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM4.504 8.187c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM16.157 8.187a2.25 2.25 0 011.31 1.228l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128c-.248-.635-.22-1.334.076-1.95l.026-.052c.558-.27 1.003-.74 1.228-1.311l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026zM10.343 15.94c.09.542.56 1.008 1.11 1.227l.128.052c.635.248 1.334.22 1.95-.076l.052-.026c.558-.27 1.003-.74 1.228-1.311l.052-.128c.248-.635.22-1.334-.076-1.95l-.026-.052c-.27-.558-.74-1.003-1.31-1.228l-.128-.052c-.635-.248-1.334-.22-1.95.076l-.052.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026.052z" />;
+const Cog6ToothIcon = () => <Icon path="M10.343 3.94c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM4.504 8.187c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM16.157 8.187a2.25 2.25 0 011.31 1.228l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128c-.248-.635-.22-1.334.076-1.95l.026-.052c.558-.27 1.003-.74 1.228-1.311l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026zM10.343 15.94c.09.542.56 1.008 1.11 1.227l.128.052c.635.248 1.334.22 1.95-.076l.052-.026c.558-.27 1.003-.74 1.228-1.311l.052-.128c.248-.635.22-1.334-.076-1.95l-.026-.052c-.27-.558-.74 1.003-1.31-1.228l-.128.052c-.635-.248-1.334-.22-1.95.076l-.052.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026.052z" />;
 
 
 // --- Data Structures and Types ---
@@ -696,28 +696,60 @@ function SettingsView() {
 
     const handleCardRequestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Backend logic will be added in the next step
         setIsRequestLoading(true);
         setRequestMessage('');
-        console.log("Card Request Submitted:", cardRequestName);
-        setTimeout(() => {
-            setRequestMessage('Thank you! Your request has been submitted.');
-            setIsRequestLoading(false);
+
+        try {
+            const response = await fetch('/api/request-card', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cardName: cardRequestName }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Something went wrong.');
+            }
+
+            setRequestMessage(data.message);
             setCardRequestName('');
-        }, 1500);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+            // Display error message to the user
+            setRequestMessage(`Error: ${message}`);
+        } finally {
+            setIsRequestLoading(false);
+        }
     };
 
     const handleFeedbackSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Backend logic will be added in the next step
         setIsFeedbackLoading(true);
         setFeedbackMessage('');
-        console.log("Feedback Submitted:", feedbackText);
-        setTimeout(() => {
-            setFeedbackMessage('Thank you for your valuable feedback!');
-            setIsFeedbackLoading(false);
+        
+        try {
+            const response = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedbackText: feedbackText }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Something went wrong.');
+            }
+
+            setFeedbackMessage(data.message);
             setFeedbackText('');
-        }, 1500);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
+            // Display error message to the user
+            setFeedbackMessage(`Error: ${message}`);
+        } finally {
+            setIsFeedbackLoading(false);
+        }
     };
 
     return (
