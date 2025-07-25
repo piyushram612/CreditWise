@@ -2,6 +2,23 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+// Explicitly set the runtime to Node.js to support Supabase server-side operations
+export const runtime = 'nodejs';
+
+// --- Type Definitions ---
+// These types ensure type safety and prevent ESLint errors.
+// Ideally, they would live in a shared file (e.g., /lib/types.ts).
+
+interface UserOwnedCard {
+    id: string;
+    credit_limit?: number;
+    card_name: string;
+    issuer: string;
+    card_type?: string;
+    benefits?: Record<string, string>;
+    fees?: Record<string, string>;
+}
+
 interface ChatMessage {
   from: 'ai' | 'user';
   text: string;
@@ -11,14 +28,31 @@ interface ChatRequestBody {
   messages: ChatMessage[];
 }
 
-const formatCardForPrompt = (card: any) => {
+// Defines the expected structure of the response from the Gemini API
+interface GeminiResponse {
+    candidates: {
+        content: {
+            parts: {
+                text: string;
+            }[];
+        };
+    }[];
+}
+
+
+/**
+ * Formats a user's card details into a string for the AI prompt.
+ * @param card - The user-owned card object.
+ * @returns A formatted string detailing the card's properties.
+ */
+const formatCardForPrompt = (card: UserOwnedCard): string => {
   const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
   const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
 
   return `
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
-Card Type: ${card.card_type}
+Card Type: ${card.card_type || 'N/A'}
 Benefits:
 ${benefits}
 Fees:
@@ -26,6 +60,11 @@ ${fees}
 `;
 };
 
+/**
+ * API route handler for the AI Card Advisor chat.
+ * It takes the conversation history, fetches user card data,
+ * and calls the Gemini API to get a contextual response.
+ */
 export async function POST(request: Request) {
   try {
     const supabase = createClient();
@@ -40,6 +79,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No messages provided.' }, { status: 400 });
     }
 
+    // Fetch the user's cards from the database
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
       .select('*')
@@ -50,6 +90,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Could not fetch user cards.' }, { status: 500 });
     }
 
+    // Format the fetched card data for the prompt
     const cardsInfo = userCards?.map(formatCardForPrompt).join('\n---\n') || "The user has not added any cards to their wallet yet.";
 
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
@@ -80,6 +121,7 @@ export async function POST(request: Request) {
       contents: [{ parts: [{ text: prompt }] }],
     };
 
+    // Call the Gemini API
     const geminiResponse = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -92,14 +134,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to get a response from the AI model.' }, { status: 500 });
     }
 
-    const geminiResult = await geminiResponse.json();
+    const geminiResult: GeminiResponse = await geminiResponse.json();
     
-    const responseText = geminiResult.candidates[0].content.parts[0].text;
+    // Safely access the response text
+    const responseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!responseText) {
+        return NextResponse.json({ error: 'AI model returned an invalid response format.' }, { status: 500 });
+    }
 
     return NextResponse.json({ reply: responseText });
 
-  } catch (error: any) {
+  } catch (error: unknown) { // Use 'unknown' for better type safety
     console.error('API Route Error:', error);
-    return NextResponse.json({ error: error.message || 'An unexpected error occurred.' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
