@@ -31,20 +31,20 @@ const SunIcon = () => <Icon path="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m
 const MoonIcon = () => <Icon path="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />;
 const TrashIcon = ({ className }: { className?: string }) => <Icon path="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.718c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" className={className} />;
 const PencilSquareIcon = ({ className }: { className?: string }) => <Icon path="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.781a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" className={className} />;
+const Bars3Icon = () => <Icon path="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />;
+const Cog6ToothIcon = () => <Icon path="M10.343 3.94c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM4.504 8.187c.09-.542.56-1.008 1.11-1.227l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026c.558.27 1.003.74 1.228 1.311l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026-.052zM16.157 8.187a2.25 2.25 0 011.31 1.228l.052.128c.248.635.22 1.334-.076 1.95l-.026.052c-.27.558-.74 1.003-1.31 1.228l-.128.052c-.635.248-1.334.22-1.95-.076l-.052-.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128c-.248-.635-.22-1.334.076-1.95l.026-.052c.558-.27 1.003-.74 1.228-1.311l.128-.052c.635-.248 1.334-.22 1.95.076l.052.026zM10.343 15.94c.09.542.56 1.008 1.11 1.227l.128.052c.635.248 1.334.22 1.95-.076l.052-.026c.558-.27 1.003-.74 1.228-1.311l.052-.128c.248-.635.22-1.334-.076-1.95l-.026-.052c-.27-.558-.74-1.003-1.31-1.228l-.128-.052c-.635-.248-1.334-.22-1.95.076l-.052.026c-.558-.27-1.003-.74-1.228-1.311l-.052-.128a2.25 2.25 0 01.076-1.95l.026.052z" />;
 
 
-// --- Data Structures and Types (FIXED) ---
+// --- Data Structures and Types ---
 interface RewardValue {
     rate: number;
     type: string;
     notes: string;
 }
-
 interface LoungeAccess {
     domestic?: string;
     international?: string;
 }
-
 interface Card {
     id: string;
     card_name: string;
@@ -62,7 +62,6 @@ interface Card {
     other_benefits?: string[];
     suitability?: string;
 }
-
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
@@ -72,12 +71,10 @@ interface UserOwnedCard {
     benefits?: Record<string, string>;
     fees?: Record<string, string>;
 }
-
 interface CardSuggestion {
   name: string;
   reason: string;
 }
-
 interface OptimizationResult {
   bestCard: {
     name: string;
@@ -86,7 +83,6 @@ interface OptimizationResult {
   reason: string;
   alternatives: CardSuggestion[];
 }
-
 interface ChatMessage {
     from: 'ai' | 'user';
     text: string;
@@ -97,7 +93,7 @@ const mockSpendCategories: string[] = [
     'Dining & Restaurants', 'Online Shopping', 'Fuel', 'Utility Bills', 'Travel & Flights', 'Groceries', 'EMI Payments', 'Education Fees'
 ];
 
-// --- New Components ---
+// --- Modal Components ---
 function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { isOpen: boolean, onClose: () => void, user: User, onCardSaved: () => void, existingCard?: UserOwnedCard | null }) {
     const supabase = createClient();
     const [allCards, setAllCards] = useState<Card[]>([]);
@@ -240,11 +236,11 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-lg w-full relative flex flex-col max-h-[90vh]">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 max-w-lg w-full relative flex flex-col max-h-[90vh]">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <XMarkIcon />
                 </button>
-                <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{existingCard ? 'Edit Credit Card' : 'Add a New Credit Card'}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-900 dark:text-white">{existingCard ? 'Edit Credit Card' : 'Add a New Credit Card'}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Select a card from the list to autofill details, or enter them manually.</p>
                 
                 <form onSubmit={handleSubmit} className="overflow-y-auto space-y-4 pr-2">
@@ -284,8 +280,8 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
                         <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-4">Benefits</h4>
                         {benefits.map((b, index) => (
                             <div key={index} className="flex items-center gap-2 mt-2">
-                                <input name="key" placeholder="Benefit (e.g., Retail Spends)" value={b.key} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
-                                <input name="value" placeholder="Value (e.g., 4 Reward Points per ₹150)" value={b.value} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="key" placeholder="Benefit" value={b.key} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="value" placeholder="Value" value={b.value} onChange={e => handleDynamicFieldChange(index, e, 'benefits')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                                 <button type="button" onClick={() => removeDynamicField(index, 'benefits')} className="p-2 text-red-500 hover:text-red-700"><TrashIcon className="w-5 h-5"/></button>
                             </div>
                         ))}
@@ -296,8 +292,8 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
                         <h4 className="font-semibold text-gray-800 dark:text-gray-200 mt-4">Fees</h4>
                         {fees.map((f, index) => (
                             <div key={index} className="flex items-center gap-2 mt-2">
-                                <input name="key" placeholder="Fee Type (e.g., Annual Fee)" value={f.key} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
-                                <input name="value" placeholder="Value (e.g., ₹2500)" value={f.value} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="key" placeholder="Fee Type" value={f.key} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                                <input name="value" placeholder="Value" value={f.value} onChange={e => handleDynamicFieldChange(index, e, 'fees')} className="w-1/2 p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                                 <button type="button" onClick={() => removeDynamicField(index, 'fees')} className="p-2 text-red-500 hover:text-red-700"><TrashIcon className="w-5 h-5"/></button>
                             </div>
                         ))}
@@ -313,43 +309,28 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
         </div>
     );
 }
-
 function ConfirmDeleteModal({ isOpen, onClose, onConfirm, cardName }: { isOpen: boolean, onClose: () => void, onConfirm: () => void, cardName: string }) {
     if (!isOpen) return null;
-
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full relative">
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Confirm Deletion</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to remove the <span className="font-semibold">{cardName}</span> from your wallet?</p>
                 <div className="flex justify-end gap-4">
-                    <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition">
-                        Cancel
-                    </button>
-                    <button onClick={onConfirm} className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition">
-                        Delete
-                    </button>
+                    <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 transition">Cancel</button>
+                    <button onClick={onConfirm} className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition">Delete</button>
                 </div>
             </div>
         </div>
     );
 }
-
 function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: () => void, supabase: SupabaseClient }) {
     if (!isOpen) return null;
-
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-8 max-w-md w-full relative">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <XMarkIcon />
-                </button>
-                <Auth
-                    supabaseClient={supabase}
-                    appearance={{ theme: ThemeSupa }}
-                    providers={['google', 'github']}
-                    theme="light"
-                />
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><XMarkIcon /></button>
+                <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={['google', 'github']} theme="light" />
             </div>
         </div>
     );
@@ -357,31 +338,33 @@ function AuthModal({ isOpen, onClose, supabase }: { isOpen: boolean, onClose: ()
 
 // --- Main App Components ---
 
-function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme, toggleTheme }: { activeView: string, setActiveView: (view: string) => void, user: User | null, onAuthClick: () => void, supabase: SupabaseClient, theme: string, toggleTheme: () => void }) {
+function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme, toggleTheme, onLinkClick }: { activeView: string, setActiveView: (view: string) => void, user: User | null, onAuthClick: () => void, supabase: SupabaseClient, theme: string, toggleTheme: () => void, onLinkClick: () => void }) {
     const navItems = [
         { name: 'Dashboard', icon: <DashboardIcon />, view: 'dashboard' },
         { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
         { name: 'Spend Optimizer', icon: <SparklesIcon />, view: 'optimizer' },
         { name: 'AI Card Advisor', icon: <ChatBubbleIcon />, view: 'advisor' },
+        { name: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
     ];
     
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        onLinkClick(); // Close sidebar on logout
     }
 
     return (
-        <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 flex flex-col">
-            <div className="flex items-center mb-8">
-                <SparklesIcon />
+        <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 flex flex-col h-full">
+            <div className="flex items-center mb-8 shrink-0">
+                <SparklesIcon className="w-7 h-7 text-blue-500" />
                 <h1 className="text-xl font-bold ml-2">CreditWise</h1>
             </div>
-            <nav className="flex-grow">
+            <nav className="flex-grow overflow-y-auto">
                 <ul>
                     {navItems.map(item => (
                         <li key={item.name} className="mb-2">
                             <a
                                 href="#"
-                                onClick={(e) => { e.preventDefault(); setActiveView(item.view); }}
+                                onClick={(e) => { e.preventDefault(); setActiveView(item.view); onLinkClick(); }}
                                 className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${activeView === item.view ? 'bg-blue-500 text-white shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                             >
                                 {item.icon}
@@ -391,16 +374,14 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme
                     ))}
                 </ul>
             </nav>
-            <div className="mt-auto">
+            <div className="mt-auto shrink-0">
                  {user ? (
                     <div className="text-sm">
                         <p className="truncate px-3" title={user.email || 'User'}>{user.email}</p>
-                        <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-semibold">
-                            Logout
-                        </button>
+                        <button onClick={handleLogout} className="w-full text-left mt-2 p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-semibold">Logout</button>
                     </div>
                 ) : (
-                    <a href="#" onClick={(e) => { e.preventDefault(); onAuthClick(); }} className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <a href="#" onClick={(e) => { e.preventDefault(); onAuthClick(); onLinkClick(); }} className="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
                         <UserCircleIcon />
                         <span className="ml-4">Login / Sign Up</span>
                     </a>
@@ -422,19 +403,11 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
     useEffect(() => {
         const fetchUserCards = async () => {
             setIsLoading(true);
-            const { data, error } = await supabase
-                .from('user_owned_cards')
-                .select('*')
-                .eq('user_id', user.id);
-
-            if (error) {
-                console.error("Error fetching user cards:", error);
-            } else {
-                setUserCards(data as UserOwnedCard[]);
-            }
+            const { data, error } = await supabase.from('user_owned_cards').select('*').eq('user_id', user.id);
+            if (error) console.error("Error fetching user cards:", error);
+            else setUserCards(data as UserOwnedCard[]);
             setIsLoading(false);
         };
-
         fetchUserCards();
     }, [user, supabase, key]);
 
@@ -452,14 +425,13 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">My Cards</h2>
-                <button onClick={onAddCardClick} className="flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 transform hover:scale-105">
+                <button onClick={onAddCardClick} className="flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 w-full sm:w-auto justify-center">
                     <PlusIcon />
                     <span className="ml-2">Add New Card</span>
                 </button>
             </div>
-
             {isLoading ? (
                 <div className="text-center py-10 text-gray-600 dark:text-gray-400">Loading your cards...</div>
             ) : userCards.length === 0 ? (
@@ -468,19 +440,15 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                     <button onClick={onAddCardClick} className="mt-4 text-blue-500 font-semibold">Add your first card</button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {userCards.map(ownedCard => (
-                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.issuer)} relative group`}>
+                        <div key={ownedCard.id} className={`p-6 rounded-xl text-white shadow-lg flex flex-col justify-between bg-gradient-to-br ${getIssuerColor(ownedCard.issuer)} relative group min-h-[220px]`}>
                             <div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-semibold">{ownedCard.issuer?.toUpperCase()}</span>
                                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
-                                            <PencilSquareIcon className="w-4 h-4 text-white" />
-                                        </button>
-                                        <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40">
-                                            <TrashIcon className="w-4 h-4 text-white" />
-                                        </button>
+                                        <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40"><PencilSquareIcon className="w-4 h-4 text-white" /></button>
+                                        <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-black/20 rounded-full hover:bg-black/40"><TrashIcon className="w-4 h-4 text-white" /></button>
                                     </div>
                                 </div>
                                 <h3 className="text-2xl font-bold mt-4">{ownedCard.card_name}</h3>
@@ -509,44 +477,30 @@ function SpendOptimizerView() {
         setIsLoading(true);
         setResult(null);
         setError(null);
-
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
             setError("You must be logged in to use the optimizer.");
             setIsLoading(false);
             return;
         }
-
         const formData = new FormData(formRef.current!);
         const spendAmount = formData.get('amount');
         const spendCategory = formData.get('category');
-
         try {
             const response = await fetch('/api/optimize', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    amount: spendAmount,
-                    category: spendCategory,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: spendAmount, category: spendCategory }),
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Something went wrong');
             }
-
             const data = await response.json();
             setResult(data);
-
         } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("An unknown error occurred.");
-            }
+            if (err instanceof Error) setError(err.message);
+            else setError("An unknown error occurred.");
         } finally {
             setIsLoading(false);
         }
@@ -556,7 +510,6 @@ function SpendOptimizerView() {
         <div>
             <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Spend Optimizer</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-6">Find the best card for your next purchase.</p>
-            
             <form ref={formRef} onSubmit={handleOptimization} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -573,33 +526,20 @@ function SpendOptimizerView() {
                 <div className="mt-6">
                     <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed">
                         {isLoading ? (
-                            <>
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Optimizing...
-                            </>
+                            <><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Optimizing...</>
                         ) : (
-                            <>
-                                <SparklesIcon className="w-5 h-5" />
-                                <span className="ml-2">Find Best Card</span>
-                            </>
+                            <><SparklesIcon className="w-5 h-5" /><span className="ml-2">Find Best Card</span></>
                         )}
                     </button>
                 </div>
             </form>
-
             {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-
             {result && (
                 <div className="mt-8 animate-fade-in">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Recommendation</h3>
                     <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-6 rounded-r-lg">
                         <div className="flex items-center">
-                           <div className="bg-green-500 p-2 rounded-full">
-                                <CreditCardIcon className="w-6 h-6 text-white"/>
-                           </div>
+                           <div className="bg-green-500 p-2 rounded-full"><CreditCardIcon className="w-6 h-6 text-white"/></div>
                            <div className="ml-4">
                                 <p className="text-sm text-green-700 dark:text-green-300">Best Option</p>
                                 <p className="font-bold text-lg text-green-900 dark:text-green-100">{result.bestCard.name}</p>
@@ -634,39 +574,27 @@ function AICardAdvisorView() {
     const [isThinking, setIsThinking] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
+    const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     useEffect(scrollToBottom, [messages]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (input.trim() === '' || isThinking) return;
-
         const userMessage: ChatMessage = { from: 'user', text: input };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setInput('');
         setIsThinking(true);
-
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ messages: newMessages }),
             });
-
-            if (!response.ok) {
-                throw new Error("Failed to get a response from the advisor.");
-            }
-
+            if (!response.ok) throw new Error("Failed to get a response from the advisor.");
             const data = await response.json();
             const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
             setMessages(prev => [...prev, aiMessage]);
-
         } catch (error) {
             console.error(error);
             const errorMessage: ChatMessage = { from: 'ai', text: "Sorry, I'm having trouble connecting right now." };
@@ -693,28 +621,15 @@ function AICardAdvisorView() {
                         <div className="flex items-end gap-2">
                             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0"><SparklesIcon className="w-5 h-5"/></div>
                             <div className="max-w-md p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                <div className="flex items-center space-x-1">
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-0"></span>
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-300"></span>
-                                </div>
+                                <div className="flex items-center space-x-1"><span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-0"></span><span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-150"></span><span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-300"></span></div>
                             </div>
                         </div>
                     )}
                     <div ref={chatEndRef} />
                 </div>
                 <form onSubmit={handleSend} className="mt-4 flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask about rewards, fees, benefits..."
-                        className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
-                        disabled={isThinking}
-                    />
-                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300" disabled={isThinking}>
-                        <SendIcon />
-                    </button>
+                    <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about rewards, fees, benefits..." className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" disabled={isThinking} />
+                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300" disabled={isThinking}><SendIcon /></button>
                 </form>
             </div>
         </div>
@@ -730,14 +645,9 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
         if (user) {
             const fetchStats = async () => {
                 setIsLoading(true);
-                const { data, error } = await supabase
-                    .from('user_owned_cards')
-                    .select('credit_limit')
-                    .eq('user_id', user.id);
-
-                if (error) {
-                    console.error("Error fetching dashboard stats:", error);
-                } else if (data) {
+                const { data, error } = await supabase.from('user_owned_cards').select('credit_limit').eq('user_id', user.id);
+                if (error) console.error("Error fetching dashboard stats:", error);
+                else if (data) {
                     const cardCount = data.length;
                     const totalLimit = data.reduce((sum, card) => sum + (card.credit_limit || 0), 0);
                     setStats({ cardCount, totalLimit });
@@ -745,9 +655,7 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
                 setIsLoading(false);
             };
             fetchStats();
-        } else {
-            setIsLoading(false);
-        }
+        } else setIsLoading(false);
     }, [user, supabase]);
 
     return (
@@ -755,46 +663,98 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
             <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Dashboard</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center text-green-500 mb-3">
-                        <CreditCardIcon />
-                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Your Wallet</h3>
-                    </div>
+                    <div className="flex items-center text-green-500 mb-3"><CreditCardIcon /><h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Your Wallet</h3></div>
                     {isLoading ? <p className="text-gray-600 dark:text-gray-400 text-sm">Loading stats...</p> : user ? (
-                        <>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">You have <span className="font-bold text-green-600 dark:text-green-400">{stats.cardCount}</span> cards.</p>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600 dark:text-green-400">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p>
-                        </>
-                    ) : (
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Log in to see your wallet summary.</p>
-                    )}
+                        <><p className="text-gray-600 dark:text-gray-400 text-sm">You have <span className="font-bold text-green-600 dark:text-green-400">{stats.cardCount}</span> cards.</p><p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600 dark:text-green-400">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p></>
+                    ) : <p className="text-gray-600 dark:text-gray-400 text-sm">Log in to see your wallet summary.</p>}
                 </div>
-                
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center text-blue-500 mb-3">
-                        <SparklesIcon />
-                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Spend Optimizer</h3>
-                    </div>
+                    <div className="flex items-center text-blue-500 mb-3"><SparklesIcon /><h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Spend Optimizer</h3></div>
                     <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">Find the best card for your next purchase.</p>
-                    <button onClick={() => setActiveView('optimizer')} className="w-full bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition p-2">
-                        Optimize Now
-                    </button>
+                    <button onClick={() => setActiveView('optimizer')} className="w-full bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition p-2">Optimize Now</button>
                 </div>
-
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center text-purple-500 mb-3">
-                        <ChatBubbleIcon />
-                        <h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">AI Advisor</h3>
-                    </div>
+                    <div className="flex items-center text-purple-500 mb-3"><ChatBubbleIcon /><h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">AI Advisor</h3></div>
                     <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">Have a question? Ask our AI for help.</p>
-                    <button onClick={() => setActiveView('advisor')} className="w-full bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition p-2">
-                        Ask Now
-                    </button>
+                    <button onClick={() => setActiveView('advisor')} className="w-full bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition p-2">Ask Now</button>
                 </div>
             </div>
         </div>
     );
 }
 
+function SettingsView() {
+    // State for the card request form
+    const [cardRequestName, setCardRequestName] = useState('');
+    const [isRequestLoading, setIsRequestLoading] = useState(false);
+    const [requestMessage, setRequestMessage] = useState('');
+
+    // State for the feedback form
+    const [feedbackText, setFeedbackText] = useState('');
+    const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+
+    const handleCardRequestSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // Backend logic will be added in the next step
+        setIsRequestLoading(true);
+        setRequestMessage('');
+        console.log("Card Request Submitted:", cardRequestName);
+        setTimeout(() => {
+            setRequestMessage('Thank you! Your request has been submitted.');
+            setIsRequestLoading(false);
+            setCardRequestName('');
+        }, 1500);
+    };
+
+    const handleFeedbackSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // Backend logic will be added in the next step
+        setIsFeedbackLoading(true);
+        setFeedbackMessage('');
+        console.log("Feedback Submitted:", feedbackText);
+        setTimeout(() => {
+            setFeedbackMessage('Thank you for your valuable feedback!');
+            setIsFeedbackLoading(false);
+            setFeedbackText('');
+        }, 1500);
+    };
+
+    return (
+        <div>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Settings & Feedback</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Card Request Section */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Request a New Card</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">Is there a credit card you&apos;d like to see in our database? Let us know!</p>
+                    <form onSubmit={handleCardRequestSubmit}>
+                        <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Card Name</label>
+                        <input id="cardName" name="cardName" type="text" value={cardRequestName} onChange={(e) => setCardRequestName(e.target.value)} required placeholder="e.g., HDFC Diners Club Black" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
+                        <button type="submit" disabled={isRequestLoading || !cardRequestName} className="mt-4 w-full flex justify-center items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed">
+                            {isRequestLoading ? 'Submitting...' : 'Submit Request'}
+                        </button>
+                        {requestMessage && <p className="text-green-600 dark:text-green-400 text-sm mt-3 text-center">{requestMessage}</p>}
+                    </form>
+                </div>
+
+                {/* Feedback Section */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Provide Feedback</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">Have suggestions or found a bug? We&apos;d love to hear from you.</p>
+                    <form onSubmit={handleFeedbackSubmit}>
+                        <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Feedback</label>
+                        <textarea id="feedback" name="feedback" value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} required rows={4} placeholder="Tell us what you think..." className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
+                        <button type="submit" disabled={isFeedbackLoading || !feedbackText} className="mt-4 w-full flex justify-center items-center bg-purple-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-600 transition-all duration-200 disabled:bg-purple-300 disabled:cursor-not-allowed">
+                            {isFeedbackLoading ? 'Sending...' : 'Send Feedback'}
+                        </button>
+                        {feedbackMessage && <p className="text-green-600 dark:text-green-400 text-sm mt-3 text-center">{feedbackMessage}</p>}
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 // --- The Main App Component ---
 export default function App() {
@@ -805,63 +765,45 @@ export default function App() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [cardToEdit, setCardToEdit] = useState<UserOwnedCard | null>(null);
     const [cardToDelete, setCardToDelete] = useState<UserOwnedCard | null>(null);
-    const [key, setKey] = useState(0); // Key to force re-render
+    const [key, setKey] = useState(0);
     const [theme, setTheme] = useState('light');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar state
     const supabase = createClient();
 
     useEffect(() => {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
     }, [theme]);
 
-    const toggleTheme = () => {
-        setTheme(theme === 'light' ? 'dark' : 'light');
-    };
+    const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
     useEffect(() => {
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setUser(session?.user ?? null);
         };
-
         getSession();
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
             setIsAuthModalOpen(false);
         });
-
-        return () => {
-            subscription?.unsubscribe();
-        };
+        return () => subscription?.unsubscribe();
     }, [supabase]);
 
-    const handleCardSaved = () => {
-        setKey(prevKey => prevKey + 1);
-    };
-    
-    const handleCardDeleted = () => {
-        setKey(prevKey => prevKey + 1);
-    };
-
+    const handleCardSaved = () => setKey(prevKey => prevKey + 1);
+    const handleCardDeleted = () => setKey(prevKey => prevKey + 1);
     const handleAddCardClick = () => {
         setCardToEdit(null);
         setIsCardFormModalOpen(true);
     };
-
     const handleEditCardClick = (card: UserOwnedCard) => {
         setCardToEdit(card);
         setIsCardFormModalOpen(true);
     };
-
     const handleDeleteCardClick = (card: UserOwnedCard) => {
         setCardToDelete(card);
         setIsDeleteModalOpen(true);
     };
-    
     const confirmDelete = async () => {
         if (!cardToDelete) return;
         await supabase.from('user_owned_cards').delete().eq('id', cardToDelete.id);
@@ -871,67 +813,59 @@ export default function App() {
     };
 
     const renderView = () => {
-        if (!user && activeView !== 'dashboard') {
-             return <div className="flex flex-col items-center justify-center h-full text-center">
+        if (!user && !['dashboard', 'settings'].includes(activeView)) {
+             return <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Please log in to continue</h2>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">This feature is available for registered users.</p>
-                <button 
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200"
-                >
-                    Login / Sign Up
-                </button>
+                <button onClick={() => setIsAuthModalOpen(true)} className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200">Login / Sign Up</button>
             </div>
         }
-
         switch (activeView) {
-            case 'dashboard':
-                return <DashboardView user={user} setActiveView={setActiveView} />;
-            case 'my-cards':
-                return user ? <MyCardsView key={key} user={user} onAddCardClick={handleAddCardClick} onEditCard={handleEditCardClick} onDeleteCard={handleDeleteCardClick} /> : null;
-            case 'optimizer':
-                return <SpendOptimizerView />;
-            case 'advisor':
-                return <AICardAdvisorView />;
-            default:
-                return <DashboardView user={user} setActiveView={setActiveView} />;
+            case 'dashboard': return <DashboardView user={user} setActiveView={setActiveView} />;
+            case 'my-cards': return user ? <MyCardsView key={key} user={user} onAddCardClick={handleAddCardClick} onEditCard={handleEditCardClick} onDeleteCard={handleDeleteCardClick} /> : null;
+            case 'optimizer': return <SpendOptimizerView />;
+            case 'advisor': return <AICardAdvisorView />;
+            case 'settings': return <SettingsView />;
+            default: return <DashboardView user={user} setActiveView={setActiveView} />;
         }
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100">
-            <Sidebar 
-                activeView={activeView} 
-                setActiveView={setActiveView} 
-                user={user}
-                onAuthClick={() => setIsAuthModalOpen(true)}
-                supabase={supabase}
-                theme={theme}
-                toggleTheme={toggleTheme}
-            />
-            <main className="flex-1 p-8 overflow-y-auto">
-                {renderView()}
-            </main>
-            <AuthModal 
-                isOpen={isAuthModalOpen} 
-                onClose={() => setIsAuthModalOpen(false)}
-                supabase={supabase}
-            />
+        <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+            
+            {/* Sidebar */}
+            <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <Sidebar 
+                    activeView={activeView} setActiveView={setActiveView} user={user}
+                    onAuthClick={() => setIsAuthModalOpen(true)}
+                    supabase={supabase} theme={theme} toggleTheme={toggleTheme}
+                    onLinkClick={() => setIsSidebarOpen(false)} // Close sidebar when a link is clicked
+                />
+            </div>
+
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Mobile Header */}
+                <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
+                    <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 dark:text-gray-300"><Bars3Icon /></button>
+                    <div className="flex items-center">
+                        <SparklesIcon className="w-6 h-6 text-blue-500" />
+                        <h1 className="text-lg font-bold ml-2">CreditWise</h1>
+                    </div>
+                    <div className="w-6"></div> {/* Spacer */}
+                </header>
+
+                <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
+                    {renderView()}
+                </main>
+            </div>
+
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} supabase={supabase} />
             {user && (
                 <>
-                    <CardFormModal
-                        isOpen={isCardFormModalOpen}
-                        onClose={() => setIsCardFormModalOpen(false)}
-                        user={user}
-                        onCardSaved={handleCardSaved}
-                        existingCard={cardToEdit}
-                    />
-                    <ConfirmDeleteModal
-                        isOpen={isDeleteModalOpen}
-                        onClose={() => setIsDeleteModalOpen(false)}
-                        onConfirm={confirmDelete}
-                        cardName={cardToDelete?.card_name || ''}
-                    />
+                    <CardFormModal isOpen={isCardFormModalOpen} onClose={() => setIsCardFormModalOpen(false)} user={user} onCardSaved={handleCardSaved} existingCard={cardToEdit} />
+                    <ConfirmDeleteModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmDelete} cardName={cardToDelete?.card_name || ''} />
                 </>
             )}
         </div>
