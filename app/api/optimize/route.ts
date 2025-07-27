@@ -19,6 +19,7 @@ interface UserOwnedCard {
 interface OptimizeRequestBody {
   amount: string;
   category: string;
+  vendor?: string; // Vendor is now optional
 }
 
 interface OptimizationResult {
@@ -87,7 +88,6 @@ ${fees}
 
 export async function POST(request: Request) {
   try {
-    // FIX: Await the createClient() call
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { amount, category }: OptimizeRequestBody = await request.json();
+    const { amount, category, vendor }: OptimizeRequestBody = await request.json();
     if (!amount || !category) {
         return NextResponse.json({ error: 'Amount and category are required.' }, { status: 400 });
     }
@@ -116,15 +116,22 @@ export async function POST(request: Request) {
 
     const cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
 
+    // Dynamically add vendor to the prompt if it exists
+    const vendorInfo = vendor ? `- Vendor: ${vendor}` : '';
+
     const prompt = `
       You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
+
       User's Purchase Details:
       - Amount: ₹${amount}
       - Category: ${category}
+      ${vendorInfo}
+
       Here is the user's wallet of available cards:
       ${cardsInfo}
+
       Your Task:
-      1. Analyze the user's cards and their benefits.
+      1. Analyze the user's cards and their benefits. Pay close attention to the vendor if provided, as some cards have specific co-brand benefits (e.g., Amazon Pay card on Amazon).
       2. Determine which card offers the absolute best value for this specific purchase.
       3. Provide a concise reason for your choice.
       4. Suggest one or two other good alternatives if they exist.
