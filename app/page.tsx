@@ -421,6 +421,18 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
         fetchUserCards();
     }, [user, supabase, key]);
 
+    const getIssuerColor = (issuer: string) => {
+        switch (issuer?.toLowerCase()) {
+            case 'hdfc': return 'border-t-blue-600';
+            case 'sbi': return 'border-t-cyan-500';
+            case 'icici': return 'border-t-orange-500';
+            case 'axis': return 'border-t-purple-600';
+            case 'amex': return 'border-t-blue-800';
+            case 'idfc': return 'border-t-red-500';
+            default: return 'border-t-gray-500';
+        }
+    };
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -446,8 +458,8 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         const utilizationWidth = Math.min(utilization, 100); // Cap at 100%
 
                         return (
-                            <div key={ownedCard.id} className={`p-6 rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group`}>
-                                <div>
+                            <div key={ownedCard.id} className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4 ${getIssuerColor(ownedCard.issuer)}`}>
+                                <div className="p-6">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ownedCard.card_name}</p>
@@ -885,43 +897,58 @@ export default function App() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
-            {/* Mobile Sidebar Overlay */}
-            {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
-            
-            {/* Sidebar */}
-            <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <Sidebar 
-                    activeView={activeView} setActiveView={setActiveView} user={user}
-                    onAuthClick={() => setIsAuthModalOpen(true)}
-                    supabase={supabase} theme={theme} toggleTheme={toggleTheme}
-                    onLinkClick={() => setIsSidebarOpen(false)} // Close sidebar when a link is clicked
-                />
+        <>
+            {/* Global Styles for Number Inputs */}
+            <style jsx global>{`
+                /* Hide spinner buttons on Chrome, Safari, Edge, Opera */
+                input[type=number]::-webkit-inner-spin-button,
+                input[type=number]::-webkit-outer-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+                /* Hide spinner buttons on Firefox */
+                input[type=number] {
+                    -moz-appearance: textfield;
+                }
+            `}</style>
+            <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+                {/* Mobile Sidebar Overlay */}
+                {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+                
+                {/* Sidebar */}
+                <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    <Sidebar 
+                        activeView={activeView} setActiveView={setActiveView} user={user}
+                        onAuthClick={() => setIsAuthModalOpen(true)}
+                        supabase={supabase} theme={theme} toggleTheme={toggleTheme}
+                        onLinkClick={() => setIsSidebarOpen(false)} // Close sidebar when a link is clicked
+                    />
+                </div>
+
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    {/* Mobile Header */}
+                    <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
+                        <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 dark:text-gray-300"><Bars3Icon /></button>
+                        <div className="flex items-center">
+                            <SparklesIcon className="w-6 h-6 text-blue-500" />
+                            <h1 className="text-lg font-bold ml-2">CreditWise</h1>
+                        </div>
+                        <div className="w-6"></div> {/* Spacer */}
+                    </header>
+
+                    <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
+                        {renderView()}
+                    </main>
+                </div>
+
+                <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} supabase={supabase} />
+                {user && (
+                    <>
+                        <CardFormModal isOpen={isCardFormModalOpen} onClose={() => setIsCardFormModalOpen(false)} user={user} onCardSaved={handleCardSaved} existingCard={cardToEdit} />
+                        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmDelete} cardName={cardToDelete?.card_name || ''} />
+                    </>
+                )}
             </div>
-
-            <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Mobile Header */}
-                <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
-                    <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 dark:text-gray-300"><Bars3Icon /></button>
-                    <div className="flex items-center">
-                        <SparklesIcon className="w-6 h-6 text-blue-500" />
-                        <h1 className="text-lg font-bold ml-2">CreditWise</h1>
-                    </div>
-                    <div className="w-6"></div> {/* Spacer */}
-                </header>
-
-                <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
-                    {renderView()}
-                </main>
-            </div>
-
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} supabase={supabase} />
-            {user && (
-                <>
-                    <CardFormModal isOpen={isCardFormModalOpen} onClose={() => setIsCardFormModalOpen(false)} user={user} onCardSaved={handleCardSaved} existingCard={cardToEdit} />
-                    <ConfirmDeleteModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmDelete} cardName={cardToDelete?.card_name || ''} />
-                </>
-            )}
-        </div>
+        </>
     );
 }
