@@ -421,15 +421,15 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
         fetchUserCards();
     }, [user, supabase, key]);
 
-    const getIssuerColor = (issuer: string) => {
+    const getIssuerColorCode = (issuer: string) => {
         switch (issuer?.toLowerCase()) {
-            case 'hdfc': return 'border-t-blue-600';
-            case 'sbi': return 'border-t-cyan-500';
-            case 'icici': return 'border-t-orange-500';
-            case 'axis': return 'border-t-purple-600';
-            case 'amex': return 'border-t-blue-800';
-            case 'idfc': return 'border-t-red-500';
-            default: return 'border-t-gray-500';
+            case 'hdfc': return '#2563EB'; // blue-600
+            case 'sbi': return '#06B6D4'; // cyan-500
+            case 'icici': return '#F97316'; // orange-500
+            case 'axis': return '#9333EA'; // purple-600
+            case 'amex': return '#1E40AF'; // blue-800
+            case 'idfc': return '#EF4444'; // red-500
+            default: return '#6B7280'; // gray-500
         }
     };
 
@@ -458,7 +458,11 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         const utilizationWidth = Math.min(utilization, 100); // Cap at 100%
 
                         return (
-                            <div key={ownedCard.id} className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4 ${getIssuerColor(ownedCard.issuer)}`}>
+                            <div 
+                                key={ownedCard.id} 
+                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4`}
+                                style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
+                            >
                                 <div className="p-6">
                                     <div className="flex justify-between items-start">
                                         <div>
