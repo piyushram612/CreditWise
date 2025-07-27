@@ -279,7 +279,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
                             <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                         </div>
-                         {/* New Input for Used Amount */}
+                         {/* CORRECTED: Input for Used Amount */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Used Amount (Current Statement)</label>
                             <input type="number" value={usedAmount} onChange={e => setUsedAmount(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
@@ -503,11 +503,12 @@ function SpendOptimizerView() {
         const formData = new FormData(formRef.current!);
         const spendAmount = formData.get('amount');
         const spendCategory = formData.get('category');
+        const vendor = formData.get('vendor'); // Get vendor from form
         try {
             const response = await fetch('/api/optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: spendAmount, category: spendCategory }),
+                body: JSON.stringify({ amount: spendAmount, category: spendCategory, vendor: vendor }),
             });
             if (!response.ok) {
                 const errorData = await response.json();
@@ -531,13 +532,17 @@ function SpendOptimizerView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Amount (₹)</label>
-                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
+                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" required className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
                     </div>
                     <div>
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Category</label>
                         <select name="category" id="category" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                             {mockSpendCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
+                    </div>
+                    <div className="md:col-span-2">
+                        <label htmlFor="vendor" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vendor (Optional)</label>
+                        <input name="vendor" type="text" id="vendor" placeholder="e.g., Amazon, Swiggy" className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
                     </div>
                 </div>
                 <div className="mt-6">
