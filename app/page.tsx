@@ -423,12 +423,12 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
 
     const getIssuerColorCode = (issuer: string) => {
         switch (issuer?.toLowerCase()) {
-            case 'hdfc': return '#2563EB'; // blue-600
-            case 'sbi': return '#06B6D4'; // cyan-500
-            case 'icici': return '#F97316'; // orange-500
-            case 'axis': return '#9333EA'; // purple-600
+            case 'hdfc': return '#ED232A'; // red
+            case 'sbi': return '#00B5EF'; // cyan-500
+            case 'icici': return ' #F99D27'; // orange-500
+            case 'axis': return '#AE275F'; // purple-600
             case 'amex': return '#1E40AF'; // blue-800
-            case 'idfc': return '#EF4444'; // red-500
+            case 'idfc': return ' #9C1D26'; // red-500
             default: return '#6B7280'; // gray-500
         }
     };
@@ -460,7 +460,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         return (
                             <div 
                                 key={ownedCard.id} 
-                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4`}
+                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-500 dark:border-gray-700 relative group overflow-hidden border-t-4`}
                                 style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
                             >
                                 <div className="p-6">
