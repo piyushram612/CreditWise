@@ -1,7 +1,8 @@
+// FILE: app/page.tsx
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import AuthComponent from '@/components/auth/AuthComponent';
+import AuthComponent from './components/auth/AuthComponent';
 
 export default async function HomePage() {
   const supabase = createServerComponentClient({ cookies });

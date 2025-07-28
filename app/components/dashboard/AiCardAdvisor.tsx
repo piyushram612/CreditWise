@@ -1,7 +1,7 @@
 // FILE: app/components/dashboard/AiCardAdvisor.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import type { Card, Message } from '@/lib/types';
-import { BotIcon, UserIcon, SendIcon } from '@/components/icons';
+import type { Card, Message } from '../../../lib/types';
+import { BotIcon, UserIcon, SendIcon } from '../icons';
 
 export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
     const [messages, setMessages] = useState<Message[]>([]);

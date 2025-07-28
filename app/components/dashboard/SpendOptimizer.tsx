@@ -1,7 +1,7 @@
 // FILE: app/components/dashboard/SpendOptimizer.tsx
 import React, { useState } from 'react';
-import type { Card } from '@/lib/types';
-import { SparklesIcon, CreditCardIcon } from '@/components/icons';
+import type { Card } from '../../../lib/types';
+import { SparklesIcon, CreditCardIcon } from '../icons';
 
 const spendCategories = [
     "Travel", "Dining", "Groceries", "Utilities", "Fuel", "Online Shopping", "Entertainment", "Other"

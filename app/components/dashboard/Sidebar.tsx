@@ -1,6 +1,7 @@
+
 // FILE: app/components/dashboard/Sidebar.tsx
 import { User } from '@supabase/supabase-js';
-import { LogoIcon, BotIcon, SettingsIcon, SlidersHorizontalIcon, LogOutIcon } from '@/components/icons';
+import { LogoIcon, BotIcon, SettingsIcon, SlidersHorizontalIcon, LogOutIcon } from '../icons';
 
 interface SidebarProps {
   user: User | null;
