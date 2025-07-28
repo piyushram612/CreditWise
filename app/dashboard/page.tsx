@@ -5,13 +5,13 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-import Sidebar from '@/components/dashboard/Sidebar';
-import CardList from '@/components/dashboard/CardList';
-import SpendOptimizer from '@/components/dashboard/SpendOptimizer';
-import AiCardAdvisor from '@/components/dashboard/AiCardAdvisor';
-import Settings from '@/components/dashboard/Settings';
-import { CreditCardIcon } from '@/components/icons';
-import type { Card } from '@/lib/types';
+import Sidebar from '../components/dashboard/Sidebar';
+import CardList from '../components/dashboard/CardList';
+import SpendOptimizer from '../components/dashboard/SpendOptimizer';
+import AiCardAdvisor from '../components/dashboard/AiCardAdvisor';
+import Settings from '../components/dashboard/Settings';
+import { CreditCardIcon } from '../components/icons';
+import type { Card } from '../../lib/types';
 
 
 export default function DashboardPage() {
