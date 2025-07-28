@@ -88,6 +88,7 @@ ${fees}
 
 export async function POST(request: Request) {
   try {
+    // FIX: Await the createClient() call
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -121,15 +122,12 @@ export async function POST(request: Request) {
 
     const prompt = `
       You are an expert Indian credit card advisor. A user wants to make a purchase and needs you to recommend the best card from their wallet.
-
       User's Purchase Details:
       - Amount: ₹${amount}
       - Category: ${category}
       ${vendorInfo}
-
       Here is the user's wallet of available cards:
       ${cardsInfo}
-
       Your Task:
       1. Analyze the user's cards and their benefits. Pay close attention to the vendor if provided, as some cards have specific co-brand benefits (e.g., Amazon Pay card on Amazon).
       2. Determine which card offers the absolute best value for this specific purchase.

@@ -6,6 +6,9 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 // --- Type Definitions ---
+// These types ensure type safety and prevent ESLint errors.
+// Ideally, they would live in a shared file (e.g., /lib/types.ts).
+
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
@@ -25,6 +28,7 @@ interface ChatRequestBody {
   messages: ChatMessage[];
 }
 
+// Defines the expected structure of the response from the Gemini API
 interface GeminiResponse {
     candidates: {
         content: {
@@ -35,6 +39,12 @@ interface GeminiResponse {
     }[];
 }
 
+
+/**
+ * Formats a user's card details into a string for the AI prompt.
+ * @param card - The user-owned card object.
+ * @returns A formatted string detailing the card's properties.
+ */
 const formatCardForPrompt = (card: UserOwnedCard): string => {
   const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
   const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${value}`).join('\n') : '  - Not specified';
@@ -50,6 +60,11 @@ ${fees}
 `;
 };
 
+/**
+ * API route handler for the AI Card Advisor chat.
+ * It takes the conversation history, fetches user card data,
+ * and calls the Gemini API to get a contextual response.
+ */
 export async function POST(request: Request) {
   try {
     // FIX: Await the createClient() call
@@ -65,6 +80,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No messages provided.' }, { status: 400 });
     }
 
+    // Fetch the user's cards from the database
     const { data: userCards, error: dbError } = await supabase
       .from('user_owned_cards')
       .select('*')
@@ -75,18 +91,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Could not fetch user cards.' }, { status: 500 });
     }
 
+    // Format the fetched card data for the prompt
     const cardsInfo = userCards?.map(formatCardForPrompt).join('\n---\n') || "The user has not added any cards to their wallet yet.";
 
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const prompt = `
       You are "CreditWise AI", a helpful and friendly Indian credit card advisor. Your role is to answer user questions about their credit cards.
+
       Here is the context about the user's current credit card wallet:
       ---
       ${cardsInfo}
       ---
+
       Here is the current conversation history:
       ${history}
+
       Your Task:
       Based on the provided context of the user's cards and the conversation history, provide a helpful and concise answer to the user's latest message. If the user asks a question you can't answer with the given information, say so politely. Do not make up information. Respond as the "AI".
     `;
@@ -102,6 +122,7 @@ export async function POST(request: Request) {
       contents: [{ parts: [{ text: prompt }] }],
     };
 
+    // Call the Gemini API
     const geminiResponse = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,6 +136,8 @@ export async function POST(request: Request) {
     }
 
     const geminiResult: GeminiResponse = await geminiResponse.json();
+    
+    // Safely access the response text
     const responseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!responseText) {
@@ -123,7 +146,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: responseText });
 
-  } catch (error: unknown) {
+  } catch (error: unknown) { // Use 'unknown' for better type safety
     console.error('API Route Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
