@@ -237,8 +237,6 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
         }
     };
 
-    if (!isOpen) return null;
-
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 max-w-lg w-full relative flex flex-col max-h-[90vh]">
@@ -277,12 +275,12 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
-                            <input type="number" value={creditLimit} onChange={e => setCreditLimit(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                            <input type="number" value={creditLimit} onWheel={(e) => e.currentTarget.blur()} onChange={e => setCreditLimit(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                         </div>
                          {/* CORRECTED: Input for Used Amount */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Used Amount (Current Statement)</label>
-                            <input type="number" value={usedAmount} onChange={e => setUsedAmount(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
+                            <input type="number" value={usedAmount} onWheel={(e) => e.currentTarget.blur()} onChange={e => setUsedAmount(e.target.value)} className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md" />
                         </div>
                     </div>
                     
@@ -423,12 +421,12 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
 
     const getIssuerColorCode = (issuer: string) => {
         switch (issuer?.toLowerCase()) {
-            case 'hdfc': return '#ED232A'; // red
-            case 'sbi': return '#00B5EF'; // cyan-500
-            case 'icici': return ' #F99D27'; // orange-500
-            case 'axis': return '#AE275F'; // purple-600
+            case 'hdfc': return '#2563EB'; // blue-600
+            case 'sbi': return '#06B6D4'; // cyan-500
+            case 'icici': return '#F97316'; // orange-500
+            case 'axis': return '#9333EA'; // purple-600
             case 'amex': return '#1E40AF'; // blue-800
-            case 'idfc': return ' #9C1D26'; // red-500
+            case 'idfc': return '#EF4444'; // red-500
             default: return '#6B7280'; // gray-500
         }
     };
@@ -460,10 +458,10 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         return (
                             <div 
                                 key={ownedCard.id} 
-                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-500 dark:border-gray-700 relative group overflow-hidden border-t-10`}
+                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4`}
                                 style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
                             >
-                                <div className="p-4">
+                                <div className="p-6">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ownedCard.card_name}</p>
@@ -548,7 +546,7 @@ function SpendOptimizerView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Amount (₹)</label>
-                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" required className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
+                        <input name="amount" type="number" id="amount" placeholder="e.g., 2500" required onWheel={(e) => e.currentTarget.blur()} className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" />
                     </div>
                     <div>
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spend Category</label>
@@ -674,7 +672,7 @@ function AICardAdvisorView() {
     );
 }
 
-function DashboardView({ user, setActiveView }: { user: User | null, setActiveView: (view: string) => void }) {
+function DashboardView({ user, setActiveView, onAddCardClick }: { user: User | null, setActiveView: (view: string) => void, onAddCardClick: () => void }) {
     const supabase = createClient();
     const [stats, setStats] = useState({ cardCount: 0, totalLimit: 0 });
     const [isLoading, setIsLoading] = useState(true);
@@ -683,12 +681,11 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
         if (user) {
             const fetchStats = async () => {
                 setIsLoading(true);
-                const { data, error } = await supabase.from('user_owned_cards').select('credit_limit').eq('user_id', user.id);
+                const { data, error, count } = await supabase.from('user_owned_cards').select('credit_limit', { count: 'exact' }).eq('user_id', user.id);
                 if (error) console.error("Error fetching dashboard stats:", error);
                 else if (data) {
-                    const cardCount = data.length;
                     const totalLimit = data.reduce((sum, card) => sum + (card.credit_limit || 0), 0);
-                    setStats({ cardCount, totalLimit });
+                    setStats({ cardCount: count ?? 0, totalLimit });
                 }
                 setIsLoading(false);
             };
@@ -699,13 +696,25 @@ function DashboardView({ user, setActiveView }: { user: User | null, setActiveVi
     return (
         <div>
             <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Dashboard</h2>
+            
+            {user && !isLoading && stats.cardCount === 0 && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-6 rounded-r-lg mb-6">
+                    <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100">Welcome to CreditWise!</h3>
+                    <p className="mt-2 text-gray-700 dark:text-gray-300">Get started by adding your first credit card to your wallet. This will unlock personalized recommendations from the Spend Optimizer and AI Advisor.</p>
+                    <button onClick={onAddCardClick} className="mt-4 flex items-center bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200">
+                        <PlusIcon className="w-5 h-5"/>
+                        <span className="ml-2">Add Your First Card</span>
+                    </button>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <button onClick={() => setActiveView('my-cards')} className="text-left bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                     <div className="flex items-center text-green-500 mb-3"><CreditCardIcon /><h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Your Wallet</h3></div>
                     {isLoading ? <p className="text-gray-600 dark:text-gray-400 text-sm">Loading stats...</p> : user ? (
                         <><p className="text-gray-600 dark:text-gray-400 text-sm">You have <span className="font-bold text-green-600 dark:text-green-400">{stats.cardCount}</span> cards.</p><p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Total credit limit: <span className="font-bold text-green-600 dark:text-green-400">₹{stats.totalLimit.toLocaleString('en-IN')}</span></p></>
                     ) : <p className="text-gray-600 dark:text-gray-400 text-sm">Log in to see your wallet summary.</p>}
-                </div>
+                </button>
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center text-blue-500 mb-3"><SparklesIcon /><h3 className="font-bold text-lg ml-2 text-gray-800 dark:text-gray-100">Spend Optimizer</h3></div>
                     <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">Find the best card for your next purchase.</p>
@@ -891,12 +900,12 @@ export default function App() {
             </div>
         }
         switch (activeView) {
-            case 'dashboard': return <DashboardView user={user} setActiveView={setActiveView} />;
+            case 'dashboard': return <DashboardView user={user} setActiveView={setActiveView} onAddCardClick={handleAddCardClick} />;
             case 'my-cards': return user ? <MyCardsView key={key} user={user} onAddCardClick={handleAddCardClick} onEditCard={handleEditCardClick} onDeleteCard={handleDeleteCardClick} /> : null;
             case 'optimizer': return <SpendOptimizerView />;
             case 'advisor': return <AICardAdvisorView />;
             case 'settings': return <SettingsView />;
-            default: return <DashboardView user={user} setActiveView={setActiveView} />;
+            default: return <DashboardView user={user} setActiveView={setActiveView} onAddCardClick={handleAddCardClick} />;
         }
     };
 
