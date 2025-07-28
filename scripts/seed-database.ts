@@ -6,19 +6,20 @@ const path = require('path');
 const fs = require('fs');
 
 // Load environment variables from the .env file in the scripts directory
+// Make sure this .env file contains your SUPABASE_SERVICE_ROLE_KEY
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const { 
   NEXT_PUBLIC_SUPABASE_URL, 
-  NEXT_PUBLIC_SUPABASE_ANON_KEY 
+  SUPABASE_SERVICE_ROLE_KEY // *** FIX: Use the Service Role Key ***
 } = process.env;
 
-if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error("Supabase URL and Anon Key must be provided in scripts/.env");
+if (!NEXT_PUBLIC_SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error("Supabase URL and Service Role Key must be provided in scripts/.env");
 }
 
-// Initialize Supabase client
-const supabase = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY);
+// Initialize Supabase client with the admin key
+const supabase = createClient(NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function seedDatabase() {
   try {

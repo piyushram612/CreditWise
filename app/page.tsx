@@ -463,7 +463,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         return (
                             <div 
                                 key={ownedCard.id} 
-                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative group overflow-hidden border-t-4`}
+                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden border-t-4`}
                                 style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
                             >
                                 <div className="p-6">
@@ -472,7 +472,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                                             <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ownedCard.card_name}</p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{ownedCard.issuer}</p>
                                         </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex gap-2">
                                             <button onClick={() => onEditCard(ownedCard)} className="p-1.5 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"><PencilSquareIcon className="w-4 h-4 text-gray-700 dark:text-gray-200" /></button>
                                             <button onClick={() => onDeleteCard(ownedCard)} className="p-1.5 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"><TrashIcon className="w-4 h-4 text-red-500" /></button>
                                         </div>

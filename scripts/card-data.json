@@ -1,5 +1,4 @@
 [
-  // --- Cashback & Entry-Level Cards ---
   {
     "card_name": "SBI Cashback Card",
     "issuer": "SBI",
@@ -225,7 +224,6 @@
     ],
     "suitability": "A strong contender for a primary fuel card, especially for users who fill up at HPCL pumps and have significant utility/grocery spends."
   },
-  // --- Travel & Premium Cards ---
   {
     "card_name": "HDFC Regalia Gold",
     "issuer": "HDFC",
@@ -350,7 +348,6 @@
     ],
     "suitability": "For ultra-high-net-worth individuals where unparalleled travel luxury, access, and service are more important than reward points."
   },
-    // --- FinTech & LTF Cards ---
   {
     "card_name": "IDFC First Millennia",
     "issuer": "IDFC",
@@ -389,7 +386,6 @@
     ],
     "suitability": "A great lifetime-free card for beginners or those seeking a secondary card, especially if their monthly spends cross the ₹20k threshold for 10x rewards."
   },
-    // --- Co-Branded Cards ---
   {
     "card_name": "Tata Neu Infinity HDFC Bank",
     "issuer": "HDFC",
@@ -428,7 +424,6 @@
     ],
     "suitability": "Extremely valuable for users deeply integrated into the Tata ecosystem (BigBasket, 1mg, Croma, Vistara, Taj)."
   },
-  // --- PREVIOUSLY ADDED CARDS ---
   {
     "card_name": "American Express Platinum Travel",
     "issuer": "Amex",
