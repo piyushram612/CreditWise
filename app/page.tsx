@@ -6,6 +6,10 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import type { User, SupabaseClient } from '@supabase/supabase-js';
 
+// --- Supabase Client Initialization (FIXED) ---
+// The client is created once here and reused throughout the app to prevent re-render loops.
+const supabase = createClient();
+
 // --- Helper Components & Icons ---
 
 interface IconProps {
@@ -96,7 +100,6 @@ const mockSpendCategories: string[] = [
 
 // --- Modal Components ---
 function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { isOpen: boolean, onClose: () => void, user: User, onCardSaved: () => void, existingCard?: UserOwnedCard | null }) {
-    const supabase = createClient();
     const [allCards, setAllCards] = useState<Card[]>([]);
     const [cardName, setCardName] = useState('');
     const [issuer, setIssuer] = useState('');
@@ -114,7 +117,7 @@ function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard }: { i
             if (!error) setAllCards(data || []);
         };
         fetchAllCards();
-    }, [supabase]);
+    }, []);
 
     useEffect(() => {
         if (isOpen && existingCard) {
@@ -404,7 +407,6 @@ function Sidebar({ activeView, setActiveView, user, onAuthClick, supabase, theme
 }
 
 function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { user: User, onAddCardClick: () => void, onEditCard: (card: UserOwnedCard) => void, onDeleteCard: (card: UserOwnedCard) => void, key: number }) {
-    const supabase = createClient();
     const [userCards, setUserCards] = useState<UserOwnedCard[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -417,7 +419,7 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
             setIsLoading(false);
         };
         fetchUserCards();
-    }, [user, supabase, key]);
+    }, [user, key]);
 
     const getIssuerColorCode = (issuer: string) => {
         switch (issuer?.toLowerCase()) {
@@ -497,7 +499,6 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
 }
 
 function SpendOptimizerView() {
-    const supabase = createClient();
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<OptimizationResult | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -673,7 +674,6 @@ function AICardAdvisorView() {
 }
 
 function DashboardView({ user, setActiveView, onAddCardClick }: { user: User | null, setActiveView: (view: string) => void, onAddCardClick: () => void }) {
-    const supabase = createClient();
     const [stats, setStats] = useState({ cardCount: 0, totalLimit: 0 });
     const [isLoading, setIsLoading] = useState(true);
 
@@ -691,7 +691,7 @@ function DashboardView({ user, setActiveView, onAddCardClick }: { user: User | n
             };
             fetchStats();
         } else setIsLoading(false);
-    }, [user, supabase]);
+    }, [user]);
 
     return (
         <div>
@@ -847,7 +847,6 @@ export default function App() {
     const [key, setKey] = useState(0);
     const [theme, setTheme] = useState('light');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar state
-    const supabase = createClient();
 
     useEffect(() => {
         if (theme === 'dark') document.documentElement.classList.add('dark');
@@ -867,7 +866,7 @@ export default function App() {
             setIsAuthModalOpen(false);
         });
         return () => subscription?.unsubscribe();
-    }, [supabase]);
+    }, []);
 
     const handleCardSaved = () => setKey(prevKey => prevKey + 1);
     const handleCardDeleted = () => setKey(prevKey => prevKey + 1);
