@@ -463,10 +463,10 @@ function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, key }: { 
                         return (
                             <div 
                                 key={ownedCard.id} 
-                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden border-t-8`}
+                                className={`rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden border-t-20`}
                                 style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
                             >
-                                <div className="p-6">
+                                <div className="p-4">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ownedCard.card_name}</p>
