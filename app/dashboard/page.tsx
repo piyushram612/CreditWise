@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
@@ -13,47 +13,17 @@ import Settings from '../components/dashboard/Settings';
 import { CreditCardIcon } from '../components/icons';
 import type { Card } from '../../lib/types';
 
-
 export default function DashboardPage() {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [cards, setCards] = useState<Card[]>([]);
-  const [allCards, setAllCards] = useState<any[]>([]);
+  const [allCards, setAllCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState('optimizer');
   
   const supabase = createClientComponentClient();
   const router = useRouter();
 
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/');
-      } else {
-        setSession(session);
-        setUser(session.user);
-        setLoading(false);
-      }
-    };
-    getSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (!session) {
-            router.push('/');
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [supabase, router]);
-
-  const fetchUserCards = async (userId: string) => {
+  const fetchUserCards = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from('user_cards')
       .select('*, card_details(*)')
@@ -71,20 +41,46 @@ export default function DashboardPage() {
       }));
       setCards(formattedCards);
     }
-  };
+  }, [supabase]);
 
-  const fetchAllCards = async () => {
+  const fetchAllCards = useCallback(async () => {
     const { data, error } = await supabase.from('card_details').select('*');
     if (error) console.error('Error fetching all cards:', error);
     else setAllCards(data || []);
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/');
+      } else {
+        setUser(session.user);
+        setLoading(false);
+      }
+    };
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+        if (!session) {
+            router.push('/');
+        }
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase, router]);
 
   useEffect(() => {
     if (user) {
       fetchUserCards(user.id);
       fetchAllCards();
     }
-  }, [user]);
+  }, [user, fetchUserCards, fetchAllCards]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -98,7 +94,7 @@ export default function DashboardPage() {
       case 'chat':
         return <AiCardAdvisor cards={cards} />;
       case 'settings':
-        return <Settings allCards={allCards} />;
+        return <Settings />;
       default:
         return <SpendOptimizer cards={cards} />;
     }
@@ -128,7 +124,7 @@ export default function DashboardPage() {
             {renderActiveView()}
         </div>
         <aside className="w-1/3 max-w-sm hidden lg:block bg-gray-950/50 border-l border-gray-800 p-6 overflow-y-auto">
-          <CardList cards={cards} onCardUpdate={() => fetchUserCards(user!.id)} allCards={allCards} />
+          <CardList cards={cards} onCardUpdate={() => user && fetchUserCards(user.id)} allCards={allCards} />
         </aside>
       </main>
     </div>

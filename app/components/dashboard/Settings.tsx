@@ -1,7 +1,6 @@
-// FILE: app/components/dashboard/Settings.tsx
 import React, { useState } from 'react';
 
-export default function Settings({ allCards }: { allCards: any[] }) {
+export default function Settings() {
     const [feedback, setFeedback] = useState('');
     const [requestedCard, setRequestedCard] = useState('');
     const [showSuccessMessage, setShowSuccessMessage] = useState('');
@@ -51,7 +50,7 @@ export default function Settings({ allCards }: { allCards: any[] }) {
             <div className="space-y-8">
                 <div className="bg-gray-800 p-6 rounded-lg">
                     <h2 className="text-xl font-semibold text-white mb-4">Request a New Card</h2>
-                    <p className="text-gray-400 mb-4">Can't find your card in our database? Let us know and we'll add it.</p>
+                    <p className="text-gray-400 mb-4">Can&apos;t find your card in our database? Let us know and we&apos;ll add it.</p>
                     <form onSubmit={handleRequestCardSubmit} className="space-y-4">
                         <input
                             type="text"
@@ -66,7 +65,7 @@ export default function Settings({ allCards }: { allCards: any[] }) {
 
                 <div className="bg-gray-800 p-6 rounded-lg">
                     <h2 className="text-xl font-semibold text-white mb-4">Submit Feedback</h2>
-                    <p className="text-gray-400 mb-4">Have suggestions or found a bug? We'd love to hear from you.</p>
+                    <p className="text-gray-400 mb-4">Have suggestions or found a bug? We&apos;d love to hear from you.</p>
                     <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                         <textarea
                             value={feedback}

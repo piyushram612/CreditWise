@@ -1,7 +1,20 @@
-
-// FILE: app/components/dashboard/Sidebar.tsx
+import React from 'react';
 import { User } from '@supabase/supabase-js';
 import { LogoIcon, BotIcon, SettingsIcon, SlidersHorizontalIcon, LogOutIcon } from '../icons';
+
+interface NavItemProps {
+    icon: React.ReactNode;
+    label: string;
+    isActive: boolean;
+    onClick: () => void;
+}
+
+const NavItem = ({ icon, label, isActive, onClick }: NavItemProps) => (
+    <button onClick={onClick} className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}`}>
+        {icon}
+        <span className="ml-4 text-sm font-medium">{label}</span>
+    </button>
+);
 
 interface SidebarProps {
   user: User | null;
@@ -9,13 +22,6 @@ interface SidebarProps {
   activeView: string;
   setActiveView: (view: string) => void;
 }
-
-const NavItem = ({ icon, label, isActive, onClick }: any) => (
-    <button onClick={onClick} className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}`}>
-        {icon}
-        <span className="ml-4 text-sm font-medium">{label}</span>
-    </button>
-);
 
 export default function Sidebar({ user, onLogout, activeView, setActiveView }: SidebarProps) {
     return (

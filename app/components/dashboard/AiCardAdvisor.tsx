@@ -1,4 +1,3 @@
-// FILE: app/components/dashboard/AiCardAdvisor.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import type { Card, Message } from '../../../lib/types';
 import { BotIcon, UserIcon, SendIcon } from '../icons';
@@ -36,8 +35,9 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
             } else {
                 throw new Error(data.error || 'Failed to get response.');
             }
-        } catch (error: any) {
-            setMessages([...newMessages, { role: 'assistant', content: `Sorry, I encountered an error: ${error.message}` }]);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+            setMessages([...newMessages, { role: 'assistant', content: `Sorry, I encountered an error: ${errorMessage}` }]);
         } finally {
             setIsGenerating(false);
         }
@@ -53,7 +53,7 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
                     {messages.length === 0 && (
                         <div className="text-center text-gray-400 p-8">
                             <BotIcon className="h-12 w-12 mx-auto text-gray-500" />
-                            <p className="mt-4">Ask a question to get started, like "Which card is best for flights?" or "Summarize the benefits of my HDFC card."</p>
+                            <p className="mt-4">Ask a question to get started, like &quot;Which card is best for flights?&quot; or &quot;Summarize the benefits of my HDFC card.&quot;</p>
                         </div>
                     )}
                     {messages.map((msg, index) => (

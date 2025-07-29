@@ -3,7 +3,13 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Card } from '../../../lib/types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon } from '../icons';
 
-const AddCardModal = ({ allCards, onCardAdded, onClose }: any) => {
+interface AddCardModalProps {
+    allCards: Card[];
+    onCardAdded: () => void;
+    onClose: () => void;
+}
+
+const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => {
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
@@ -39,7 +45,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: any) => {
                         <label className="block text-sm font-medium text-gray-300 mb-1">Card</label>
                         <select value={selectedCardId} onChange={(e) => setSelectedCardId(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded">
                             <option value="">Select a card</option>
-                            {allCards.map((card: any) => (
+                            {allCards.map((card) => (
                                 <option key={card.id} value={card.id}>{card.card_name}</option>
                             ))}
                         </select>
@@ -62,9 +68,15 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: any) => {
     );
 };
 
-const EditCardModal = ({ card, onCardUpdated, onClose }: any) => {
-    const [creditLimit, setCreditLimit] = useState(card.credit_limit);
-    const [amountUsed, setAmountUsed] = useState(card.amount_used);
+interface EditCardModalProps {
+    card: Card;
+    onCardUpdated: () => void;
+    onClose: () => void;
+}
+
+const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
+    const [creditLimit, setCreditLimit] = useState(card.credit_limit.toString());
+    const [amountUsed, setAmountUsed] = useState(card.amount_used.toString());
     const supabase = createClientComponentClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -106,11 +118,15 @@ const EditCardModal = ({ card, onCardUpdated, onClose }: any) => {
     );
 };
 
+interface CardListProps {
+    cards: Card[];
+    onCardUpdate: () => void;
+    allCards: Card[];
+}
 
-export default function CardList({ cards, onCardUpdate, allCards }: { cards: Card[], onCardUpdate: () => void, allCards: any[] }) {
+export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
-    const [deletingCard, setDeletingCard] = useState<Card | null>(null);
     const supabase = createClientComponentClient();
 
     const handleDelete = async (cardId: number) => {
@@ -123,7 +139,6 @@ export default function CardList({ cards, onCardUpdate, allCards }: { cards: Car
             alert('Card deleted.');
             onCardUpdate();
         }
-        setDeletingCard(null);
     };
 
     return (

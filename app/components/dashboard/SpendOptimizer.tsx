@@ -1,4 +1,3 @@
-// FILE: app/components/dashboard/SpendOptimizer.tsx
 import React, { useState } from 'react';
 import type { Card } from '../../../lib/types';
 import { SparklesIcon, CreditCardIcon } from '../icons';
@@ -42,8 +41,9 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
             } else {
                 throw new Error(data.error || 'Failed to get recommendation.');
             }
-        } catch (error: any) {
-            setOptimizationResult(`Error: ${error.message}`);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+            setOptimizationResult(`Error: ${errorMessage}`);
         } finally {
             setIsOptimizing(false);
         }
@@ -91,7 +91,7 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                 <div className="mt-6 text-center p-6 bg-gray-800 rounded-lg">
                     <CreditCardIcon className="mx-auto h-10 w-10 text-gray-500"/>
                     <p className="mt-4 text-white">Please add a card to use the Spend Optimizer.</p>
-                    <p className="text-sm text-gray-400">You can add cards from the 'Your Cards' panel on the right.</p>
+                    <p className="text-sm text-gray-400">You can add cards from the &apos;Your Cards&apos; panel on the right.</p>
                 </div>
             )}
         </div>
