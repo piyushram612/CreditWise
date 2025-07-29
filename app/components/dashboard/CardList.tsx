@@ -5,7 +5,6 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Card } from '../../../lib/types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, EyeIcon } from '../icons';
 
-// New component to display card details and benefits
 const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; }) => {
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -15,10 +14,11 @@ const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; 
                     <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
                 <div className="space-y-2 text-gray-300 max-h-60 overflow-y-auto pr-2">
-                    {card.benefits && card.benefits.length > 0 ? (
+                    {/* FIX: Check if benefits is an array before mapping */}
+                    {Array.isArray(card.benefits) && card.benefits.length > 0 ? (
                         <ul className="list-disc list-inside space-y-1">
                             {card.benefits.map((benefit, index) => (
-                                <li key={index}>{benefit}</li>
+                                <li key={index}>{String(benefit)}</li>
                             ))}
                         </ul>
                     ) : (
@@ -50,13 +50,17 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
         e.preventDefault();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || !selectedCardId || !creditLimit) return;
+        
+        const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
 
-        // FIX: Corrected table name to 'user_owned_cards'
         const { error } = await supabase.from('user_owned_cards').insert({
             user_id: user.id,
-            card_details_id: parseInt(selectedCardId),
+            card_id: selectedCardId, // FIX: Use card_id
             credit_limit: parseFloat(creditLimit),
-            amount_used: parseFloat(amountUsed) || 0,
+            used_amount: parseFloat(amountUsed) || 0, // FIX: Use used_amount
+            // Add other fields from your schema that are required or have defaults
+            card_name: selectedMasterCard?.card_name,
+            issuer: selectedMasterCard?.card_issuer,
         });
 
         if (error) {
@@ -107,16 +111,15 @@ interface EditCardModalProps {
 }
 
 const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
-    const [creditLimit, setCreditLimit] = useState(card.credit_limit.toString());
-    const [amountUsed, setAmountUsed] = useState(card.amount_used.toString());
+    const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
+    const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
     const supabase = createClientComponentClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // FIX: Corrected table name to 'user_owned_cards'
         const { error } = await supabase.from('user_owned_cards').update({
             credit_limit: parseFloat(creditLimit),
-            amount_used: parseFloat(amountUsed),
+            used_amount: parseFloat(amountUsed), // FIX: Use used_amount
         }).eq('id', card.id);
 
         if (error) {
@@ -160,13 +163,12 @@ interface CardListProps {
 export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
-    const [viewingCard, setViewingCard] = useState<Card | null>(null); // State for viewing details
+    const [viewingCard, setViewingCard] = useState<Card | null>(null);
     const supabase = createClientComponentClient();
 
-    const handleDelete = async (cardId: number) => {
+    const handleDelete = async (cardId: string) => { // ID is now string
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
-        // FIX: Corrected table name to 'user_owned_cards'
         const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
         if (error) {
             alert('Error deleting card: ' + error.message);
@@ -205,11 +207,11 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
                         </div>
                         <div className="mt-4">
                             <div className="flex justify-between text-xs text-gray-400 mb-1">
-                                <span>Used: ₹{card.amount_used.toLocaleString()}</span>
-                                <span>Limit: ₹{card.credit_limit.toLocaleString()}</span>
+                                <span>Used: ₹{(card.used_amount ?? 0).toLocaleString()}</span>
+                                <span>Limit: ₹{(card.credit_limit ?? 0).toLocaleString()}</span>
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2.5">
-                                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full" style={{ width: `${(card.amount_used / card.credit_limit) * 100}%` }}></div>
+                                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full" style={{ width: `${((card.used_amount ?? 0) / (card.credit_limit ?? 1)) * 100}%` }}></div>
                             </div>
                         </div>
                     </div>

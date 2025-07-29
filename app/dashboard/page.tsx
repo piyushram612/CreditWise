@@ -11,19 +11,27 @@ import SpendOptimizer from '../components/dashboard/SpendOptimizer';
 import AiCardAdvisor from '../components/dashboard/AiCardAdvisor';
 import Settings from '../components/dashboard/Settings';
 import { CreditCardIcon } from '../components/icons';
-import type { Card } from '../../lib/types';
+import type { Card, Json } from '../../lib/types';
 
 // Define a type for the raw data structure from Supabase
-interface SupabaseCardData {
-  id: number;
-  credit_limit: number;
-  amount_used: number;
-  cards: { 
-    id: number;
+interface SupabaseUserCard {
+  id: string;
+  user_id: string;
+  card_id: string | null;
+  credit_limit: number | null;
+  created_at: string | null;
+  custom_benefits: string | null;
+  card_name: string | null;
+  issuer: string | null;
+  card_type: string | null;
+  benefits: Json | null;
+  fees: Json | null;
+  used_amount: number | null;
+  cards: { // This comes from the join
     card_name: string;
     issuer: string;
-    benefits: string[]; // Added benefits
-  };
+    benefits: Json | null;
+  } | null;
 }
 
 export default function DashboardPage() {
@@ -45,14 +53,15 @@ export default function DashboardPage() {
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      const formattedCards: Card[] = data.map((card: SupabaseCardData) => ({
+      const formattedCards: Card[] = data.map((card: SupabaseUserCard) => ({
         id: card.id,
-        card_name: card.cards.card_name,
-        card_issuer: card.cards.issuer,
+        user_id: card.user_id,
+        card_id: card.card_id,
         credit_limit: card.credit_limit,
-        amount_used: card.amount_used,
-        card_details_id: card.cards.id,
-        benefits: card.cards.benefits, // Pass benefits data
+        card_name: card.card_name || card.cards?.card_name,
+        card_issuer: card.issuer || card.cards?.issuer,
+        benefits: card.benefits || card.cards?.benefits,
+        used_amount: card.used_amount,
       }));
       setCards(formattedCards);
     }
