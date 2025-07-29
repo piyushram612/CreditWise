@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import type { Card } from '../../../lib/types';
 import { SparklesIcon, CreditCardIcon } from '../icons';

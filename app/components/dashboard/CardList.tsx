@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Card } from '../../../lib/types';

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import type { Card, Message } from '../../../lib/types';
 import { BotIcon, UserIcon, SendIcon } from '../icons';
