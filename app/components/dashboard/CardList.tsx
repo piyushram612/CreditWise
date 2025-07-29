@@ -3,7 +3,36 @@
 import React, { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Card } from '../../../lib/types';
-import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon } from '../icons';
+import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, EyeIcon } from '../icons';
+
+// New component to display card details and benefits
+const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; }) => {
+    return (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-2xl">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-white">{card.card_name} Benefits</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <div className="space-y-2 text-gray-300 max-h-60 overflow-y-auto pr-2">
+                    {card.benefits && card.benefits.length > 0 ? (
+                        <ul className="list-disc list-inside space-y-1">
+                            {card.benefits.map((benefit, index) => (
+                                <li key={index}>{benefit}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No benefits listed for this card.</p>
+                    )}
+                </div>
+                 <div className="mt-6 text-right">
+                    <button onClick={onClose} className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Close</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 interface AddCardModalProps {
     allCards: Card[];
@@ -22,7 +51,8 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || !selectedCardId || !creditLimit) return;
 
-        const { error } = await supabase.from('user_cards').insert({
+        // FIX: Corrected table name to 'user_owned_cards'
+        const { error } = await supabase.from('user_owned_cards').insert({
             user_id: user.id,
             card_details_id: parseInt(selectedCardId),
             credit_limit: parseFloat(creditLimit),
@@ -83,7 +113,8 @@ const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const { error } = await supabase.from('user_cards').update({
+        // FIX: Corrected table name to 'user_owned_cards'
+        const { error } = await supabase.from('user_owned_cards').update({
             credit_limit: parseFloat(creditLimit),
             amount_used: parseFloat(amountUsed),
         }).eq('id', card.id);
@@ -129,12 +160,14 @@ interface CardListProps {
 export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
+    const [viewingCard, setViewingCard] = useState<Card | null>(null); // State for viewing details
     const supabase = createClientComponentClient();
 
     const handleDelete = async (cardId: number) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
-        const { error } = await supabase.from('user_cards').delete().eq('id', cardId);
+        // FIX: Corrected table name to 'user_owned_cards'
+        const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
         if (error) {
             alert('Error deleting card: ' + error.message);
         } else {
@@ -147,6 +180,7 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
         <div className="bg-gray-800/50 rounded-xl p-6 h-full">
             {showAddCardModal && <AddCardModal allCards={allCards} onCardAdded={onCardUpdate} onClose={() => setShowAddCardModal(false)} />}
             {editingCard && <EditCardModal card={editingCard} onCardUpdated={onCardUpdate} onClose={() => setEditingCard(null)} />}
+            {viewingCard && <CardDetailsModal card={viewingCard} onClose={() => setViewingCard(null)} />}
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-white">Your Wallet</h2>
@@ -163,7 +197,8 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
                                 <p className="font-bold text-lg text-white">{card.card_name}</p>
                                 <p className="text-sm text-gray-400">{card.card_issuer}</p>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-1">
+                                <button onClick={() => setViewingCard(card)} className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full"><EyeIcon className="h-4 w-4" /></button>
                                 <button onClick={() => setEditingCard(card)} className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full"><EditIcon className="h-4 w-4" /></button>
                                 <button onClick={() => handleDelete(card.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-700 rounded-full"><TrashIcon className="h-4 w-4" /></button>
                             </div>

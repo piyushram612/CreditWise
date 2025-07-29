@@ -18,10 +18,11 @@ interface SupabaseCardData {
   id: number;
   credit_limit: number;
   amount_used: number;
-  cards: { // Corrected from card_details
+  cards: { 
     id: number;
     card_name: string;
     issuer: string;
+    benefits: string[]; // Added benefits
   };
 }
 
@@ -36,7 +37,6 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const fetchUserCards = useCallback(async (userId: string) => {
-    // Corrected table name to 'user_owned_cards' and the join to 'cards(*)'
     const { data, error } = await supabase
       .from('user_owned_cards')
       .select('*, cards(*)')
@@ -52,13 +52,13 @@ export default function DashboardPage() {
         credit_limit: card.credit_limit,
         amount_used: card.amount_used,
         card_details_id: card.cards.id,
+        benefits: card.cards.benefits, // Pass benefits data
       }));
       setCards(formattedCards);
     }
   }, [supabase]);
 
   const fetchAllCards = useCallback(async () => {
-    // Corrected table name to 'cards'
     const { data, error } = await supabase.from('cards').select('*');
     if (error) console.error('Error fetching all cards:', error);
     else setAllCards(data || []);
