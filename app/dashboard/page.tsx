@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Session, User } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
 import Sidebar from '../components/dashboard/Sidebar';
@@ -12,6 +12,18 @@ import AiCardAdvisor from '../components/dashboard/AiCardAdvisor';
 import Settings from '../components/dashboard/Settings';
 import { CreditCardIcon } from '../components/icons';
 import type { Card } from '../../lib/types';
+
+// Define a type for the raw data structure from Supabase
+interface SupabaseCardData {
+  id: number;
+  credit_limit: number;
+  amount_used: number;
+  card_details: {
+    id: number;
+    card_name: string;
+    issuer: string;
+  };
+}
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -31,7 +43,7 @@ export default function DashboardPage() {
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      const formattedCards: Card[] = data.map((card: any) => ({
+      const formattedCards: Card[] = data.map((card: SupabaseCardData) => ({
         id: card.id,
         card_name: card.card_details.card_name,
         card_issuer: card.card_details.issuer,
