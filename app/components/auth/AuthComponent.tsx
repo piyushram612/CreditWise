@@ -20,8 +20,7 @@ export default function AuthComponent() {
     });
   };
 
-  const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleEmailLogin = async () => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -34,8 +33,7 @@ export default function AuthComponent() {
     }
   };
   
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSignUp = async () => {
     const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -52,7 +50,7 @@ export default function AuthComponent() {
 
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 shadow-lg space-y-6">
-      <form className="space-y-4">
+      <div className="space-y-4">
         <div>
           <label
             htmlFor="email"
@@ -92,19 +90,19 @@ export default function AuthComponent() {
         </div>
         <div className="flex space-x-2">
             <button
-            onClick={(e:any) => handleEmailLogin(e)}
+            onClick={handleEmailLogin}
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
             Sign In
             </button>
             <button
-            onClick={(e:any) => handleSignUp(e)}
+            onClick={handleSignUp}
             className="w-full flex justify-center py-3 px-4 border border-indigo-600 rounded-md shadow-sm text-sm font-medium text-indigo-300 bg-transparent hover:bg-indigo-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
             Sign Up
             </button>
         </div>
-      </form>
+      </div>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
