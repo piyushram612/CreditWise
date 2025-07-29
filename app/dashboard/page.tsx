@@ -68,7 +68,6 @@ export default function DashboardPage() {
         router.push('/');
       } else {
         setUser(session.user);
-        setLoading(false);
       }
     };
     getSession();
@@ -89,8 +88,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user) {
-      fetchUserCards(user.id);
-      fetchAllCards();
+      Promise.all([
+        fetchUserCards(user.id),
+        fetchAllCards()
+      ]).finally(() => setLoading(false));
     }
   }, [user, fetchUserCards, fetchAllCards]);
 
@@ -117,7 +118,7 @@ export default function DashboardPage() {
         <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
             <div className="flex items-center space-x-2">
                 <CreditCardIcon className="h-8 w-8 animate-pulse" />
-                <span className="text-xl">Loading your dashboard...</span>
+                <span className="text-xl">Loading CreditWise...</span>
             </div>
         </div>
     );
@@ -131,13 +132,13 @@ export default function DashboardPage() {
         activeView={activeView}
         setActiveView={setActiveView}
       />
-      <main className="flex-1 flex overflow-hidden">
-        <div className="flex-1 flex flex-col overflow-y-auto p-4 md:p-6 lg:p-8">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 overflow-y-auto">
+        <div className="lg:col-span-2">
             {renderActiveView()}
         </div>
-        <aside className="w-1/3 max-w-sm hidden lg:block bg-gray-950/50 border-l border-gray-800 p-6 overflow-y-auto">
+        <div className="lg:col-span-1">
           <CardList cards={cards} onCardUpdate={() => user && fetchUserCards(user.id)} allCards={allCards} />
-        </aside>
+        </div>
       </main>
     </div>
   );
