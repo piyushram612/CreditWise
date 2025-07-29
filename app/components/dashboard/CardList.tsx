@@ -1,10 +1,8 @@
-// FILE: app/components/dashboard/CardList.tsx
 import React, { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Card } from '../../../lib/types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon } from '../icons';
 
-// You would create these modal components in separate files
 const AddCardModal = ({ allCards, onCardAdded, onClose }: any) => {
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
