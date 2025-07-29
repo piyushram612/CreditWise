@@ -18,7 +18,7 @@ interface SupabaseCardData {
   id: number;
   credit_limit: number;
   amount_used: number;
-  card_details: {
+  cards: { // Corrected from card_details
     id: number;
     card_name: string;
     issuer: string;
@@ -36,27 +36,30 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const fetchUserCards = useCallback(async (userId: string) => {
+    // Corrected table name to 'user_owned_cards' and the join to 'cards(*)'
     const { data, error } = await supabase
-      .from('user_cards')
-      .select('*, card_details(*)')
+      .from('user_owned_cards')
+      .select('*, cards(*)')
       .eq('user_id', userId);
+
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
       const formattedCards: Card[] = data.map((card: SupabaseCardData) => ({
         id: card.id,
-        card_name: card.card_details.card_name,
-        card_issuer: card.card_details.issuer,
+        card_name: card.cards.card_name,
+        card_issuer: card.cards.issuer,
         credit_limit: card.credit_limit,
         amount_used: card.amount_used,
-        card_details_id: card.card_details.id,
+        card_details_id: card.cards.id,
       }));
       setCards(formattedCards);
     }
   }, [supabase]);
 
   const fetchAllCards = useCallback(async () => {
-    const { data, error } = await supabase.from('card_details').select('*');
+    // Corrected table name to 'cards'
+    const { data, error } = await supabase.from('cards').select('*');
     if (error) console.error('Error fetching all cards:', error);
     else setAllCards(data || []);
   }, [supabase]);
