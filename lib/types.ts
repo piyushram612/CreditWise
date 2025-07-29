@@ -6,6 +6,7 @@ export interface Card {
   credit_limit: number;
   amount_used: number;
   card_details_id: number;
+  benefits?: string[]; // This line is crucial
 }
 
 export interface Message {
