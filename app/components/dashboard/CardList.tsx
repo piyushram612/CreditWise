@@ -1,17 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-// THIS IS THE ONLY CHANGE NEEDED IN THIS FILE
-import { createBrowserClient } from '@supabase/ssr'; 
-import type { Card } from '../../../lib/types';
+import { createBrowserClient } from '@supabase/ssr';
+import type { Card, Json } from '../../../lib/types';
 import type { Database } from '../../../lib/database.types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, EyeIcon } from '../icons';
 
 // The CardDetailsModal component displays the benefits of a selected card.
 const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; }) => {
     // Helper function to render any JSON object as a list
-    const renderJsonDetails = (details: any) => {
-        if (!details || typeof details !== 'object') {
+    const renderJsonDetails = (details: Json | null | undefined) => {
+        if (!details || typeof details !== 'object' || Array.isArray(details)) {
             return <li>No details available.</li>;
         }
         return Object.entries(details).map(([key, value]) => (
