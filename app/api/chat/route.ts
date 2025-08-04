@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/lib/database.types';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { Json } from '@/lib/types'; // Import the Json type
 
 // Initialize the Gemini AI model
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -16,8 +17,9 @@ interface UserOwnedCard {
     card_name: string;
     issuer: string;
     card_type?: string;
-    benefits?: Record<string, any>;
-    fees?: Record<string, any>;
+    // FIX: Replaced 'any' with the specific 'Json' type
+    benefits?: Json | null;
+    fees?: Json | null;
 }
 
 interface ChatMessage {
@@ -31,8 +33,8 @@ interface ChatRequestBody {
 }
 
 const formatCardForPrompt = (card: UserOwnedCard): string => {
-  const benefits = card.benefits ? Object.entries(card.benefits).map(([key, value]) => `  - ${key}: ${JSON.stringify(value)}`).join('\n') : '  - Not specified';
-  const fees = card.fees ? Object.entries(card.fees).map(([key, value]) => `  - ${key}: ${JSON.stringify(value)}`).join('\n') : '  - Not specified';
+  const benefits = card.benefits ? JSON.stringify(card.benefits, null, 2) : 'Not specified';
+  const fees = card.fees ? JSON.stringify(card.fees, null, 2) : 'Not specified';
 
   return `
 Card Name: ${card.card_name}
@@ -49,7 +51,6 @@ ${fees}
 export async function POST(request: Request) {
   try {
     const cookieStore = cookies();
-    // FIX: Create the Supabase client locally within the API route
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
