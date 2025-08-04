@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import type { Database } from '@/lib/database.types';
+// FIX: Removed unused 'Database' import
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { Json } from '@/lib/types';
 
