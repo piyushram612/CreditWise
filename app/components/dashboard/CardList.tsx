@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@supabase/ssr'; 
 import type { Card, Json } from '../../../lib/types';
 import type { Database } from '../../../lib/database.types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, EyeIcon } from '../icons';
 
-// The CardDetailsModal component displays the benefits of a selected card.
 const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; }) => {
-    // Helper function to render any JSON object as a list
     const renderJsonDetails = (details: Json | null | undefined) => {
         if (!details || typeof details !== 'object' || Array.isArray(details)) {
             return <li>No details available.</li>;
@@ -51,39 +49,29 @@ const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; 
     );
 };
 
-// Props for the AddCardModal component
 interface AddCardModalProps {
     allCards: Card[];
     onCardAdded: () => void;
     onClose: () => void;
 }
 
-// The AddCardModal component allows users to add a new card to their wallet.
 const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => {
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
-    const supabase = createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = createBrowserClient<Database>();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || !selectedCardId || !creditLimit) return;
         
-        const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
-
-        const { error } = await supabase.from('user_owned_cards').insert({
+        // FIX: Use 'user_cards' table and correct column names
+        const { error } = await supabase.from('user_cards').insert({
             user_id: user.id,
-            card_id: selectedCardId,
+            card_details_id: parseInt(selectedCardId, 10),
             credit_limit: parseFloat(creditLimit),
-            used_amount: parseFloat(amountUsed) || 0,
-            card_name: selectedMasterCard?.card_name,
-            issuer: selectedMasterCard?.card_issuer,
-            benefits: selectedMasterCard?.benefits,
-            fees: selectedMasterCard?.fees,
+            amount_used: parseFloat(amountUsed) || 0,
         });
 
         if (error) {
@@ -127,27 +115,23 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
     );
 };
 
-// Props for the EditCardModal component
 interface EditCardModalProps {
     card: Card;
     onCardUpdated: () => void;
     onClose: () => void;
 }
 
-// The EditCardModal allows users to update their card's credit limit and used amount.
 const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
     const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
     const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
-    const supabase = createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = createBrowserClient<Database>();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const { error } = await supabase.from('user_owned_cards').update({
+        // FIX: Use 'user_cards' table and correct column names
+        const { error } = await supabase.from('user_cards').update({
             credit_limit: parseFloat(creditLimit),
-            used_amount: parseFloat(amountUsed),
+            amount_used: parseFloat(amountUsed),
         }).eq('id', card.id);
 
         if (error) {
@@ -182,27 +166,23 @@ const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => 
     );
 };
 
-// Props for the main CardList component
 interface CardListProps {
     cards: Card[];
     onCardUpdate: () => void;
     allCards: Card[];
 }
 
-// The main component that renders the list of user-owned cards and manages modals.
 export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
-    const supabase = createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = createBrowserClient<Database>();
 
     const handleDelete = async (cardId: string) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
-        const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
+        // FIX: Use 'user_cards' table
+        const { error } = await supabase.from('user_cards').delete().eq('id', cardId);
         if (error) {
             alert('Error deleting card: ' + error.message);
         } else {
