@@ -17,7 +17,8 @@ const ratelimit = new Ratelimit({
 
 export async function POST(req: NextRequest) {
   // 1. Check Rate Limiting
-  const ip = req.ip ?? '127.0.0.1';
+  // CORRECTED LINE: Get IP from headers instead of req.ip
+  const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
   const { success } = await ratelimit.limit(ip);
 
   if (!success) {
