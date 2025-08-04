@@ -14,19 +14,21 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
+          // The `set` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing user sessions.
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (_error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
+          } catch (error) {
+            // This is intentional
           }
         },
         remove(name: string, options: CookieOptions) {
+          // The `delete` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing user sessions.
           try {
             cookieStore.set({ name, value: '', ...options });
-          } catch (_error) {
-            // The `delete` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
+          } catch (error) {
+            // This is intentional
           }
         },
       },
