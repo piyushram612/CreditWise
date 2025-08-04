@@ -35,15 +35,15 @@ export default async function DashboardPage() {
     console.error('Error fetching cards:', userCardsError || allCardsError);
   }
 
-  // FIX: Ensure all potentially undefined values are coalesced to null to match the Card type.
+  // Correctly map the data from the joined tables without using 'any'
   const initialUserCards: Card[] = (userCardsData as UserCardFromDB[] || []).map((item) => {
       const cardDetails = item.cards;
       return {
           id: item.id,
           user_id: item.user_id,
           card_id: item.card_id,
-          credit_limit: item.credit_limit ?? null,
-          used_amount: item.used_amount ?? null,
+          credit_limit: item.credit_limit,
+          used_amount: item.used_amount,
           card_name: item.card_name || cardDetails?.card_name || null,
           card_issuer: item.issuer || cardDetails?.issuer || null,
           benefits: item.benefits || cardDetails?.benefits || null,

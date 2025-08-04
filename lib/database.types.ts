@@ -70,19 +70,19 @@ export type Database = {
       }
       feedback: {
         Row: {
-          id: string
+          id: number
           created_at: string
           user_id: string
           feedback_text: string
         }
         Insert: {
-          id?: string
+          id?: number
           created_at?: string
           user_id: string
           feedback_text: string
         }
         Update: {
-          id?: string
+          id?: number
           created_at?: string
           user_id?: string
           feedback_text?: string
@@ -90,19 +90,19 @@ export type Database = {
       }
       card_requests: {
         Row: {
-          id: string
+          id: number
           created_at: string
           user_id: string
           card_name: string
         }
         Insert: {
-          id?: string
+          id?: number
           created_at?: string
           user_id: string
           card_name: string
         }
         Update: {
-          id?: string
+          id?: number
           created_at?: string
           user_id?: string
           card_name?: string
