@@ -41,8 +41,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // FIX: Explicitly type the return of the .map() callback to 'Card | null'.
-      // This gives the TypeScript compiler the hint it needs to resolve the type error.
       const mappedData = data.map((item): Card | null => {
         const cardDetails = item.card_details;
 
@@ -102,7 +100,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           </div>
           <div className="space-y-6">
             <CardList 
-              initialCards={cards}
+              cards={cards}
               allCards={allMasterCards}
               onCardUpdate={handleCardUpdate}
             />
