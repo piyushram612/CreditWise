@@ -11,7 +11,7 @@ import SpendOptimizer from './SpendOptimizer';
 import AiCardAdvisor from './AiCardAdvisor';
 import Settings from './Settings';
 import type { Card } from '@/lib/types';
-import type { Database } from '@/lib/database.types';
+import type { Database, Tables } from '@/lib/database.types';
 
 interface DashboardClientProps {
   user: User;
@@ -35,14 +35,14 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // Ensure the fetched data conforms to the Card type
-      const formattedCards: Card[] = data.map((card: any) => ({
+      // FIX: Replaced 'any' with the specific type from database.types.ts
+      const formattedCards: Card[] = data.map((card: Tables<'user_owned_cards'>) => ({
         id: card.id,
         user_id: card.user_id,
         card_id: card.card_id,
         credit_limit: card.credit_limit,
         card_name: card.card_name,
-        card_issuer: card.issuer, // Ensure this matches your type
+        card_issuer: card.issuer,
         benefits: card.benefits,
         fees: card.fees,
         used_amount: card.used_amount,
