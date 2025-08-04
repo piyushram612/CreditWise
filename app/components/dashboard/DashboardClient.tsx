@@ -23,7 +23,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const [cards, setCards] = useState(initialUserCards);
   const [activeView, setActiveView] = useState('optimizer');
   
-  // FIX: Pass the Supabase URL and anon key to the client
   const supabase = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -31,25 +30,42 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const router = useRouter();
 
   const handleCardUpdate = useCallback(async () => {
+    // FIX: The table name is 'user_cards', not 'user_owned_cards'.
+    // We also need to join with 'card_details' to get all card info.
     const { data, error } = await supabase
-      .from('user_owned_cards')
-      .select('*')
+      .from('user_cards')
+      .select(`
+        *,
+        card_details (*)
+      `)
       .eq('user_id', user.id);
 
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      const formattedCards: Card[] = data.map((card: Database['public']['Tables']['user_owned_cards']['Row']) => ({
-        id: card.id,
-        user_id: card.user_id,
-        card_id: card.card_id,
-        credit_limit: card.credit_limit,
-        card_name: card.card_name,
-        card_issuer: card.issuer,
-        benefits: card.benefits,
-        fees: card.fees,
-        used_amount: card.used_amount,
-      }));
+      // FIX: Map the data from the joined tables to the 'Card' type.
+      const formattedCards: Card[] = data.map((item) => {
+        const cardDetails = item.card_details;
+
+        // Handle cases where the join might not return details.
+        if (!cardDetails) {
+          return null;
+        }
+
+        return {
+          id: item.id.toString(),
+          user_id: item.user_id,
+          card_id: item.card_details_id.toString(),
+          credit_limit: item.credit_limit,
+          used_amount: item.amount_used,
+          card_name: cardDetails.card_name,
+          card_issuer: cardDetails.issuer,
+          // Cast to any for benefits/fees if their structure is not strictly defined in the base type
+          benefits: (cardDetails as any).benefits ?? null,
+          fees: (cardDetails as any).fees ?? null,
+        };
+      }).filter((c): c is Card => c !== null); // Filter out any null entries
+
       setCards(formattedCards);
     }
   }, [supabase, user.id]);
