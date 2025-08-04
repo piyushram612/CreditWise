@@ -59,19 +59,28 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
-    const supabase = createBrowserClient<Database>();
+    // FIX: Pass the Supabase URL and anon key to the client
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || !selectedCardId || !creditLimit) return;
         
-        // FIX: Use 'user_cards' table and correct column names
-        const { error } = await supabase.from('user_cards').insert({
+        const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
+
+        const { error } = await supabase.from('user_owned_cards').insert({
             user_id: user.id,
-            card_details_id: parseInt(selectedCardId, 10),
+            card_id: selectedCardId,
             credit_limit: parseFloat(creditLimit),
-            amount_used: parseFloat(amountUsed) || 0,
+            used_amount: parseFloat(amountUsed) || 0,
+            card_name: selectedMasterCard?.card_name,
+            issuer: selectedMasterCard?.card_issuer,
+            benefits: selectedMasterCard?.benefits,
+            fees: selectedMasterCard?.fees,
         });
 
         if (error) {
@@ -124,14 +133,17 @@ interface EditCardModalProps {
 const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
     const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
     const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
-    const supabase = createBrowserClient<Database>();
+    // FIX: Pass the Supabase URL and anon key to the client
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // FIX: Use 'user_cards' table and correct column names
-        const { error } = await supabase.from('user_cards').update({
+        const { error } = await supabase.from('user_owned_cards').update({
             credit_limit: parseFloat(creditLimit),
-            amount_used: parseFloat(amountUsed),
+            used_amount: parseFloat(amountUsed),
         }).eq('id', card.id);
 
         if (error) {
@@ -176,13 +188,16 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
-    const supabase = createBrowserClient<Database>();
+    // FIX: Pass the Supabase URL and anon key to the client
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const handleDelete = async (cardId: string) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
-        // FIX: Use 'user_cards' table
-        const { error } = await supabase.from('user_cards').delete().eq('id', cardId);
+        const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
         if (error) {
             alert('Error deleting card: ' + error.message);
         } else {
