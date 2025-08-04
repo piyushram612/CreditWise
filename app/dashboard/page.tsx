@@ -5,10 +5,9 @@ import DashboardClient from '../components/dashboard/DashboardClient';
 import type { Card } from '@/lib/types';
 import type { Database } from '@/lib/database.types';
 
-// Define a more specific type for the data we expect from the query,
-// aligning with the actual database.types.ts file.
-type UserCardFromDB = Database['public']['Tables']['user_cards']['Row'] & {
-  card_details: Database['public']['Tables']['card_details']['Row'] | null;
+// This type now correctly references the updated database types
+type UserCardFromDB = Database['public']['Tables']['user_owned_cards']['Row'] & {
+  cards: Database['public']['Tables']['cards']['Row'] | null;
 };
 
 export default async function DashboardPage() {
@@ -21,44 +20,44 @@ export default async function DashboardPage() {
     redirect('/');
   }
 
-  // FIX: Query the correct 'user_cards' table and join with 'card_details'
+  // Query the correct 'user_owned_cards' table and join with 'cards'
   const { data: userCardsData, error: userCardsError } = await supabase
-    .from('user_cards')
-    .select(`*, card_details(*)`)
+    .from('user_owned_cards')
+    .select(`*, cards(*)`)
     .eq('user_id', session.user.id);
 
-  // FIX: Fetch all master cards from the 'card_details' table
+  // Fetch all master cards from the 'cards' table
   const { data: allCardsData, error: allCardsError } = await supabase
-    .from('card_details')
+    .from('cards')
     .select('*');
 
   if (userCardsError || allCardsError) {
     console.error('Error fetching cards:', userCardsError || allCardsError);
   }
 
-  // FIX: Correctly map the data from the joined tables
+  // Correctly map the data from the joined tables without using 'any'
   const initialUserCards: Card[] = (userCardsData as UserCardFromDB[] || []).map((item) => {
-      const cardDetails = item.card_details;
-      if (!cardDetails) return null;
+      const cardDetails = item.cards;
       return {
-          id: item.id.toString(),
+          id: item.id,
           user_id: item.user_id,
-          card_id: item.card_details_id.toString(),
+          card_id: item.card_id,
           credit_limit: item.credit_limit,
-          used_amount: item.amount_used,
-          card_name: cardDetails.card_name,
-          card_issuer: cardDetails.issuer,
-          // These fields may not exist on card_details, so we provide fallbacks
-          benefits: (cardDetails as any).benefits ?? null,
-          fees: (cardDetails as any).fees ?? null,
+          used_amount: item.used_amount,
+          card_name: item.card_name || cardDetails?.card_name,
+          card_issuer: item.issuer || cardDetails?.issuer,
+          benefits: item.benefits || cardDetails?.benefits,
+          fees: item.fees || cardDetails?.fees,
       };
   }).filter((c): c is Card => c !== null);
 
   const allMasterCards: Card[] = (allCardsData || []).map(card => ({
-      id: card.id.toString(),
+      id: card.id,
       user_id: '', // Not applicable for master list
       card_name: card.card_name,
       card_issuer: card.issuer,
+      benefits: card.benefits,
+      fees: card.fees,
   }));
 
   return (

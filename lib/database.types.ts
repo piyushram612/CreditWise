@@ -9,23 +9,103 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      // This is a placeholder. If you generate types from your
-      // Supabase dashboard, you can paste them here.
-      // For now, an empty object will satisfy the compiler.
-      card_details: {
+      cards: {
         Row: {
-          id: number
+          id: string
           card_name: string
           issuer: string
+          benefits: Json | null
+          fees: Json | null
+          // Add any other columns from your master 'cards' table here
+        }
+        Insert: {
+          id?: string
+          card_name: string
+          issuer: string
+          benefits?: Json | null
+          fees?: Json | null
+        }
+        Update: {
+          id?: string
+          card_name?: string
+          issuer?: string
+          benefits?: Json | null
+          fees?: Json | null
         }
       }
-      user_cards: {
+      user_owned_cards: {
         Row: {
-          id: number
+          id: string
           user_id: string
-          card_details_id: number
-          credit_limit: number
-          amount_used: number
+          card_id: string
+          credit_limit: number | null
+          used_amount: number | null
+          card_name: string | null // Denormalized
+          issuer: string | null     // Denormalized
+          benefits: Json | null     // Denormalized
+          fees: Json | null         // Denormalized
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          card_id: string
+          credit_limit?: number | null
+          used_amount?: number | null
+          card_name?: string | null
+          issuer?: string | null
+          benefits?: Json | null
+          fees?: Json | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          card_id?: string
+          credit_limit?: number | null
+          used_amount?: number | null
+          card_name?: string | null
+          issuer?: string | null
+          benefits?: Json | null
+          fees?: Json | null
+        }
+      }
+      feedback: {
+        Row: {
+          id: string
+          created_at: string
+          user_id: string
+          feedback_text: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          user_id: string
+          feedback_text: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          user_id?: string
+          feedback_text?: string
+        }
+      }
+      card_requests: {
+        Row: {
+          id: string
+          created_at: string
+          user_id: string
+          card_name: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          user_id: string
+          card_name: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          user_id?: string
+          card_name?: string
         }
       }
     }
