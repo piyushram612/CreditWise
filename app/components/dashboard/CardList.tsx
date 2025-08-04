@@ -1,31 +1,50 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+// THIS IS THE ONLY CHANGE NEEDED IN THIS FILE
+import { createBrowserClient } from '@supabase/ssr'; 
 import type { Card } from '../../../lib/types';
+import type { Database } from '../../../lib/database.types';
 import { PlusIcon, EditIcon, TrashIcon, CreditCardIcon, EyeIcon } from '../icons';
 
+// The CardDetailsModal component displays the benefits of a selected card.
 const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; }) => {
+    // Helper function to render any JSON object as a list
+    const renderJsonDetails = (details: any) => {
+        if (!details || typeof details !== 'object') {
+            return <li>No details available.</li>;
+        }
+        return Object.entries(details).map(([key, value]) => (
+            <li key={key}>
+                <span className="font-semibold capitalize">{key.replace(/_/g, ' ')}:</span> {String(value)}
+            </li>
+        ));
+    };
+
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-2xl">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-white">{card.card_name} Benefits</h2>
+                    <h2 className="text-xl font-bold text-white">{card.card_name} Details</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
-                <div className="space-y-2 text-gray-300 max-h-60 overflow-y-auto pr-2">
-                    {/* FIX: Check if benefits is an array before mapping */}
-                    {Array.isArray(card.benefits) && card.benefits.length > 0 ? (
+                <div className="space-y-4 text-gray-300 max-h-96 overflow-y-auto pr-2">
+                    <div>
+                        <h3 className="font-bold text-lg text-indigo-400 mb-2">Benefits</h3>
                         <ul className="list-disc list-inside space-y-1">
-                            {card.benefits.map((benefit, index) => (
-                                <li key={index}>{String(benefit)}</li>
-                            ))}
+                            {renderJsonDetails(card.benefits)}
                         </ul>
-                    ) : (
-                        <p>No benefits listed for this card.</p>
+                    </div>
+                     {card.fees && (
+                        <div>
+                            <h3 className="font-bold text-lg text-indigo-400 mb-2">Fees</h3>
+                            <ul className="list-disc list-inside space-y-1">
+                                {renderJsonDetails(card.fees)}
+                            </ul>
+                        </div>
                     )}
                 </div>
-                 <div className="mt-6 text-right">
+                <div className="mt-6 text-right">
                     <button onClick={onClose} className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Close</button>
                 </div>
             </div>
@@ -33,18 +52,22 @@ const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; 
     );
 };
 
-
+// Props for the AddCardModal component
 interface AddCardModalProps {
     allCards: Card[];
     onCardAdded: () => void;
     onClose: () => void;
 }
 
+// The AddCardModal component allows users to add a new card to their wallet.
 const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => {
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,12 +78,13 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
 
         const { error } = await supabase.from('user_owned_cards').insert({
             user_id: user.id,
-            card_id: selectedCardId, // FIX: Use card_id
+            card_id: selectedCardId,
             credit_limit: parseFloat(creditLimit),
-            used_amount: parseFloat(amountUsed) || 0, // FIX: Use used_amount
-            // Add other fields from your schema that are required or have defaults
+            used_amount: parseFloat(amountUsed) || 0,
             card_name: selectedMasterCard?.card_name,
             issuer: selectedMasterCard?.card_issuer,
+            benefits: selectedMasterCard?.benefits,
+            fees: selectedMasterCard?.fees,
         });
 
         if (error) {
@@ -104,22 +128,27 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
     );
 };
 
+// Props for the EditCardModal component
 interface EditCardModalProps {
     card: Card;
     onCardUpdated: () => void;
     onClose: () => void;
 }
 
+// The EditCardModal allows users to update their card's credit limit and used amount.
 const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
     const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
     const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const { error } = await supabase.from('user_owned_cards').update({
             credit_limit: parseFloat(creditLimit),
-            used_amount: parseFloat(amountUsed), // FIX: Use used_amount
+            used_amount: parseFloat(amountUsed),
         }).eq('id', card.id);
 
         if (error) {
@@ -154,19 +183,24 @@ const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => 
     );
 };
 
+// Props for the main CardList component
 interface CardListProps {
     cards: Card[];
     onCardUpdate: () => void;
     allCards: Card[];
 }
 
+// The main component that renders the list of user-owned cards and manages modals.
 export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-    const handleDelete = async (cardId: string) => { // ID is now string
+    const handleDelete = async (cardId: string) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
         const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
@@ -217,10 +251,10 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
                     </div>
                 )) : (
                      <div className="text-center py-16 px-4 border-2 border-dashed border-gray-700 rounded-lg">
-                        <CreditCardIcon className="mx-auto h-12 w-12 text-gray-500" />
-                        <h3 className="mt-2 text-lg font-medium text-white">Your wallet is empty</h3>
-                        <p className="mt-1 text-sm text-gray-400">Add your first credit card to get started.</p>
-                    </div>
+                         <CreditCardIcon className="mx-auto h-12 w-12 text-gray-500" />
+                         <h3 className="mt-2 text-lg font-medium text-white">Your wallet is empty</h3>
+                         <p className="mt-1 text-sm text-gray-400">Add your first credit card to get started.</p>
+                     </div>
                 )}
             </div>
         </div>
