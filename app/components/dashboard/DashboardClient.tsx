@@ -11,7 +11,6 @@ import SpendOptimizer from './SpendOptimizer';
 import AiCardAdvisor from './AiCardAdvisor';
 import Settings from './Settings';
 import type { Card } from '@/lib/types';
-// FIX: The 'Tables' type is not a direct export. We only need to import 'Database'.
 import type { Database } from '@/lib/database.types';
 
 interface DashboardClientProps {
@@ -24,7 +23,11 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const [cards, setCards] = useState(initialUserCards);
   const [activeView, setActiveView] = useState('optimizer');
   
-  const supabase = createBrowserClient<Database>();
+  // FIX: Pass the Supabase URL and anon key to the client
+  const supabase = createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const router = useRouter();
 
   const handleCardUpdate = useCallback(async () => {
@@ -36,7 +39,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // FIX: Use the correctly nested type for the database row.
       const formattedCards: Card[] = data.map((card: Database['public']['Tables']['user_owned_cards']['Row']) => ({
         id: card.id,
         user_id: card.user_id,
