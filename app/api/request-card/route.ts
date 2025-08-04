@@ -1,12 +1,13 @@
-// app/api/request-card/route.ts
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export const runtime = 'nodejs';
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    // FIX: createClient() is not an async function and should not be awaited.
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -14,21 +15,15 @@ export async function POST(request: Request) {
     }
 
     const { cardName } = await request.json();
-    if (!cardName) {
-      return NextResponse.json({ error: 'Card name is required.' }, { status: 400 });
-    }
 
-    const { error } = await supabase
-      .from('card_requests')
-      .insert({ card_name: cardName, user_id: user.id });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const prompt = `A user wants to request the credit card "${cardName}". Briefly acknowledge their request and tell them it will be processed.`;
 
-    if (error) {
-      console.error('Supabase Error (Card Request):', error);
-      return NextResponse.json({ error: 'Failed to submit card request.' }, { status: 500 });
-    }
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    return NextResponse.json({ message: 'Thank you! Your request has been submitted.' });
-
+    return NextResponse.json({ message: text });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
