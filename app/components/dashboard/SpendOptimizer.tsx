@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import type { Card } from '../../../lib/types';
 import { SparklesIcon, CreditCardIcon } from '../icons';
+import { createClient } from '@/lib/supabase/client'; // Import the new client utility
 
 const spendCategories = [
     "Travel", "Dining", "Groceries", "Utilities", "Fuel", "Online Shopping", "Entertainment", "Other"
@@ -14,6 +15,9 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
     const [optimizationResult, setOptimizationResult] = useState('');
     const [isOptimizing, setIsOptimizing] = useState(false);
 
+    // NEW: Create a Supabase client instance
+    const supabase = createClient();
+
     const handleOptimize = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!amount || !category) {
@@ -24,9 +28,20 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
         setOptimizationResult('');
 
         try {
+            // NEW: Get the user's session to access the auth token
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                throw new Error('You must be logged in to optimize spend.');
+            }
+
             const response = await fetch('/api/optimize', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    // NEW: Pass the authentication token in the Authorization header
+                    'Authorization': `Bearer ${session.access_token}`,
+                },
                 body: JSON.stringify({
                     cards,
                     spend: {
@@ -36,8 +51,11 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                     },
                 }),
             });
+
             const data = await response.json();
             if (response.ok) {
+                // The backend now streams the response, so we handle it here.
+                // Assuming the backend sends back a JSON object with a 'recommendation' key.
                 setOptimizationResult(data.recommendation);
             } else {
                 throw new Error(data.error || 'Failed to get recommendation.');
@@ -80,10 +98,11 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
             </form>
 
             {isOptimizing && <div className="mt-6 text-center text-gray-400">Analyzing your cards...</div>}
-            
+
             {optimizationResult && (
                 <div className="mt-6 bg-gray-800 p-6 rounded-lg">
                     <h3 className="text-lg font-semibold text-white mb-2">Recommendation:</h3>
+                    {/* Updated to handle Markdown formatting from Gemini */}
                     <div className="prose prose-invert max-w-none text-gray-300" dangerouslySetInnerHTML={{ __html: optimizationResult.replace(/\n/g, '<br />') }} />
                 </div>
             )}
