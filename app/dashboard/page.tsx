@@ -1,13 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Sidebar from '../components/dashboard/Sidebar';
-import CardList from '../components/dashboard/CardList';
-import SpendOptimizer from '../components/dashboard/SpendOptimizer';
-import AiCardAdvisor from '../components/dashboard/AiCardAdvisor';
-import Settings from '../components/dashboard/Settings';
+import DashboardClient from '../components/dashboard/DashboardClient';
 import type { Card } from '@/lib/types';
 
-export default async function Dashboard() {
+export default async function DashboardPage() {
   const supabase = createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
@@ -16,34 +12,30 @@ export default async function Dashboard() {
     redirect('/');
   }
 
-  const { data: cards, error } = await supabase
+  // Fetch the user's owned cards
+  const { data: userCardsData, error: userCardsError } = await supabase
     .from('user_owned_cards')
     .select('*')
     .eq('user_id', session.user.id);
 
-  if (error) {
-    console.error('Error fetching cards:', error);
+  // Fetch all master cards from the 'cards' table for the "Add Card" modal
+  const { data: allCardsData, error: allCardsError } = await supabase
+    .from('cards')
+    .select('*');
+
+  if (userCardsError || allCardsError) {
+    console.error('Error fetching cards:', userCardsError || allCardsError);
+    // Optionally, render an error state
   }
 
-  const typedCards: Card[] = cards || [];
+  const initialUserCards: Card[] = userCardsData || [];
+  const allMasterCards: Card[] = allCardsData || [];
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <Sidebar />
-      <main className="flex-1 p-6 overflow-y-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <SpendOptimizer cards={typedCards} />
-            <AiCardAdvisor cards={typedCards} />
-          </div>
-          <div className="space-y-6">
-            {/* Assuming CardList is a client component, it will fetch its own data or receive it as props */}
-            {/* The initialCards prop is passed from the server */}
-            <CardList initialCards={typedCards} />
-            <Settings />
-          </div>
-        </div>
-      </main>
-    </div>
+    <DashboardClient 
+      user={session.user}
+      initialUserCards={initialUserCards}
+      allMasterCards={allMasterCards}
+    />
   );
 }
