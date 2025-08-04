@@ -59,7 +59,6 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
-    // FIX: Pass the Supabase URL and anon key to the client
     const supabase = createBrowserClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -78,7 +77,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
             credit_limit: parseFloat(creditLimit),
             used_amount: parseFloat(amountUsed) || 0,
             card_name: selectedMasterCard?.card_name,
-            issuer: selectedMasterCard?.card_issuer,
+            issuer: selectedMasterCard?.issuer,
             benefits: selectedMasterCard?.benefits,
             fees: selectedMasterCard?.fees,
         });
@@ -133,7 +132,6 @@ interface EditCardModalProps {
 const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
     const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
     const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
-    // FIX: Pass the Supabase URL and anon key to the client
     const supabase = createBrowserClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -188,7 +186,6 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
-    // FIX: Pass the Supabase URL and anon key to the client
     const supabase = createBrowserClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -225,7 +222,7 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="font-bold text-lg text-white">{card.card_name}</p>
-                                <p className="text-sm text-gray-400">{card.card_issuer}</p>
+                                <p className="text-sm text-gray-400">{card.issuer}</p>
                             </div>
                             <div className="flex items-center space-x-1">
                                 <button onClick={() => setViewingCard(card)} className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full"><EyeIcon className="h-4 w-4" /></button>
