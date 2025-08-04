@@ -11,7 +11,8 @@ import SpendOptimizer from './SpendOptimizer';
 import AiCardAdvisor from './AiCardAdvisor';
 import Settings from './Settings';
 import type { Card } from '@/lib/types';
-import type { Database, Tables } from '@/lib/database.types';
+// FIX: The 'Tables' type is not a direct export. We only need to import 'Database'.
+import type { Database } from '@/lib/database.types';
 
 interface DashboardClientProps {
   user: User;
@@ -35,8 +36,8 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // FIX: Replaced 'any' with the specific type from database.types.ts
-      const formattedCards: Card[] = data.map((card: Tables<'user_owned_cards'>) => ({
+      // FIX: Use the correctly nested type for the database row.
+      const formattedCards: Card[] = data.map((card: Database['public']['Tables']['user_owned_cards']['Row']) => ({
         id: card.id,
         user_id: card.user_id,
         card_id: card.card_id,
