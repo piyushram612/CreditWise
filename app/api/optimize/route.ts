@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Ratelimit } from '@upstash/ratelimit';
 import { kv } from '@vercel/kv';
-import type { Database } from '@/lib/database.types';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
