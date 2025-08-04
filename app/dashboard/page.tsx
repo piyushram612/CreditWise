@@ -1,5 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Sidebar from '../components/dashboard/Sidebar';
 import CardList from '../components/dashboard/CardList';
@@ -9,18 +8,7 @@ import Settings from '../components/dashboard/Settings';
 import type { Card } from '@/lib/types';
 
 export default async function Dashboard() {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+  const supabase = createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -35,7 +23,6 @@ export default async function Dashboard() {
 
   if (error) {
     console.error('Error fetching cards:', error);
-    // Handle error appropriately
   }
 
   const typedCards: Card[] = cards || [];
@@ -50,6 +37,8 @@ export default async function Dashboard() {
             <AiCardAdvisor cards={typedCards} />
           </div>
           <div className="space-y-6">
+            {/* Assuming CardList is a client component, it will fetch its own data or receive it as props */}
+            {/* The initialCards prop is passed from the server */}
             <CardList initialCards={typedCards} />
             <Settings />
           </div>
