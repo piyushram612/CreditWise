@@ -5,11 +5,6 @@ import DashboardClient from '../components/dashboard/DashboardClient';
 import type { Card } from '@/lib/types';
 import type { Database } from '@/lib/database.types';
 
-// This type now correctly references the updated database types
-type UserCardFromDB = Database['public']['Tables']['user_owned_cards']['Row'] & {
-  cards: Database['public']['Tables']['cards']['Row'] | null;
-};
-
 export default async function DashboardPage() {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
@@ -35,31 +30,13 @@ export default async function DashboardPage() {
     console.error('Error fetching cards:', userCardsError || allCardsError);
   }
 
-  // Correctly map the data from the joined tables without using 'any'
-  const initialUserCards: Card[] = (userCardsData as UserCardFromDB[] || []).map((item) => {
-      const cardDetails = item.cards;
-      return {
-          id: item.id,
-          user_id: item.user_id,
-          card_id: item.card_id,
-          credit_limit: item.credit_limit,
-          used_amount: item.used_amount,
-          card_name: item.card_name || cardDetails?.card_name || null,
-          card_issuer: item.issuer || cardDetails?.issuer || null,
-          benefits: item.benefits || cardDetails?.benefits || null,
-          fees: item.fees || cardDetails?.fees || null,
-      };
-  }).filter((c): c is Card => c !== null);
-
+  // The 'userCardsData' now directly matches the 'Card[]' type, so no complex mapping is needed.
+  const initialUserCards: Card[] = userCardsData || [];
   const allMasterCards: Card[] = (allCardsData || []).map(card => ({
+      ...card,
       id: card.id,
       user_id: '', // Not applicable for master list
       card_id: card.id,
-      card_name: card.card_name,
-      card_issuer: card.issuer,
-      benefits: card.benefits,
-      fees: card.fees,
-      // Add missing properties to satisfy the Card type
       credit_limit: null,
       used_amount: null,
   }));

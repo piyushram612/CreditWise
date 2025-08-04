@@ -16,7 +16,6 @@ export type Database = {
           issuer: string
           benefits: Json | null
           fees: Json | null
-          // Add any other columns from your master 'cards' table here
         }
         Insert: {
           id?: string
@@ -40,10 +39,10 @@ export type Database = {
           card_id: string
           credit_limit: number | null
           used_amount: number | null
-          card_name: string | null // Denormalized
-          issuer: string | null     // Denormalized
-          benefits: Json | null     // Denormalized
-          fees: Json | null         // Denormalized
+          card_name: string | null
+          issuer: string | null
+          benefits: Json | null
+          fees: Json | null
         }
         Insert: {
           id?: string
