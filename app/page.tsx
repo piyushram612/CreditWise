@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 import AuthComponent from './components/auth/AuthComponent';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
-  const supabase = createClient();
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   const { data: { session } } = await supabase.auth.getSession();
 

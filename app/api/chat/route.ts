@@ -1,23 +1,20 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/lib/database.types';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { Json } from '@/lib/types'; // Import the Json type
+import type { Json } from '@/lib/types';
 
-// Initialize the Gemini AI model
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export const runtime = 'nodejs';
 
-// --- Type Definitions ---
 interface UserOwnedCard {
     id: string;
     credit_limit?: number;
     card_name: string;
     issuer: string;
     card_type?: string;
-    // FIX: Replaced 'any' with the specific 'Json' type
     benefits?: Json | null;
     fees?: Json | null;
 }
@@ -47,21 +44,10 @@ ${fees}
 `;
 };
 
-
 export async function POST(request: Request) {
   try {
     const cookieStore = cookies();
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) { return cookieStore.get(name)?.value; },
-          set(name: string, value: string, options: CookieOptions) { cookieStore.set({ name, value, ...options }); },
-          remove(name: string, options: CookieOptions) { cookieStore.set({ name, value: '', ...options }); },
-        },
-      }
-    );
+    const supabase = createClient(cookieStore);
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -87,7 +73,7 @@ export async function POST(request: Request) {
       Here is the current conversation history:
       ${history}
       Your Task:
-      Based on the provided context of the user's cards and the conversation history, provide a helpful and concise answer to the user's latest message. If the user asks a question you can't answer with the given information, say so politely. Do not make up information. Respond as the "AI".
+      Based on the provided context of the user's cards and the conversation history, provide a helpful and concise answer to the user's latest message. If you can't answer, say so politely. Do not make up information. Respond as the "AI".
     `;
 
     const result = await model.generateContent(prompt);
