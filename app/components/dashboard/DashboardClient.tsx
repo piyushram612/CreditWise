@@ -30,8 +30,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const router = useRouter();
 
   const handleCardUpdate = useCallback(async () => {
-    // FIX: The table name is 'user_cards', not 'user_owned_cards'.
-    // We also need to join with 'card_details' to get all card info.
     const { data, error } = await supabase
       .from('user_cards')
       .select(`
@@ -43,11 +41,9 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // FIX: Map the data from the joined tables to the 'Card' type.
       const formattedCards: Card[] = data.map((item) => {
         const cardDetails = item.card_details;
 
-        // Handle cases where the join might not return details.
         if (!cardDetails) {
           return null;
         }
@@ -60,11 +56,12 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           used_amount: item.amount_used,
           card_name: cardDetails.card_name,
           card_issuer: cardDetails.issuer,
-          // Cast to any for benefits/fees if their structure is not strictly defined in the base type
-          benefits: (cardDetails as any).benefits ?? null,
-          fees: (cardDetails as any).fees ?? null,
+          // FIX: Removed the 'as any' cast to comply with linting rules.
+          // The types from Supabase should be sufficient here.
+          benefits: cardDetails.benefits ?? null,
+          fees: cardDetails.fees ?? null,
         };
-      }).filter((c): c is Card => c !== null); // Filter out any null entries
+      }).filter((c): c is Card => c !== null);
 
       setCards(formattedCards);
     }
