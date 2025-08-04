@@ -41,9 +41,9 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      // FIX: Map and filter in two steps to ensure the final array does not contain nulls,
-      // which resolves the TypeScript error.
-      const mappedData = data.map((item) => {
+      // FIX: Explicitly type the return of the .map() callback to 'Card | null'.
+      // This gives the TypeScript compiler the hint it needs to resolve the type error.
+      const mappedData = data.map((item): Card | null => {
         const cardDetails = item.card_details;
 
         if (!cardDetails) {
