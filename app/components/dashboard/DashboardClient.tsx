@@ -41,7 +41,9 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      const formattedCards: Card[] = data.map((item) => {
+      // FIX: Map and filter in two steps to ensure the final array does not contain nulls,
+      // which resolves the TypeScript error.
+      const mappedData = data.map((item) => {
         const cardDetails = item.card_details;
 
         if (!cardDetails) {
@@ -56,12 +58,12 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           used_amount: item.amount_used,
           card_name: cardDetails.card_name,
           card_issuer: cardDetails.issuer,
-          // FIX: Removed the 'as any' cast to comply with linting rules.
-          // The types from Supabase should be sufficient here.
           benefits: cardDetails.benefits ?? null,
           fees: cardDetails.fees ?? null,
         };
-      }).filter((c): c is Card => c !== null);
+      });
+
+      const formattedCards: Card[] = mappedData.filter((c): c is Card => c !== null);
 
       setCards(formattedCards);
     }
