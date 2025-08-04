@@ -35,19 +35,19 @@ export default async function DashboardPage() {
     console.error('Error fetching cards:', userCardsError || allCardsError);
   }
 
-  // Correctly map the data from the joined tables without using 'any'
+  // FIX: Ensure all potentially undefined values are coalesced to null to match the Card type.
   const initialUserCards: Card[] = (userCardsData as UserCardFromDB[] || []).map((item) => {
       const cardDetails = item.cards;
       return {
           id: item.id,
           user_id: item.user_id,
           card_id: item.card_id,
-          credit_limit: item.credit_limit,
-          used_amount: item.used_amount,
-          card_name: item.card_name || cardDetails?.card_name,
-          card_issuer: item.issuer || cardDetails?.issuer,
-          benefits: item.benefits || cardDetails?.benefits,
-          fees: item.fees || cardDetails?.fees,
+          credit_limit: item.credit_limit ?? null,
+          used_amount: item.used_amount ?? null,
+          card_name: item.card_name || cardDetails?.card_name || null,
+          card_issuer: item.issuer || cardDetails?.issuer || null,
+          benefits: item.benefits || cardDetails?.benefits || null,
+          fees: item.fees || cardDetails?.fees || null,
       };
   }).filter((c): c is Card => c !== null);
 
@@ -59,6 +59,9 @@ export default async function DashboardPage() {
       card_issuer: card.issuer,
       benefits: card.benefits,
       fees: card.fees,
+      // Add missing properties to satisfy the Card type
+      credit_limit: null,
+      used_amount: null,
   }));
 
   return (
