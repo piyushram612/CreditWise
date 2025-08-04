@@ -41,7 +41,7 @@ export default async function DashboardPage() {
       return {
           id: item.id,
           user_id: item.user_id,
-          card_id: item.card_id, // This is now correctly typed as a required string
+          card_id: item.card_id,
           credit_limit: item.credit_limit,
           used_amount: item.used_amount,
           card_name: item.card_name || cardDetails?.card_name,
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
   const allMasterCards: Card[] = (allCardsData || []).map(card => ({
       id: card.id,
       user_id: '', // Not applicable for master list
-      card_id: card.id, // Use the card's own id for this field
+      card_id: card.id,
       card_name: card.card_name,
       card_issuer: card.issuer,
       benefits: card.benefits,
