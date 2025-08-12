@@ -26,7 +26,7 @@ export function AuthModal({ isOpen, onClose, supabase }: AuthModalProps) {
         <Auth 
           supabaseClient={supabase} 
           appearance={{ theme: ThemeSupa }} 
-          providers={['google', 'github']} 
+          providers={['google']} 
           theme="light" 
         />
       </div>
