@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import type { User } from '@supabase/supabase-js'
+import { getSupabaseClient } from '@/app/utils/supabase'
+import type { User } from '@/app/types'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
+    const supabase = getSupabaseClient()
+    
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
