@@ -55,7 +55,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           credit_limit: item.credit_limit,
           used_amount: item.amount_used,
           card_name: cardDetails.card_name,
-          card_issuer: cardDetails.issuer,
+          issuer: cardDetails.issuer,
           benefits: cardDetails.benefits ?? null,
           fees: cardDetails.fees ?? null,
         };
