@@ -6,8 +6,7 @@ export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = await createClient();
     
     const { data: { user } } = await supabase.auth.getUser();
 

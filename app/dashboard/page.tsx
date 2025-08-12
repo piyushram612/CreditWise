@@ -10,8 +10,7 @@ type UserCardFromDB = Database['public']['Tables']['user_owned_cards']['Row'] & 
 };
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
 

@@ -27,7 +27,7 @@ import { ConfirmDeleteModal } from '@/app/components/cards/ConfirmDeleteModal';
 export default function App() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  
+
   const [activeView, setActiveView] = useState('dashboard');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCardFormModalOpen, setIsCardFormModalOpen] = useState(false);
@@ -74,8 +74,8 @@ export default function App() {
           <p className="text-gray-500 dark:text-gray-400 mb-6">
             This feature is available for registered users.
           </p>
-          <button 
-            onClick={() => setIsAuthModalOpen(true)} 
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
             className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200"
           >
             Login / Sign Up
@@ -85,39 +85,39 @@ export default function App() {
     }
 
     switch (activeView) {
-      case 'dashboard': 
+      case 'dashboard':
         return (
-          <DashboardView 
-            key={key} 
-            user={user} 
-            setActiveView={setActiveView} 
-            onAddCardClick={handleAddCardClick} 
+          <DashboardView
+            key={key}
+            user={user}
+            setActiveView={setActiveView}
+            onAddCardClick={handleAddCardClick}
           />
         );
-      case 'my-cards': 
+      case 'my-cards':
         return user ? (
-          <MyCardsView 
+          <MyCardsView
             key={key}
             refreshKey={key}
-            user={user} 
-            onAddCardClick={handleAddCardClick} 
-            onEditCard={handleEditCardClick} 
-            onDeleteCard={handleDeleteCardClick} 
+            user={user}
+            onAddCardClick={handleAddCardClick}
+            onEditCard={handleEditCardClick}
+            onDeleteCard={handleDeleteCardClick}
           />
         ) : null;
-      case 'optimizer': 
+      case 'optimizer':
         return <SpendOptimizerView />;
-      case 'advisor': 
+      case 'advisor':
         return <AICardAdvisorView />;
-      case 'settings': 
+      case 'settings':
         return <SettingsView />;
-      default: 
+      default:
         return (
-          <DashboardView 
-            key={key} 
-            user={user} 
-            setActiveView={setActiveView} 
-            onAddCardClick={handleAddCardClick} 
+          <DashboardView
+            key={key}
+            user={user}
+            setActiveView={setActiveView}
+            onAddCardClick={handleAddCardClick}
           />
         );
     }
@@ -142,23 +142,22 @@ export default function App() {
       <div className="flex h-screen bg-gray-100 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
         {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
-          <div 
-            onClick={() => setIsSidebarOpen(false)} 
+          <div
+            onClick={() => setIsSidebarOpen(false)}
             className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
           ></div>
         )}
 
         {/* Sidebar */}
-        <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-          <Sidebar 
-            activeView={activeView} 
-            setActiveView={setActiveView} 
+        <div className={`fixed top-0 left-0 h-full z-30 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}>
+          <Sidebar
+            activeView={activeView}
+            setActiveView={setActiveView}
             user={user}
             onAuthClick={() => setIsAuthModalOpen(true)}
-            supabase={getSupabaseClient()} 
-            theme={theme} 
+            supabase={getSupabaseClient()}
+            theme={theme}
             toggleTheme={toggleTheme}
             onLinkClick={() => setIsSidebarOpen(false)}
           />
@@ -174,26 +173,26 @@ export default function App() {
         </div>
 
         {/* Modals */}
-        <AuthModal 
-          isOpen={isAuthModalOpen} 
-          onClose={() => setIsAuthModalOpen(false)} 
-          supabase={getSupabaseClient()} 
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          supabase={getSupabaseClient()}
         />
 
         {user && (
           <>
-            <CardFormModal 
-              isOpen={isCardFormModalOpen} 
-              onClose={() => setIsCardFormModalOpen(false)} 
-              user={user} 
-              onCardSaved={handleCardSaved} 
-              existingCard={cardToEdit} 
+            <CardFormModal
+              isOpen={isCardFormModalOpen}
+              onClose={() => setIsCardFormModalOpen(false)}
+              user={user}
+              onCardSaved={handleCardSaved}
+              existingCard={cardToEdit}
             />
-            <ConfirmDeleteModal 
-              isOpen={isDeleteModalOpen} 
-              onClose={() => setIsDeleteModalOpen(false)} 
-              onConfirm={confirmDelete} 
-              cardName={cardToDelete?.card_name || ''} 
+            <ConfirmDeleteModal
+              isOpen={isDeleteModalOpen}
+              onClose={() => setIsDeleteModalOpen(false)}
+              onConfirm={confirmDelete}
+              cardName={cardToDelete?.card_name || ''}
             />
           </>
         )}

@@ -20,8 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
   }
 
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
 
