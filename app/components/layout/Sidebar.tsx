@@ -6,7 +6,7 @@ import {
   SparklesIcon, 
   ChatBubbleIcon, 
   UserCircleIcon, 
-  Cog6ToothIcon,
+  SettingsIcon,
   SunIcon,
   MoonIcon
 } from '@/app/components/shared/Icons';
@@ -26,7 +26,7 @@ export function Sidebar({
     { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
     { name: 'Spend Optimizer', icon: <SparklesIcon />, view: 'optimizer' },
     { name: 'AI Card Advisor', icon: <ChatBubbleIcon />, view: 'advisor' },
-    { name: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
+    { name: 'Settings', icon: <SettingsIcon />, view: 'settings' },
   ];
 
   const handleLogout = async () => {
