@@ -1,12 +1,14 @@
-// app/api/feedback/route.ts
 import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
