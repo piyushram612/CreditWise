@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 
 // Explicitly set the runtime to Node.js to support Supabase server-side operations
 export const runtime = 'nodejs';
@@ -8,6 +9,7 @@ export const runtime = 'nodejs';
 interface UserOwnedCard {
   id: string;
   credit_limit?: number;
+  used_amount?: number;
   card_name: string;
   issuer: string;
   card_type?: string;
@@ -36,7 +38,7 @@ interface GeminiResponse {
 }
 
 /**
- * Formats a user's card details into a string for the AI prompt.
+ * Formats a user's card details into a string for the AI prompt with enhanced information.
  * @param card - The user-owned card object.
  * @returns A formatted string detailing the card's properties.
  */
@@ -53,14 +55,39 @@ const formatCardForPrompt = (card: UserOwnedCard): string => {
         .join('\n') 
     : '  - Not specified';
 
+  // Get detailed information from knowledge base
+  const detailedInfo = getDetailedCardInfo(card.card_name || "", card.issuer || "");
+  
+  let enhancedInfo = "";
+  if (detailedInfo) {
+    enhancedInfo = `
+Enhanced Card Information:
+  Reward Rates:
+${Object.entries(detailedInfo.reward_rates)
+  .map(([category, info]) => `    - ${category}: ${info.rate}% ${info.type} (${info.notes})`)
+  .join('\n')}
+  
+  Key Partnerships:
+${Object.entries(detailedInfo.partnerships)
+  .map(([partner, info]) => `    - ${partner}: ${info.reward_rate}% rewards on ${info.merchants.join(', ')}`)
+  .join('\n')}
+  
+  Best For: ${detailedInfo.suitability}`;
+  }
+
   return `
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Card Type: ${card.card_type || 'N/A'}
-Benefits:
+Credit Limit: ₹${card.credit_limit?.toLocaleString() || 'Not specified'}
+Used Amount: ₹${card.used_amount?.toLocaleString() || '0'}
+Available Credit: ₹${card.credit_limit && card.used_amount ? (card.credit_limit - card.used_amount).toLocaleString() : 'Not calculated'}
+
+Basic Benefits:
 ${benefits}
 Fees:
 ${fees}
+${enhancedInfo}
 `;
 };
 
@@ -113,7 +140,7 @@ export async function POST(request: Request) {
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const prompt = `
-      You are "CreditWise AI", a helpful and friendly Indian credit card advisor. Your role is to answer user questions about their credit cards.
+      You are "CreditWise AI", a helpful and friendly Indian credit card advisor with access to detailed card partnership information and real-time knowledge about reward structures.
       
       Here is the context about the user's current credit card wallet:
       ---
@@ -123,8 +150,14 @@ export async function POST(request: Request) {
       Here is the current conversation history:
       ${history}
       
+      IMPORTANT KNOWLEDGE:
+      - Tata Neu Infinity HDFC card offers 5% NeuCoins on BigBasket and other Tata partner brands
+      - Always consider specific merchant partnerships when recommending cards
+      - Look for category-specific bonuses and ongoing partnerships
+      - Provide specific reward rates and partnership details when available
+      
       Your Task:
-      Based on the provided context of the user's cards and the conversation history, provide a helpful and concise answer to the user's latest message. If the user asks a question you can't answer with the given information, say so politely. Do not make up information. Respond as the "AI".
+      Based on the provided context of the user's cards and the conversation history, provide a helpful and detailed answer. When recommending cards for specific merchants or categories, mention exact reward rates and partnerships. If the user asks about grocery shopping on BigBasket, specifically mention the Tata Neu partnership advantage. Always be specific about reward rates and benefits.
     `;
 
     const apiKey = process.env.GEMINI_API_KEY;

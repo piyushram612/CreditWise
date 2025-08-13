@@ -1,31 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getDetailedCardInfo, findBestCardForMerchant, getMerchantSpecificAdvice } from '@/app/utils/cardKnowledgeBase';
 
-// Initialize the Gemini AI model
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-// Rate limiting - with fallback for development
-let ratelimit: { limit: (ip: string) => Promise<{ success: boolean }> } | null = null;
-
-// Try to initialize rate limiting
-async function initRateLimit() {
-  try {
-    const { Ratelimit } = await import('@upstash/ratelimit');
-    const { kv } = await import('@vercel/kv');
-    
-    ratelimit = new Ratelimit({
-      redis: kv,
-      limiter: Ratelimit.slidingWindow(5, '10 s'),
-    });
-    console.log('Rate limiting initialized');
-  } catch (error) {
-    console.warn('Rate limiting not available (this is normal in development):', error);
-  }
+interface UserCard {
+  id: string;
+  card_name: string | null;
+  issuer: string | null;
+  credit_limit: number | null;
+  used_amount: number | null;
+  [key: string]: unknown;
 }
 
-// Initialize rate limiting
-initRateLimit();
+
 
 export async function POST(req: NextRequest) {
   console.log('=== Optimize API called ===');
@@ -66,19 +51,56 @@ export async function POST(req: NextRequest) {
 
     console.log('GEMINI_API_KEY found, length:', process.env.GEMINI_API_KEY.length);
 
-    // Use the same approach as the working chat API
-    console.log('Using direct Gemini API call (same as chat API)...');
+    // Enhanced AI analysis with detailed card knowledge
+    console.log('Using enhanced AI analysis with detailed card knowledge...');
     try {
+      // First, try to find the best card using our knowledge base
+      const merchantSpecificResult = spend.vendor ? 
+        findBestCardForMerchant(cards, spend.vendor, spend.category) : null;
+      
+      // Get detailed information for all user cards
+      const enhancedCards = cards.map((card: UserCard) => {
+        const detailedInfo = getDetailedCardInfo(card.card_name || "", card.issuer || "");
+        return {
+          ...card,
+          detailedInfo: detailedInfo
+        };
+      });
+
+      // Get merchant-specific advice
+      const merchantAdvice = spend.vendor ? getMerchantSpecificAdvice(spend.vendor, spend.category) : "";
+
       const prompt = `
-        You are a credit card optimization expert in India. Given a list of credit cards a user owns and a specific spend, your task is to recommend the best card to use for that transaction.
+        You are a credit card optimization expert in India with access to real-time card partnership information. Given a list of credit cards a user owns and a specific spend, recommend the best card to use.
+
+        IMPORTANT CONTEXT:
+        ${merchantAdvice ? `MERCHANT-SPECIFIC INSIGHT: ${merchantAdvice}` : ""}
         
-        User's Cards (JSON format):
-        ${JSON.stringify(cards, null, 2)}
+        ${merchantSpecificResult ? `
+        KNOWLEDGE BASE RECOMMENDATION: 
+        Based on current partnerships and reward structures, ${merchantSpecificResult.card.card_name} appears to be the best choice because: ${merchantSpecificResult.reason}
+        ` : ""}
+
+        User's Cards with Enhanced Details:
+        ${JSON.stringify(enhancedCards, null, 2)}
         
-        Spend Details (JSON format):
+        Spend Details:
         ${JSON.stringify(spend, null, 2)}
         
-        Your recommendation should be concise, clear, and provide a strong justification based on the rewards, benefits, and current utilization of the cards. Consider factors like reward rates for the spend category, ongoing offers (if any are implied by the vendor), and the available credit limit. Format your response in Markdown.
+        ANALYSIS REQUIREMENTS:
+        1. Consider specific merchant partnerships (e.g., Tata Neu + BigBasket partnership offers 5% rewards)
+        2. Look for category-specific bonuses that match the spend type
+        3. Factor in current credit utilization and available limits
+        4. Consider any ongoing promotional offers or partnerships
+        5. Verify if the recommended card actually exists in the user's wallet
+
+        Your recommendation should be:
+        - Specific about reward rates and partnerships
+        - Clear about why this card beats others for this transaction
+        - Mention any special benefits or offers applicable
+        - Format the response in clear, readable Markdown
+
+        If you're recommending based on a specific partnership (like Tata Neu for BigBasket), explicitly mention the partnership and reward rate.
       `;
 
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
