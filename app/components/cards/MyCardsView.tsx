@@ -54,7 +54,7 @@ export function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, re
               <div 
                 key={ownedCard.id} 
                 className="rounded-xl shadow-lg flex flex-col justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative overflow-hidden border-t-20"
-                style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer) }}
+                style={{ borderTopColor: getIssuerColorCode(ownedCard.issuer || '') }}
               >
                 <div className="p-4">
                   <div className="flex justify-between items-start">

@@ -32,38 +32,108 @@ export function SpendOptimizerView() {
       return;
     }
 
+    // First, fetch user's cards
+    const { data: userCards, error: cardsError } = await supabase
+      .from('user_owned_cards')
+      .select('*')
+      .eq('user_id', session.user.id);
+
+    if (cardsError) {
+      setError("Failed to fetch your cards.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!userCards || userCards.length === 0) {
+      setError("You need to add some cards first to use the optimizer.");
+      setIsLoading(false);
+      return;
+    }
+
     const formData = new FormData(formRef.current!);
     const spendAmount = formData.get('amount');
     const spendCategory = formData.get('category');
     const vendor = formData.get('vendor');
 
+    const spendData = {
+      amount: Number(spendAmount),
+      category: spendCategory,
+      vendor: vendor || null
+    };
+
     try {
+      console.log('Making API call to optimize with data:', { 
+        cards: userCards,
+        spend: spendData
+      });
+
       const response = await apiCall('/api/optimize', {
         method: 'POST',
         body: JSON.stringify({ 
-          amount: spendAmount, 
-          category: spendCategory, 
-          vendor: vendor 
+          cards: userCards,
+          spend: spendData
         }),
       });
 
+      console.log('API Response status:', response.status);
+      console.log('API Response headers:', response.headers);
+
       if (!response.ok) {
-        let errorMessage = 'Something went wrong';
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
+          const errorText = await response.text();
+          console.log('Error response text:', errorText);
+          
+          // Try to parse as JSON
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+          } catch {
+            // If not JSON, use the text as is
+            errorMessage = errorText || errorMessage;
+          }
         } catch {
-          // If response is not JSON, use status text
+          // If can't read response, use status text
           errorMessage = response.statusText || errorMessage;
         }
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      setResult(data);
+      const responseText = await response.text();
+      console.log('Success response text:', responseText);
+      
+      try {
+        const data = JSON.parse(responseText);
+        console.log('Parsed response data:', data);
+        
+        // The API returns { recommendation: "text" }, but we need to format it for display
+        if (data.recommendation) {
+          // For now, create a simple result format
+          const mockResult: OptimizationResult = {
+            bestCard: {
+              name: "AI Recommendation",
+              issuer: "Based on your cards"
+            },
+            reason: data.recommendation,
+            alternatives: []
+          };
+          setResult(mockResult);
+        } else {
+          setResult(data);
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        throw new Error('Invalid response format from server');
+      }
     } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("An unknown error occurred.");
+      console.error('Spend Optimizer Error:', err);
+      if (err instanceof Error) {
+        console.error('Error message:', err.message);
+        setError(err.message);
+      } else {
+        console.error('Unknown error:', err);
+        setError("An unknown error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -69,43 +69,57 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
   const handleTemplateSelect = (cardId: string) => {
     const template = allCards.find(c => c.id === cardId);
     if (template) {
-      setCardName(template.card_name);
-      setIssuer(template.issuer);
+      setCardName(template.card_name || '');
+      setIssuer(template.issuer || '');
 
       const newBenefits = [];
-      if (template.reward_rates) {
-        for (const [key, value] of Object.entries(template.reward_rates)) {
-          const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          const rate = value.rate ?? 'N/A';
-          const type = value.type ?? '';
-          const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
-          newBenefits.push({ key: formattedKey, value: `${rateDisplay} (${value.notes})` });
+      if (template.benefits && typeof template.benefits === 'object') {
+        const benefitsObj = template.benefits as Record<string, unknown>;
+        
+        // Extract reward rates if they exist
+        if (benefitsObj.reward_rates) {
+          for (const [key, value] of Object.entries(benefitsObj.reward_rates)) {
+            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const valueObj = value as Record<string, unknown>;
+            const rate = valueObj?.rate ?? 'N/A';
+            const type = valueObj?.type ?? '';
+            const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
+            const notes = valueObj?.notes ? ` (${valueObj.notes})` : '';
+            newBenefits.push({ key: formattedKey, value: String(`${rateDisplay}${notes}`) });
+          }
         }
-      }
 
-      if (template.welcome_benefits && template.welcome_benefits !== "None.") {
-        newBenefits.push({ key: 'Welcome Benefit', value: template.welcome_benefits });
-      }
+        // Extract welcome benefits if they exist
+        if (benefitsObj.welcome_benefits && benefitsObj.welcome_benefits !== "None.") {
+          newBenefits.push({ key: 'Welcome Benefit', value: String(benefitsObj.welcome_benefits) });
+        }
 
-      if (template.lounge_access?.domestic && template.lounge_access.domestic !== "None.") {
-        newBenefits.push({ key: 'Domestic Lounge Access', value: template.lounge_access.domestic });
-      }
+        // Extract lounge access if it exists
+        const loungeAccess = benefitsObj.lounge_access as Record<string, unknown> | undefined;
+        if (loungeAccess?.domestic && loungeAccess.domestic !== "None.") {
+          newBenefits.push({ key: 'Domestic Lounge Access', value: String(loungeAccess.domestic) });
+        }
 
-      if (template.lounge_access?.international && template.lounge_access.international !== "None.") {
-        newBenefits.push({ key: 'International Lounge Access', value: template.lounge_access.international });
+        if (loungeAccess?.international && loungeAccess.international !== "None.") {
+          newBenefits.push({ key: 'International Lounge Access', value: String(loungeAccess.international) });
+        }
       }
 
       setBenefits(newBenefits.length > 0 ? newBenefits : [{ key: '', value: '' }]);
 
       const newFees = [];
-      if (template.joining_fee) {
-        newFees.push({ key: 'Joining Fee', value: `₹${template.joining_fee}` });
-      }
-      if (template.annual_fee) {
-        newFees.push({ key: 'Annual Fee', value: `₹${template.annual_fee}` });
-      }
-      if (template.fee_waiver && template.fee_waiver !== "None.") {
-        newFees.push({ key: 'Fee Waiver', value: template.fee_waiver });
+      if (template.fees && typeof template.fees === 'object') {
+        const feesObj = template.fees as Record<string, unknown>;
+        
+        if (feesObj.joining_fee) {
+          newFees.push({ key: 'Joining Fee', value: `₹${String(feesObj.joining_fee)}` });
+        }
+        if (feesObj.annual_fee) {
+          newFees.push({ key: 'Annual Fee', value: `₹${String(feesObj.annual_fee)}` });
+        }
+        if (feesObj.fee_waiver && feesObj.fee_waiver !== "None.") {
+          newFees.push({ key: 'Fee Waiver', value: String(feesObj.fee_waiver) });
+        }
       }
 
       setFees(newFees.length > 0 ? newFees : [{ key: '', value: '' }]);
