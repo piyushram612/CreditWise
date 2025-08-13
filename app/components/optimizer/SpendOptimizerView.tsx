@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { getSupabaseClient } from '@/app/utils/supabase';
+import { apiCall } from '@/app/utils/api';
 import { mockSpendCategories } from '@/app/utils/constants';
 import type { OptimizationResult } from '@/app/types';
 import { SparklesIcon, CreditCardIcon } from '@/app/components/shared/Icons';
@@ -37,9 +38,8 @@ export function SpendOptimizerView() {
     const vendor = formData.get('vendor');
 
     try {
-      const response = await fetch('/api/optimize', {
+      const response = await apiCall('/api/optimize', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           amount: spendAmount, 
           category: spendCategory, 
@@ -48,8 +48,15 @@ export function SpendOptimizerView() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Something went wrong');
+        let errorMessage = 'Something went wrong';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

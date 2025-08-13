@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { isNativeApp } from '@/app/utils/capacitor';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -70,7 +71,7 @@ export default function InstallPrompt() {
     }
   };
 
-  if (!showInstallButton || isStandalone) return null;
+  if (!showInstallButton || isStandalone || isNativeApp()) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 bg-black text-white p-4 rounded-lg shadow-lg z-50 md:left-auto md:right-4 md:max-w-sm">

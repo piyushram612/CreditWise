@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { initializeApp, hapticFeedback, isNativeApp } from '@/app/utils/capacitor';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTheme } from '@/app/hooks/useTheme';
 import { getSupabaseClient } from '@/app/utils/supabase';
@@ -36,6 +37,11 @@ export default function ClientApp() {
   const [cardToDelete, setCardToDelete] = useState<UserOwnedCard | null>(null);
   const [key, setKey] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Initialize native app features
+  useEffect(() => {
+    initializeApp();
+  }, []);
 
   const handleCardSaved = () => setKey(prevKey => prevKey + 1);
   const handleCardDeleted = () => setKey(prevKey => prevKey + 1);
@@ -77,7 +83,10 @@ export default function ClientApp() {
             This feature is available for registered users.
           </p>
           <button
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => {
+              hapticFeedback();
+              setIsAuthModalOpen(true);
+            }}
             className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200"
           >
             Login / Sign Up

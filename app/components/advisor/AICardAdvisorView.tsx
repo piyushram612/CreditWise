@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { apiCall } from '@/app/utils/api';
 import type { ChatMessage } from '@/app/types';
 import { SparklesIcon, SendIcon } from '@/app/components/shared/Icons';
 
@@ -30,9 +31,8 @@ export function AICardAdvisorView() {
     setIsThinking(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await apiCall('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
       });
 
