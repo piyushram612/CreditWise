@@ -1,25 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Ratelimit } from '@upstash/ratelimit';
+import { kv } from '@vercel/kv';
 
-// Initialize Gemini AI only if API key is available
-let genAI: GoogleGenerativeAI | null = null;
-if (process.env.GEMINI_API_KEY) {
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-}
+// Initialize the Gemini AI model
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-interface UserCard {
-  card_name: string | null;
-  issuer: string | null;
-  credit_limit: number | null;
-  used_amount: number | null;
-  benefits: unknown;
-  fees: unknown;
+// Rate limiting - with fallback for development
+let ratelimit: Ratelimit | null = null;
+try {
+  ratelimit = new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(5, '10 s'),
+  });
+} catch (error) {
+  console.warn('Rate limiting not available:', error);
 }
 
 export async function POST(req: NextRequest) {
   console.log('Optimize API called');
 
   try {
+    // 1. Check Rate Limiting (skip if not available)
+    if (ratelimit) {
+      const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
+      const { success } = await ratelimit.limit(ip);
+      if (!success) {
+        return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
+      }
+    }
+
+    // 2. Check Authentication (skip for native app compatibility)
+    try {
+      const supabase = await createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log('No session found, but continuing for native app compatibility');
+        // Don't return error - allow unauthenticated requests for native app
+      }
+    } catch (authError) {
+      console.warn('Auth check failed, continuing anyway:', authError);
+    }
+
+    // 3. Proceed with optimization logic
     const body = await req.json();
     console.log('Request body:', body);
 
@@ -32,62 +57,17 @@ export async function POST(req: NextRequest) {
 
     console.log(`Processing request for ${cards.length} cards and spend of ₹${spend.amount} in ${spend.category}`);
 
-    if (!genAI) {
-      console.log('GEMINI_API_KEY not configured, returning fallback recommendation');
-      const fallbackRecommendation = `Based on your ${cards.length} card(s) and spend of ₹${spend.amount} in ${spend.category}${spend.vendor ? ` at ${spend.vendor}` : ''}, here's a general recommendation:
-
-For ${spend.category} purchases, consider using a card that offers good rewards for this category. Look for cards with:
-- Higher reward rates for ${spend.category}
-- Lower fees relative to your spend amount
-- Available credit limit
-
-To get personalized AI recommendations, please configure the AI service in your environment settings.`;
-
-      return NextResponse.json({ 
-        recommendation: fallbackRecommendation,
-        debug: {
-          cardsCount: cards.length,
-          spendAmount: spend.amount,
-          spendCategory: spend.category,
-          aiConfigured: false,
-          timestamp: new Date().toISOString()
-        }
-      });
-    }
-
-    console.log('Using Gemini AI for optimization...');
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-    
-    // Create a cleaner card summary for the AI
-    const cardSummary = cards.map((card: UserCard) => ({
-      name: card.card_name,
-      issuer: card.issuer,
-      creditLimit: card.credit_limit,
-      usedAmount: card.used_amount,
-      availableCredit: card.credit_limit && card.used_amount ? card.credit_limit - card.used_amount : null,
-      benefits: card.benefits,
-      fees: card.fees
-    }));
-
     const prompt = `
-      You are a credit card optimization expert for Indian credit cards. Analyze the user's cards and recommend the best one for their specific spend.
+      You are a credit card optimization expert in India. Given a list of credit cards a user owns and a specific spend, your task is to recommend the best card to use for that transaction.
       
-      User's Cards:
-      ${JSON.stringify(cardSummary, null, 2)}
+      User's Cards (JSON format):
+      ${JSON.stringify(cards, null, 2)}
       
-      Spend Details:
-      - Amount: ₹${spend.amount}
-      - Category: ${spend.category}
-      - Vendor: ${spend.vendor || 'Not specified'}
+      Spend Details (JSON format):
+      ${JSON.stringify(spend, null, 2)}
       
-      Instructions:
-      1. Recommend the BEST card from their collection for this specific spend
-      2. Explain WHY this card is the best choice (rewards, benefits, etc.)
-      3. Consider reward rates, fees, credit utilization, and category bonuses
-      4. Keep response concise but informative (3-4 sentences)
-      5. If all cards are similar, pick one and explain the reasoning
-      
-      Format your response as plain text, not markdown.
+      Your recommendation should be concise, clear, and provide a strong justification based on the rewards, benefits, and current utilization of the cards. Consider factors like reward rates for the spend category, ongoing offers (if any are implied by the vendor), and the available credit limit. Format your response in Markdown.
     `;
 
     const result = await model.generateContent(prompt);
@@ -101,7 +81,6 @@ To get personalized AI recommendations, please configure the AI service in your 
         cardsCount: cards.length,
         spendAmount: spend.amount,
         spendCategory: spend.category,
-        aiConfigured: true,
         timestamp: new Date().toISOString()
       }
     });
@@ -109,16 +88,7 @@ To get personalized AI recommendations, please configure the AI service in your 
   } catch (error) {
     console.error('Error in optimization API:', error);
     
-    // Return more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
-    
-    console.error('Error details:', {
-      message: errorMessage,
-      stack: errorStack,
-      timestamp: new Date().toISOString()
-    });
-    
     return NextResponse.json({ 
       error: 'Failed to get recommendation.',
       details: errorMessage,
