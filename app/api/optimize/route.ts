@@ -31,40 +31,10 @@ export async function POST(req: NextRequest) {
   console.log('=== Optimize API called ===');
 
   try {
-    // 1. Check Rate Limiting (skip if not available)
-    if (ratelimit) {
-      console.log('Checking rate limit...');
-      try {
-        const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
-        const { success } = await ratelimit.limit(ip);
-        if (!success) {
-          console.log('Rate limit exceeded');
-          return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
-        }
-        console.log('Rate limit check passed');
-      } catch (rateLimitError) {
-        console.warn('Rate limit check failed, continuing:', rateLimitError);
-      }
-    } else {
-      console.log('Rate limiting not available, skipping');
-    }
+    // Skip rate limiting and auth for now - just test the core functionality
+    console.log('Skipping rate limiting and auth for debugging...');
 
-    // 2. Check Authentication (skip for native app compatibility)
-    console.log('Checking authentication...');
-    try {
-      const supabase = await createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        console.log('User authenticated:', session.user.id);
-      } else {
-        console.log('No session found, but continuing for native app compatibility');
-      }
-    } catch (authError) {
-      console.warn('Auth check failed, continuing anyway:', authError);
-    }
-
-    // 3. Parse request body
+    // Parse request body
     console.log('Parsing request body...');
     const body = await req.json();
     console.log('Request body received:', {
@@ -84,41 +54,95 @@ export async function POST(req: NextRequest) {
 
     console.log(`Processing optimization for ${cards.length} cards and spend of ₹${spend.amount} in ${spend.category}`);
 
-    // 4. Call Gemini AI
-    console.log('Initializing Gemini AI...');
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-    
-    const prompt = `
-      You are a credit card optimization expert in India. Given a list of credit cards a user owns and a specific spend, your task is to recommend the best card to use for that transaction.
-      
-      User's Cards (JSON format):
-      ${JSON.stringify(cards, null, 2)}
-      
-      Spend Details (JSON format):
-      ${JSON.stringify(spend, null, 2)}
-      
-      Your recommendation should be concise, clear, and provide a strong justification based on the rewards, benefits, and current utilization of the cards. Consider factors like reward rates for the spend category, ongoing offers (if any are implied by the vendor), and the available credit limit. Format your response in Markdown.
-    `;
-
-    console.log('Calling Gemini AI...');
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    console.log('AI optimization response received, length:', text.length);
-    return NextResponse.json({ 
-      recommendation: text,
-      debug: {
-        cardsCount: cards.length,
-        spendAmount: spend.amount,
-        spendCategory: spend.category,
-        responseLength: text.length,
+    // Test if Gemini API key is available
+    if (!process.env.GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY not found in environment');
+      return NextResponse.json({ 
+        error: 'AI service not configured.',
+        details: 'GEMINI_API_KEY not found',
         timestamp: new Date().toISOString()
+      }, { status: 500 });
+    }
+
+    console.log('GEMINI_API_KEY found, length:', process.env.GEMINI_API_KEY.length);
+
+    // Use the same approach as the working chat API
+    console.log('Using direct Gemini API call (same as chat API)...');
+    try {
+      const prompt = `
+        You are a credit card optimization expert in India. Given a list of credit cards a user owns and a specific spend, your task is to recommend the best card to use for that transaction.
+        
+        User's Cards (JSON format):
+        ${JSON.stringify(cards, null, 2)}
+        
+        Spend Details (JSON format):
+        ${JSON.stringify(spend, null, 2)}
+        
+        Your recommendation should be concise, clear, and provide a strong justification based on the rewards, benefits, and current utilization of the cards. Consider factors like reward rates for the spend category, ongoing offers (if any are implied by the vendor), and the available credit limit. Format your response in Markdown.
+      `;
+
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }],
+      };
+
+      console.log('Calling Gemini API directly...');
+      const geminiResponse = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error('Gemini API Error:', errorText);
+        return NextResponse.json({ 
+          error: 'Failed to get a response from the AI model.',
+          details: errorText,
+          timestamp: new Date().toISOString()
+        }, { status: 500 });
       }
-    });
+
+      const geminiResult = await geminiResponse.json();
+      console.log('Gemini API response received');
+
+      // Safely access the response text (same as chat API)
+      const responseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!responseText) {
+        return NextResponse.json({ 
+          error: 'AI model returned an invalid response format.',
+          timestamp: new Date().toISOString()
+        }, { status: 500 });
+      }
+
+      console.log('AI optimization response received, length:', responseText.length);
+      return NextResponse.json({ 
+        recommendation: responseText,
+        debug: {
+          cardsCount: cards.length,
+          spendAmount: spend.amount,
+          spendCategory: spend.category,
+          responseLength: responseText.length,
+          timestamp: new Date().toISOString()
+        }
+      });
+
+    } catch (geminiError) {
+      console.error('=== GEMINI API ERROR ===');
+      console.error('Gemini error type:', geminiError?.constructor?.name);
+      console.error('Gemini error message:', geminiError instanceof Error ? geminiError.message : 'Unknown Gemini error');
+      console.error('Gemini error stack:', geminiError instanceof Error ? geminiError.stack : 'No stack trace');
+      
+      return NextResponse.json({ 
+        error: 'AI service error.',
+        details: geminiError instanceof Error ? geminiError.message : 'Unknown Gemini error',
+        errorType: 'GeminiError',
+        timestamp: new Date().toISOString()
+      }, { status: 500 });
+    }
 
   } catch (error) {
-    console.error('=== ERROR in optimization API ===');
+    console.error('=== GENERAL ERROR in optimization API ===');
     console.error('Error type:', error?.constructor?.name);
     console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
