@@ -106,6 +106,15 @@ export function SpendOptimizerView() {
         const data = JSON.parse(responseText);
         console.log('Parsed response data:', data);
         
+        // Check if there's an error in the response
+        if (data.error) {
+          console.error('API returned error:', data.error);
+          if (data.details) {
+            console.error('Error details:', data.details);
+          }
+          throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
+        }
+        
         // The API returns { recommendation: "text" }, but we need to format it for display
         if (data.recommendation) {
           // For now, create a simple result format
@@ -119,10 +128,12 @@ export function SpendOptimizerView() {
           };
           setResult(mockResult);
         } else {
-          setResult(data);
+          console.error('No recommendation in response:', data);
+          throw new Error('No recommendation received from server');
         }
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
+        console.error('Raw response text:', responseText);
         throw new Error('Invalid response format from server');
       }
     } catch (err: unknown) {

@@ -21,11 +21,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing cards or spend data.' }, { status: 400 });
     }
 
+    console.log(`Processing request for ${cards.length} cards and spend of ₹${spend.amount} in ${spend.category}`);
+
+    // Always return a mock response for now to test the flow
+    const mockRecommendation = `Based on your ${cards.length} card(s) and spend of ₹${spend.amount} in ${spend.category}${spend.vendor ? ` at ${spend.vendor}` : ''}, here's my recommendation:
+
+For ${spend.category} purchases, I recommend using your ${cards[0]?.card_name || 'primary card'} as it typically offers good rewards for this category. 
+
+Key considerations:
+- Amount: ₹${spend.amount}
+- Category: ${spend.category}
+- Available cards: ${cards.length}
+
+This is a test response to verify the API is working correctly.`;
+
+    console.log('Returning mock recommendation');
+    return NextResponse.json({ 
+      recommendation: mockRecommendation,
+      debug: {
+        cardsCount: cards.length,
+        spendAmount: spend.amount,
+        spendCategory: spend.category,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+    // TODO: Uncomment this section when ready to use real AI
+    /*
     if (!genAI) {
-      console.log('GEMINI_API_KEY not configured, returning mock response');
-      // Return a mock response if Gemini is not configured
+      console.log('GEMINI_API_KEY not configured');
       return NextResponse.json({ 
-        recommendation: `Based on your ${cards.length} card(s) and spend of ₹${spend.amount} in ${spend.category}, I recommend using your primary card for this transaction. This is a mock response since AI is not configured.` 
+        recommendation: mockRecommendation
       });
     }
 
@@ -51,12 +77,21 @@ export async function POST(req: NextRequest) {
 
     console.log('AI response received');
     return NextResponse.json({ recommendation: text });
+    */
 
   } catch (error) {
     console.error('Error in optimization API:', error);
     
     // Return more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    
+    console.error('Error details:', {
+      message: errorMessage,
+      stack: errorStack,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json({ 
       error: 'Failed to get recommendation.',
       details: errorMessage,
