@@ -49,47 +49,40 @@ export async function POST(request: Request) {
 
     console.log('Latest user message:', latestMessage.text);
 
-    // Always return a mock response for now to test the flow
-    const mockResponses = [
-      "Thanks for your question! I'm here to help with your credit card queries. This is a test response to verify the chat is working.",
-      "I understand you're asking about credit cards. While I'm currently in test mode, I'd be happy to help you with card recommendations, rewards, and benefits once fully configured.",
-      "That's a great question about credit cards! I'm designed to help you optimize your card usage and understand benefits. This is a mock response for testing.",
-      "I can help you with credit card advice, rewards optimization, and understanding card benefits. This is currently a test response.",
-      "Thanks for reaching out! I specialize in Indian credit cards and can help with recommendations, comparisons, and usage tips. This is a test message."
-    ];
-
-    const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
-
-    console.log('Returning mock response');
-    return NextResponse.json({ 
-      reply: randomResponse,
-      debug: {
-        messageCount: messages.length,
-        latestMessage: latestMessage.text,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-    // TODO: Uncomment this section when ready to use real AI
-    /*
     if (!genAI) {
-      console.log('GEMINI_API_KEY not configured');
+      console.log('GEMINI_API_KEY not configured, returning fallback response');
+      const fallbackResponse = "I'm here to help with your credit card questions! However, I need to be properly configured with AI services to provide personalized advice. For now, I can suggest checking your card benefits, comparing reward rates, and optimizing your spending categories.";
+      
       return NextResponse.json({ 
-        reply: "I'm currently in test mode. Please configure the AI service to get personalized credit card advice."
+        reply: fallbackResponse,
+        debug: {
+          messageCount: messages.length,
+          latestMessage: latestMessage.text,
+          aiConfigured: false,
+          timestamp: new Date().toISOString()
+        }
       });
     }
 
+    console.log('Using Gemini AI for response');
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const prompt = `
-      You are "CreditWise AI", a helpful and friendly Indian credit card advisor. Your role is to answer user questions about their credit cards.
+      You are "CreditWise AI", a helpful and friendly Indian credit card advisor. Your role is to answer user questions about their credit cards, rewards, benefits, and usage optimization.
       
       Here is the current conversation history:
       ${history}
       
-      Your Task:
-      Based on the conversation history, provide a helpful and concise answer to the user's latest message. Focus on Indian credit cards, rewards, benefits, and usage tips. If you can't answer, say so politely. Do not make up information.
+      Guidelines:
+      - Focus on Indian credit cards, rewards, benefits, and usage tips
+      - Be concise but helpful (2-3 sentences max unless complex topic)
+      - If you don't know something specific, say so politely
+      - Don't make up specific card details or offers
+      - Help with general advice on card categories, reward optimization, and smart usage
+      - Be friendly and conversational
+      
+      Respond to the user's latest message:
     `;
 
     const result = await model.generateContent(prompt);
@@ -97,8 +90,15 @@ export async function POST(request: Request) {
     const text = response.text();
 
     console.log('AI response received');
-    return NextResponse.json({ reply: text });
-    */
+    return NextResponse.json({ 
+      reply: text,
+      debug: {
+        messageCount: messages.length,
+        latestMessage: latestMessage.text,
+        aiConfigured: true,
+        timestamp: new Date().toISOString()
+      }
+    });
 
   } catch (error: unknown) {
     console.error('Error in chat API:', error);
