@@ -36,9 +36,19 @@ export function AICardAdvisorView() {
         body: JSON.stringify({ messages: newMessages }),
       });
 
-      if (!response.ok) throw new Error("Failed to get a response from the advisor.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
 
       const data = await response.json();
+      console.log('Chat API response:', data);
+      
+      if (data.error) {
+        throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
+      }
+      
       const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
