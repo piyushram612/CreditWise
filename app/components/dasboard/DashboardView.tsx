@@ -18,6 +18,11 @@ export function DashboardView({ user, setActiveView, onAddCardClick }: Dashboard
       const fetchStats = async () => {
         setIsLoading(true);
         const supabase = getSupabaseClient();
+        if (!supabase) {
+          setIsLoading(false);
+          return;
+        }
+        
         const { data, error, count } = await supabase
           .from('user_owned_cards')
           .select('credit_limit', { count: 'exact' })

@@ -26,6 +26,8 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
   useEffect(() => {
     const fetchAllCards = async () => {
       const supabase = getSupabaseClient();
+      if (!supabase) return;
+      
       const { data, error } = await supabase
         .from('cards')
         .select('*')
@@ -164,6 +166,12 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
     };
 
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      setError('Unable to connect to database');
+      setIsLoading(false);
+      return;
+    }
+    
     const { error: upsertError } = existingCard
       ? await supabase.from('user_owned_cards').update(cardData).eq('id', existingCard.id)
       : await supabase.from('user_owned_cards').insert(cardData);

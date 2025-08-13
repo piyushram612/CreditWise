@@ -16,6 +16,11 @@ export function useCards(user: User | null, refreshKey: number) {
     const fetchUserCards = async () => {
       setIsLoading(true);
       const supabase = getSupabaseClient();
+      if (!supabase) {
+        setIsLoading(false);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('user_owned_cards')
         .select('*')

@@ -6,6 +6,8 @@ export function useTheme() {
 
   // Initialize theme after component mounts
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     setMounted(true);
     
     // Check localStorage first, then system preference, default to light
@@ -18,7 +20,7 @@ export function useTheme() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || typeof window === 'undefined') return;
     
     // Apply theme to document
     if (theme === 'dark') {

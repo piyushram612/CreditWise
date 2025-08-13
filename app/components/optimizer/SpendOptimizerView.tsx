@@ -17,6 +17,12 @@ export function SpendOptimizerView() {
     setError(null);
 
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      setError("Unable to connect to database.");
+      setIsLoading(false);
+      return;
+    }
+    
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
