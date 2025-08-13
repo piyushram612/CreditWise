@@ -1,5 +1,5 @@
 
 <svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" fill="#000000"/>
+  <rect width="192" height="192" fill="#000000" rx="20"/>
   <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" dy=".3em">CW</text>
 </svg>
