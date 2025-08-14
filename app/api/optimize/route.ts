@@ -71,30 +71,25 @@ export async function POST(req: NextRequest) {
       const merchantAdvice = spend.vendor ? getMerchantSpecificAdvice(spend.vendor, spend.category) : "";
 
       const prompt = `
-        You are a credit card optimization expert inspired by Ali Hajiani and Suvan Dural Jha. Provide concise, actionable recommendations with insider tips.
+        You are a credit card optimization expert. Analyze the user's existing cards and recommend the BEST card from their wallet for this specific spend.
+
+        CRITICAL RULE: You can ONLY recommend cards that exist in the user's wallet. Do NOT suggest cards they don't own.
 
         ${merchantAdvice ? `MERCHANT INSIGHT: ${merchantAdvice}` : ""}
         ${merchantSpecificResult ? `KNOWLEDGE BASE: ${merchantSpecificResult.card.card_name} - ${merchantSpecificResult.reason}` : ""}
 
-        User's Cards: ${JSON.stringify(enhancedCards, null, 2)}
+        User's Available Cards: ${JSON.stringify(enhancedCards, null, 2)}
         Spend: ₹${spend.amount} on ${spend.category}${spend.vendor ? ` at ${spend.vendor}` : ""}
         
-        EXPERT OPTIMIZATION RULES:
-        - Focus on highest reward rate for this specific spend
-        - Consider milestone benefits and bonus categories
-        - Factor in point transfer opportunities (airline miles, hotel points)
-        - Mention any stacking opportunities (bank portals, offers)
-        - Check credit utilization impact
-        
-        ADVANCED HACKS TO INCLUDE:
-        - Point transfer ratios for premium redemptions
-        - Milestone timing strategies
-        - Portal stacking opportunities (SmartBuy, Payzapp, etc.)
-        - Elite status benefits if applicable
-        - Cashback vs points value comparison
+        ANALYSIS REQUIREMENTS:
+        1. ONLY recommend cards from the user's wallet above
+        2. Compare reward rates across their existing cards
+        3. Consider milestone benefits and bonus categories
+        4. Factor in credit utilization impact
+        5. Include point transfer opportunities if applicable
         
         FORMAT:
-        ## Best Card: [Card Name]
+        ## Best Card: [Card Name from user's wallet]
         **Reward Rate:** [X%/points per ₹100]
         **Why:** [Concise reason - max 2 lines]
         
@@ -103,6 +98,7 @@ export async function POST(req: NextRequest) {
         - [Point transfer opportunity if relevant]
         - [Any stacking method]
         
+        If no card in their wallet is particularly good for this category, still pick the best available option and explain why.
         Keep total response under 200 words. Be direct and actionable.
       `;
 
