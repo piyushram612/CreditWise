@@ -6,8 +6,6 @@ export const mockSpendCategories: string[] = [
   'Utility Bills',
   'Travel & Flights',
   'Hotels & Accommodation',
-  'EMI Payments',
-  'Education Fees',
   'Entertainment & Movies',
   'Healthcare & Medical',
   'Insurance Premiums',
@@ -18,15 +16,12 @@ export const mockSpendCategories: string[] = [
   'Fashion & Clothing',
   'Beauty & Personal Care',
   'Pharmacy & Medicine',
-  'Government Payments',
-  'Mutual Funds & Investments',
   'Cab & Transportation',
   'Coffee & Quick Bites',
   'Department Stores',
-  'Home Improvement',
   'Subscription Services',
   'Gift Cards & Vouchers',
-  'Charity & Donations',
+  'Education Fees',
   'Other'
 ];
 

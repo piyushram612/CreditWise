@@ -43,34 +43,34 @@ interface GeminiResponse {
  * @returns A formatted string detailing the card's properties.
  */
 const formatCardForPrompt = (card: UserOwnedCard): string => {
-  const benefits = card.benefits 
+  const benefits = card.benefits
     ? Object.entries(card.benefits)
-        .map(([key, value]) => `  - ${key}: ${value}`)
-        .join('\n') 
+      .map(([key, value]) => `  - ${key}: ${value}`)
+      .join('\n')
     : '  - Not specified';
-  
-  const fees = card.fees 
+
+  const fees = card.fees
     ? Object.entries(card.fees)
-        .map(([key, value]) => `  - ${key}: ${value}`)
-        .join('\n') 
+      .map(([key, value]) => `  - ${key}: ${value}`)
+      .join('\n')
     : '  - Not specified';
 
   // Get detailed information from knowledge base
   const detailedInfo = getDetailedCardInfo(card.card_name || "", card.issuer || "");
-  
+
   let enhancedInfo = "";
   if (detailedInfo) {
     enhancedInfo = `
 Enhanced Card Information:
   Reward Rates:
 ${Object.entries(detailedInfo.reward_rates)
-  .map(([category, info]) => `    - ${category}: ${info.rate}% ${info.type} (${info.notes})`)
-  .join('\n')}
+        .map(([category, info]) => `    - ${category}: ${info.rate}% ${info.type} (${info.notes})`)
+        .join('\n')}
   
   Key Partnerships:
 ${Object.entries(detailedInfo.partnerships)
-  .map(([partner, info]) => `    - ${partner}: ${info.reward_rate}% rewards on ${info.merchants.join(', ')}`)
-  .join('\n')}
+        .map(([partner, info]) => `    - ${partner}: ${info.reward_rate}% rewards on ${info.merchants.join(', ')}`)
+        .join('\n')}
   
   Best For: ${detailedInfo.suitability}`;
   }
@@ -140,30 +140,42 @@ export async function POST(request: Request) {
     const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const prompt = `
-      You are "CreditWise AI", a helpful and friendly Indian credit card advisor with access to detailed card partnership information and real-time knowledge about reward structures.
+      You are "CreditWise AI", an expert Indian credit card advisor inspired by creators like Ali Hajiani, The Credit Card Guy, and Suvan Dural Jha. You provide concise, actionable advice with insider tips and hacks.
       
-      Here is the context about the user's current credit card wallet:
-      ---
+      User's Cards:
       ${cardsInfo}
-      ---
       
-      Here is the current conversation history:
+      Conversation:
       ${history}
       
-      IMPORTANT KNOWLEDGE:
-      - Tata Neu Infinity HDFC card offers 5% NeuCoins on BigBasket and other Tata partner brands
-      - Always consider specific merchant partnerships when recommending cards
-      - Look for category-specific bonuses and ongoing partnerships
-      - Provide specific reward rates and partnership details when available
+      EXPERT KNOWLEDGE & HACKS:
+      - Tata Neu Infinity: 5% NeuCoins on BigBasket, Tata CLiQ (convert to airline miles)
+      - HDFC Infinia: Transfer points to airline partners at 1:1 ratio for premium redemptions
+      - Axis Magnus: 25,000 points = 5,000 airline miles (sweet spot for transfers)
+      - SBI Cashback: 5% on online spends (Amazon, Flipkart) - no cap
+      - ICICI Amazon Pay: 5% on Amazon, 2% on bill payments
+      - Amex Platinum Travel: 5x points on flights, hotels (transfer to Marriott/Singapore Airlines)
       
-      Your Task:
-      Based on the provided context of the user's cards and the conversation history, provide a helpful and detailed answer. When recommending cards for specific merchants or categories, mention exact reward rates and partnerships. If the user asks about grocery shopping on BigBasket, specifically mention the Tata Neu partnership advantage. Always be specific about reward rates and benefits.
+      ADVANCED TIPS:
+      - Use milestone benefits strategically (spend timing for bonus rewards)
+      - Stack cashback with merchant offers (Payzapp, SmartBuy portals)
+      - Convert points to airline miles for 3-5x value on international flights
+      - Use rent payment cards for milestone achievement (avoid convenience fees)
+      - Book hotels through bank portals for extra points + elite status benefits
+      
+      RESPONSE RULES:
+      - Keep responses under 80 words (be extremely concise)
+      - Give 1-2 specific actionable tips maximum
+      - Use bullet points only when necessary
+      - Be direct and avoid explanations
+      - Focus on immediate value (reward rates, specific hacks)
+      - No fluff or background information
     `;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.log('GEMINI_API_KEY not configured');
-      return NextResponse.json({ 
+      return NextResponse.json({
         reply: "I'm here to help with your credit card questions! However, I need to be properly configured with AI services to provide personalized advice. For now, I can suggest checking your card benefits, comparing reward rates, and optimizing your spending categories."
       });
     }
@@ -196,7 +208,7 @@ export async function POST(request: Request) {
     }
 
     console.log('AI response received');
-    return NextResponse.json({ 
+    return NextResponse.json({
       reply: responseText,
       debug: {
         messageCount: messages.length,
