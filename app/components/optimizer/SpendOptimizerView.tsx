@@ -3,7 +3,8 @@ import { getSupabaseClient } from '@/app/utils/supabase';
 import { apiCall } from '@/app/utils/api';
 import { mockSpendCategories } from '@/app/utils/constants';
 import type { OptimizationResult } from '@/app/types';
-import { SparklesIcon, CreditCardIcon } from '@/app/components/shared/Icons';
+import { SparklesIcon } from '@/app/components/shared/Icons';
+import { OptimizationResult as OptimizationResultComponent } from './OptimizationResult';
 
 export function SpendOptimizerView() {
   const [isLoading, setIsLoading] = useState(false);
@@ -117,16 +118,15 @@ export function SpendOptimizerView() {
         
         // The API returns { recommendation: "text" }, but we need to format it for display
         if (data.recommendation) {
-          // For now, create a simple result format
-          const mockResult: OptimizationResult = {
+          // Store the markdown recommendation directly
+          setResult({
             bestCard: {
               name: "AI Recommendation",
               issuer: "Based on your cards"
             },
             reason: data.recommendation,
             alternatives: []
-          };
-          setResult(mockResult);
+          });
         } else {
           console.error('No recommendation in response:', data);
           throw new Error('No recommendation received from server');
@@ -231,37 +231,7 @@ export function SpendOptimizerView() {
 
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
 
-      {result && (
-        <div className="mt-8 animate-fade-in">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Recommendation</h3>
-          <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-6 rounded-r-lg">
-            <div className="flex items-center">
-              <div className="bg-green-500 p-2 rounded-full">
-                <CreditCardIcon className="w-6 h-6 text-white"/>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-green-700 dark:text-green-300">Best Option</p>
-                <p className="font-bold text-lg text-green-900 dark:text-green-100">{result.bestCard.name}</p>
-              </div>
-            </div>
-            <p className="mt-4 text-gray-700 dark:text-gray-300">{result.reason}</p>
-          </div>
-          
-          {result.alternatives.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Other Good Options:</h4>
-              <ul className="space-y-3">
-                {result.alternatives.map((alt, index) => (
-                  <li key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="font-bold text-gray-800 dark:text-gray-100">{alt.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{alt.reason}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
+      {result && <OptimizationResultComponent result={result} />}
     </div>
   );
 }

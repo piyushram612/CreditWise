@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { apiCall } from '@/app/utils/api';
 import type { ChatMessage } from '@/app/types';
 import { SparklesIcon, SendIcon } from '@/app/components/shared/Icons';
 
 export function AICardAdvisorView() {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { 
-      from: 'ai', 
-      text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else." 
+    {
+      from: 'ai',
+      text: "Hi! How can I help you with your cards today? You can ask about rewards, benefits, or anything else."
     }
   ]);
   const [input, setInput] = useState('');
@@ -44,18 +45,18 @@ export function AICardAdvisorView() {
 
       const data = await response.json();
       console.log('Chat API response:', data);
-      
+
       if (data.error) {
         throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
       }
-      
+
       const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error(error);
-      const errorMessage: ChatMessage = { 
-        from: 'ai', 
-        text: "Sorry, I'm having trouble connecting right now." 
+      const errorMessage: ChatMessage = {
+        from: 'ai',
+        text: "Sorry, I'm having trouble connecting right now."
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -66,33 +67,48 @@ export function AICardAdvisorView() {
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">AI Card Advisor</h2>
-      
+
       <div className="flex-grow bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col p-4">
         <div className="flex-grow space-y-4 overflow-y-auto pr-2">
           {messages.map((msg, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`flex items-end gap-2 ${msg.from === 'user' ? 'justify-end' : ''}`}
             >
               {msg.from === 'ai' && (
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                  <SparklesIcon className="w-5 h-5"/>
+                  <SparklesIcon className="w-5 h-5" />
                 </div>
               )}
-              <div className={`max-w-xl p-3 rounded-lg ${
-                msg.from === 'user' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-              }`}>
-                <p>{msg.text}</p>
+              <div className={`max-w-xl p-3 rounded-lg ${msg.from === 'user'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                }`}>
+                {msg.from === 'ai' ? (
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-gray-800 dark:prose-headings:text-gray-200 prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-ul:text-gray-800 dark:prose-ul:text-gray-200 prose-li:text-gray-800 dark:prose-li:text-gray-200">
+                    <ReactMarkdown 
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="mb-2 last:mb-0 ml-4">{children}</ul>,
+                        li: ({ children }) => <li className="mb-1">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        em: ({ children }) => <em className="italic">{children}</em>,
+                      }}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p>{msg.text}</p>
+                )}
               </div>
             </div>
           ))}
-          
+
           {isThinking && (
             <div className="flex items-end gap-2">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                <SparklesIcon className="w-5 h-5"/>
+                <SparklesIcon className="w-5 h-5" />
               </div>
               <div className="max-w-md p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 <div className="flex items-center space-x-1">
@@ -103,22 +119,22 @@ export function AICardAdvisorView() {
               </div>
             </div>
           )}
-          
+
           <div ref={chatEndRef} />
         </div>
-        
+
         <form onSubmit={handleSend} className="mt-4 flex items-center gap-2">
-          <input 
-            type="text" 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
-            placeholder="Ask about rewards, fees, benefits..." 
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" 
-            disabled={isThinking} 
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about rewards, fees, benefits..."
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400"
+            disabled={isThinking}
           />
-          <button 
-            type="submit" 
-            className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300" 
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-3 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 disabled:bg-blue-300"
             disabled={isThinking}
           >
             <SendIcon />
