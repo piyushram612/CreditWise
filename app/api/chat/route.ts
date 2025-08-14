@@ -13,6 +13,7 @@ interface UserOwnedCard {
   card_name: string;
   issuer: string;
   card_type?: string;
+  network?: string;
   benefits?: Record<string, string>;
   fees?: Record<string, string>;
 }
@@ -79,6 +80,7 @@ ${Object.entries(detailedInfo.partnerships)
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Card Type: ${card.card_type || 'N/A'}
+Network: ${card.network || 'Not specified'} ${card.network === 'RuPay' ? '(UPI Compatible)' : card.network ? '(No UPI)' : ''}
 Credit Limit: ₹${card.credit_limit?.toLocaleString() || 'Not specified'}
 Used Amount: ₹${card.used_amount?.toLocaleString() || '0'}
 Available Credit: ₹${card.credit_limit && card.used_amount ? (card.credit_limit - card.used_amount).toLocaleString() : 'Not calculated'}
@@ -155,6 +157,12 @@ export async function POST(request: Request) {
       - SBI Cashback: 5% on online spends (Amazon, Flipkart) - no cap
       - ICICI Amazon Pay: 5% on Amazon, 2% on bill payments
       - Amex Platinum Travel: 5x points on flights, hotels (transfer to Marriott/Singapore Airlines)
+      
+      NETWORK IMPORTANCE:
+      - RuPay cards: Can be used for UPI payments (great for small merchants, bill payments)
+      - Visa/Mastercard: No UPI support but wider international acceptance
+      - American Express: Premium benefits but limited merchant acceptance in India
+      - When recommending cards, consider UPI compatibility for daily spending
       
       RESPONSE GUIDELINES:
       1. ONLY answer credit card related questions

@@ -5,6 +5,7 @@ interface UserCard {
   id: string;
   card_name: string | null;
   issuer: string | null;
+  network: string | null;
   credit_limit: number | null;
   used_amount: number | null;
   [key: string]: unknown;

@@ -29,6 +29,7 @@ export interface UserOwnedCard {
   card_name: string | null;
   issuer: string | null;
   card_type?: string | null;
+  network?: string | null;
   benefits: Json | null;
   fees: Json | null;
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getSupabaseClient } from '@/app/utils/supabase';
 import type { User, UserOwnedCard, Card } from '@/app/types';
 import { XMarkIcon, TrashIcon, PlusIcon } from '@/app/components/shared/Icons';
+import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 
 interface CardFormModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
   const [cardName, setCardName] = useState('');
   const [issuer, setIssuer] = useState('');
   const [cardType, setCardType] = useState('Points');
+  const [network, setNetwork] = useState('');
+  const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
   const [creditLimit, setCreditLimit] = useState('');
   const [usedAmount, setUsedAmount] = useState('');
   const [benefits, setBenefits] = useState([{ key: '', value: '' }]);
@@ -42,6 +45,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       setCardName(existingCard.card_name || '');
       setIssuer(existingCard.issuer || '');
       setCardType(existingCard.card_type || 'Points');
+      setNetwork(existingCard.network || '');
       setCreditLimit(existingCard.credit_limit?.toString() || '');
       setUsedAmount(existingCard.used_amount?.toString() || '0');
       setBenefits(
@@ -58,6 +62,8 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       setCardName('');
       setIssuer('');
       setCardType('Points');
+      setNetwork('');
+      setAvailableNetworks([]);
       setCreditLimit('');
       setUsedAmount('');
       setBenefits([{ key: '', value: '' }]);
@@ -72,8 +78,45 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       setCardName(template.card_name || '');
       setIssuer(template.issuer || '');
 
+      // Get detailed card info from knowledge base
+      const detailedInfo = getDetailedCardInfo(template.card_name || '', template.issuer || '');
+      
+      // Set available networks and default network
+      if (detailedInfo?.network) {
+        const networks = detailedInfo.network.split('/').map(n => n.trim());
+        setAvailableNetworks(networks);
+        setNetwork(networks[0]); // Set first network as default
+      } else {
+        setAvailableNetworks(['Visa', 'Mastercard', 'RuPay', 'American Express']);
+        setNetwork('');
+      }
+
       const newBenefits = [];
-      if (template.benefits && typeof template.benefits === 'object') {
+      
+      // First try to get benefits from knowledge base (more detailed)
+      if (detailedInfo) {
+        // Add reward rates from knowledge base
+        Object.entries(detailedInfo.reward_rates).forEach(([category, info]) => {
+          const formattedCategory = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const rateDisplay = `${info.rate}${info.type.includes('%') ? '%' : 'x'}`;
+          const notes = info.notes ? ` - ${info.notes}` : '';
+          newBenefits.push({ 
+            key: formattedCategory, 
+            value: `${rateDisplay}${notes}` 
+          });
+        });
+
+        // Add partnership benefits
+        Object.entries(detailedInfo.partnerships).forEach(([partner, info]) => {
+          newBenefits.push({ 
+            key: `${partner} Partnership`, 
+            value: `${info.reward_rate}% rewards - ${info.benefits.join(', ')}` 
+          });
+        });
+      }
+
+      // Fallback to template benefits if knowledge base doesn't have info
+      if (newBenefits.length === 0 && template.benefits && typeof template.benefits === 'object') {
         const benefitsObj = template.benefits as Record<string, unknown>;
         
         // Extract reward rates if they exist
@@ -173,6 +216,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       card_name: cardName,
       issuer: issuer,
       card_type: cardType,
+      network: network || null,
       credit_limit: parseInt(creditLimit, 10),
       used_amount: parseInt(usedAmount, 10) || 0,
       benefits: benefitsAsObject,
@@ -230,7 +274,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             ))}
           </select>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Card Name</label>
               <input
@@ -267,6 +311,34 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Network
+                <span className="text-xs text-gray-500 ml-1">(Important for UPI compatibility)</span>
+              </label>
+              <select
+                value={network}
+                onChange={e => setNetwork(e.target.value)}
+                className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md"
+              >
+                <option value="">Select Network</option>
+                {availableNetworks.length > 0 ? (
+                  availableNetworks.map(net => (
+                    <option key={net} value={net}>
+                      {net} {net === 'RuPay' ? '(UPI Compatible)' : '(No UPI)'}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="Visa">Visa (No UPI)</option>
+                    <option value="Mastercard">Mastercard (No UPI)</option>
+                    <option value="RuPay">RuPay (UPI Compatible)</option>
+                    <option value="American Express">American Express (No UPI)</option>
+                  </>
+                )}
+              </select>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
               <input
                 type="number"
@@ -277,7 +349,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 lg:col-span-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Used Amount (Current Statement)</label>
               <input
                 type="number"
