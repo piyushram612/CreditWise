@@ -1,12 +1,33 @@
 export const mockSpendCategories: string[] = [
   'Dining & Restaurants',
-  'Online Shopping', 
-  'Fuel',
+  'Online Shopping',
+  'Groceries & Supermarkets', 
+  'Fuel & Petrol',
   'Utility Bills',
   'Travel & Flights',
-  'Groceries',
+  'Hotels & Accommodation',
   'EMI Payments',
-  'Education Fees'
+  'Education Fees',
+  'Entertainment & Movies',
+  'Healthcare & Medical',
+  'Insurance Premiums',
+  'Mobile & DTH Recharge',
+  'Rent Payments',
+  'Jewellery & Gold',
+  'Electronics & Appliances',
+  'Fashion & Clothing',
+  'Beauty & Personal Care',
+  'Pharmacy & Medicine',
+  'Government Payments',
+  'Mutual Funds & Investments',
+  'Cab & Transportation',
+  'Coffee & Quick Bites',
+  'Department Stores',
+  'Home Improvement',
+  'Subscription Services',
+  'Gift Cards & Vouchers',
+  'Charity & Donations',
+  'Other'
 ];
 
 export const getIssuerColorCode = (issuer: string) => {

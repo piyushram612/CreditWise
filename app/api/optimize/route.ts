@@ -71,36 +71,39 @@ export async function POST(req: NextRequest) {
       const merchantAdvice = spend.vendor ? getMerchantSpecificAdvice(spend.vendor, spend.category) : "";
 
       const prompt = `
-        You are a credit card optimization expert in India with access to real-time card partnership information. Given a list of credit cards a user owns and a specific spend, recommend the best card to use.
+        You are a credit card optimization expert inspired by Ali Hajiani and Suvan Dural Jha. Provide concise, actionable recommendations with insider tips.
 
-        IMPORTANT CONTEXT:
-        ${merchantAdvice ? `MERCHANT-SPECIFIC INSIGHT: ${merchantAdvice}` : ""}
+        ${merchantAdvice ? `MERCHANT INSIGHT: ${merchantAdvice}` : ""}
+        ${merchantSpecificResult ? `KNOWLEDGE BASE: ${merchantSpecificResult.card.card_name} - ${merchantSpecificResult.reason}` : ""}
+
+        User's Cards: ${JSON.stringify(enhancedCards, null, 2)}
+        Spend: ₹${spend.amount} on ${spend.category}${spend.vendor ? ` at ${spend.vendor}` : ""}
         
-        ${merchantSpecificResult ? `
-        KNOWLEDGE BASE RECOMMENDATION: 
-        Based on current partnerships and reward structures, ${merchantSpecificResult.card.card_name} appears to be the best choice because: ${merchantSpecificResult.reason}
-        ` : ""}
-
-        User's Cards with Enhanced Details:
-        ${JSON.stringify(enhancedCards, null, 2)}
+        EXPERT OPTIMIZATION RULES:
+        - Focus on highest reward rate for this specific spend
+        - Consider milestone benefits and bonus categories
+        - Factor in point transfer opportunities (airline miles, hotel points)
+        - Mention any stacking opportunities (bank portals, offers)
+        - Check credit utilization impact
         
-        Spend Details:
-        ${JSON.stringify(spend, null, 2)}
+        ADVANCED HACKS TO INCLUDE:
+        - Point transfer ratios for premium redemptions
+        - Milestone timing strategies
+        - Portal stacking opportunities (SmartBuy, Payzapp, etc.)
+        - Elite status benefits if applicable
+        - Cashback vs points value comparison
         
-        ANALYSIS REQUIREMENTS:
-        1. Consider specific merchant partnerships (e.g., Tata Neu + BigBasket partnership offers 5% rewards)
-        2. Look for category-specific bonuses that match the spend type
-        3. Factor in current credit utilization and available limits
-        4. Consider any ongoing promotional offers or partnerships
-        5. Verify if the recommended card actually exists in the user's wallet
-
-        Your recommendation should be:
-        - Specific about reward rates and partnerships
-        - Clear about why this card beats others for this transaction
-        - Mention any special benefits or offers applicable
-        - Format the response in clear, readable Markdown
-
-        If you're recommending based on a specific partnership (like Tata Neu for BigBasket), explicitly mention the partnership and reward rate.
+        FORMAT:
+        ## Best Card: [Card Name]
+        **Reward Rate:** [X%/points per ₹100]
+        **Why:** [Concise reason - max 2 lines]
+        
+        ### Pro Tips:
+        - [Specific hack/tip for this spend]
+        - [Point transfer opportunity if relevant]
+        - [Any stacking method]
+        
+        Keep total response under 200 words. Be direct and actionable.
       `;
 
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
