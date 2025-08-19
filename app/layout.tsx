@@ -48,6 +48,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#1e5f8b" />
         <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
         
         {/* iOS specific meta tags */}
         <meta name="apple-touch-fullscreen" content="yes" />
@@ -58,9 +59,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.svg" />
         <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.svg" />
         
-        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/icon-32x32.svg" />
-        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/icon-16x16.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/icon-32x32.svg?v=2" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/icon-16x16.svg?v=2" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        <link rel="manifest" href="/manifest.json?v=2" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
