@@ -8,7 +8,8 @@ import {
   UserCircleIcon, 
   SettingsIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  CreditWiseIcon
 } from '@/app/components/shared/Icons';
 
 export function Sidebar({ 
@@ -37,8 +38,8 @@ export function Sidebar({
   return (
     <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 flex flex-col h-full">
       <div className="flex items-center mb-8 shrink-0">
-        <SparklesIcon className="w-7 h-7 text-blue-500" />
-        <h1 className="text-xl font-bold ml-2">CreditWise</h1>
+        <CreditWiseIcon className="w-8 h-8 text-[#1e5f8b]" />
+        <h1 className="text-xl font-bold ml-2 text-[#1e5f8b] dark:text-blue-400">CreditWise</h1>
       </div>
 
       <nav className="flex-grow overflow-y-auto">

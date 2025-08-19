@@ -1,5 +1,49 @@
-
-<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" fill="#000000" rx="20"/>
-  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="4" fill="white" text-anchor="middle" dy=".3em">CW</text>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Credit Card -->
+  <rect 
+    x="30" 
+    y="60" 
+    width="120" 
+    height="75" 
+    rx="8" 
+    ry="8" 
+    fill="none" 
+    stroke="#1e5f8b" 
+    stroke-width="6"
+  />
+  <!-- Card stripe -->
+  <rect 
+    x="30" 
+    y="75" 
+    width="120" 
+    height="12" 
+    fill="#1e5f8b"
+  />
+  <!-- Card chip -->
+  <rect 
+    x="45" 
+    y="95" 
+    width="20" 
+    height="15" 
+    rx="2" 
+    ry="2" 
+    fill="#1e5f8b"
+  />
+  
+  <!-- Checkmark circle -->
+  <circle 
+    cx="140" 
+    cy="140" 
+    r="25" 
+    fill="#1e5f8b"
+  />
+  <!-- Checkmark -->
+  <path 
+    d="M130 140 L137 147 L150 130" 
+    fill="none" 
+    stroke="white" 
+    stroke-width="6" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
 </svg>

@@ -26,6 +26,141 @@ const Bars3Icon = () => <Icon path="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5
 const Cog6ToothIcon = () => <Icon path="M9.594 3.94c.09-.542.56-.94 1.11-1.153L12 2.25l1.313.537c.55.213 1.02.611 1.11 1.153.09.54-.09 1.09-.537 1.313L12 5.79l-1.886-.537c-.447-.223-.627-.773-.537-1.313zM21.75 12a9.75 9.75 0 11-19.5 0 9.75 9.75 0 0119.5 0zM14.625 12a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />;
 const SettingsIcon = () => <Icon path="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />;
 
+// CreditWise Logo Components
+const CreditWiseLogo = ({ className = "w-32 h-32", showText = true }: { className?: string; showText?: boolean }) => (
+  <div className="flex flex-col items-center space-y-2">
+    <svg 
+      viewBox="0 0 200 200" 
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Credit Card */}
+      <rect 
+        x="30" 
+        y="60" 
+        width="120" 
+        height="75" 
+        rx="8" 
+        ry="8" 
+        fill="none" 
+        stroke="#1e5f8b" 
+        strokeWidth="4"
+      />
+      {/* Card stripe */}
+      <rect 
+        x="30" 
+        y="75" 
+        width="120" 
+        height="8" 
+        fill="#1e5f8b"
+      />
+      {/* Card chip */}
+      <rect 
+        x="45" 
+        y="95" 
+        width="20" 
+        height="15" 
+        rx="2" 
+        ry="2" 
+        fill="none" 
+        stroke="#1e5f8b" 
+        strokeWidth="2"
+      />
+      {/* Card numbers representation */}
+      <rect x="45" y="115" width="8" height="3" fill="#1e5f8b" />
+      <rect x="57" y="115" width="8" height="3" fill="#1e5f8b" />
+      <rect x="69" y="115" width="8" height="3" fill="#1e5f8b" />
+      <rect x="81" y="115" width="8" height="3" fill="#1e5f8b" />
+      
+      {/* Checkmark circle */}
+      <circle 
+        cx="140" 
+        cy="140" 
+        r="25" 
+        fill="#1e5f8b"
+      />
+      {/* Checkmark */}
+      <path 
+        d="M130 140 L137 147 L150 130" 
+        fill="none" 
+        stroke="white" 
+        strokeWidth="4" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+    
+    {showText && (
+      <div className="text-2xl font-bold text-[#1e5f8b] tracking-wide">
+        CreditWise
+      </div>
+    )}
+  </div>
+);
+
+const CreditWiseIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 200 200" 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Credit Card */}
+    <rect 
+      x="30" 
+      y="60" 
+      width="120" 
+      height="75" 
+      rx="8" 
+      ry="8" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="4"
+    />
+    {/* Card stripe */}
+    <rect 
+      x="30" 
+      y="75" 
+      width="120" 
+      height="8" 
+      fill="currentColor"
+    />
+    {/* Card chip */}
+    <rect 
+      x="45" 
+      y="95" 
+      width="20" 
+      height="15" 
+      rx="2" 
+      ry="2" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2"
+    />
+    {/* Card numbers representation */}
+    <rect x="45" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="57" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="69" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="81" y="115" width="8" height="3" fill="currentColor" />
+    
+    {/* Checkmark circle */}
+    <circle 
+      cx="140" 
+      cy="140" 
+      r="25" 
+      fill="currentColor"
+    />
+    {/* Checkmark */}
+    <path 
+      d="M130 140 L137 147 L150 130" 
+      fill="none" 
+      stroke="white" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export {
   Icon,
   CreditCardIcon,
@@ -42,6 +177,8 @@ export {
   PencilSquareIcon,
   Bars3Icon,
   Cog6ToothIcon,
-  SettingsIcon
+  SettingsIcon,
+  CreditWiseLogo,
+  CreditWiseIcon
 };
 

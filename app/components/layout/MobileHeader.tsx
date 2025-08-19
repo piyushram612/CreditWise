@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bars3Icon, SparklesIcon } from '@/app/components/shared/Icons';
+import { Bars3Icon, CreditWiseIcon } from '@/app/components/shared/Icons';
 
 interface MobileHeaderProps {
   onMenuClick: () => void;
@@ -16,8 +16,8 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
       </button>
       
       <div className="flex items-center">
-        <SparklesIcon className="w-6 h-6 text-blue-500" />
-        <h1 className="text-lg font-bold ml-2">CreditWise</h1>
+        <CreditWiseIcon className="w-7 h-7 text-[#1e5f8b]" />
+        <h1 className="text-lg font-bold ml-2 text-[#1e5f8b] dark:text-blue-400">CreditWise</h1>
       </div>
       
       <div className="w-6"></div> {/* Spacer */}
