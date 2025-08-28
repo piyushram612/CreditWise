@@ -82,8 +82,16 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       const detailedInfo = getDetailedCardInfo(template.card_name || '', template.issuer || '');
       
       // Set available networks and default network
+      let networkString = '';
       if (detailedInfo?.network) {
-        const networks = detailedInfo.network.split('/').map(n => n.trim());
+        networkString = detailedInfo.network;
+      } else if (template.benefits && typeof template.benefits === 'object') {
+        const benefitsObj = template.benefits as Record<string, unknown>;
+        networkString = String(benefitsObj.network || '');
+      }
+      
+      if (networkString) {
+        const networks = networkString.split('/').map(n => n.trim());
         setAvailableNetworks(networks);
         setNetwork(networks[0]); // Set first network as default
       } else {
@@ -146,12 +154,60 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
         if (loungeAccess?.international && loungeAccess.international !== "None.") {
           newBenefits.push({ key: 'International Lounge Access', value: String(loungeAccess.international) });
         }
+
+        // Extract other benefits if they exist
+        if (benefitsObj.other_benefits && Array.isArray(benefitsObj.other_benefits)) {
+          benefitsObj.other_benefits.forEach((benefit, index) => {
+            newBenefits.push({ key: `Other Benefit ${index + 1}`, value: String(benefit) });
+          });
+        }
+
+        // Extract milestone benefits if they exist
+        if (benefitsObj.milestone_benefits && Array.isArray(benefitsObj.milestone_benefits)) {
+          benefitsObj.milestone_benefits.forEach((milestone: any, index: number) => {
+            if (milestone.condition && milestone.reward) {
+              newBenefits.push({ 
+                key: `Milestone ${index + 1}`, 
+                value: `${milestone.condition} - ${milestone.reward}` 
+              });
+            }
+          });
+        }
+
+        // Extract suitability as a benefit
+        if (benefitsObj.suitability) {
+          newBenefits.push({ key: 'Best For', value: String(benefitsObj.suitability) });
+        }
       }
 
       setBenefits(newBenefits.length > 0 ? newBenefits : [{ key: '', value: '' }]);
 
       const newFees = [];
-      if (template.fees && typeof template.fees === 'object') {
+      
+      // First try to get fees from knowledge base
+      if (detailedInfo) {
+        newFees.push({ key: 'Joining Fee', value: `₹${detailedInfo.joining_fee}` });
+        newFees.push({ key: 'Annual Fee', value: `₹${detailedInfo.annual_fee}` });
+        if (detailedInfo.fee_waiver && detailedInfo.fee_waiver !== "None.") {
+          newFees.push({ key: 'Fee Waiver', value: detailedInfo.fee_waiver });
+        }
+      }
+      // Fallback to template fees (now inside benefits object)
+      else if (template.benefits && typeof template.benefits === 'object') {
+        const benefitsObj = template.benefits as Record<string, unknown>;
+        
+        if (benefitsObj.joining_fee !== undefined) {
+          newFees.push({ key: 'Joining Fee', value: `₹${String(benefitsObj.joining_fee)}` });
+        }
+        if (benefitsObj.annual_fee !== undefined) {
+          newFees.push({ key: 'Annual Fee', value: `₹${String(benefitsObj.annual_fee)}` });
+        }
+        if (benefitsObj.fee_waiver && benefitsObj.fee_waiver !== "None.") {
+          newFees.push({ key: 'Fee Waiver', value: String(benefitsObj.fee_waiver) });
+        }
+      }
+      // Legacy support for old template structure
+      else if (template.fees && typeof template.fees === 'object') {
         const feesObj = template.fees as Record<string, unknown>;
         
         if (feesObj.joining_fee) {
