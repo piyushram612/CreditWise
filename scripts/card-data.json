@@ -1,392 +1,5 @@
 [
   {
-    "card_name": "SBI Cashback Card",
-    "issuer": "SBI",
-    "network": "Mastercard",
-    "card_type": ["Cashback"],
-    "joining_fee": 999,
-    "annual_fee": 999,
-    "fee_waiver": "Annual fee reversed on spending ₹2,00,000 or more in the preceding year.",
-    "reward_rates": {
-      "online_spends": {
-        "rate": 5,
-        "type": "Cashback (%)",
-        "notes": "No merchant restrictions. Capped at ₹5,000 cashback per monthly statement cycle."
-      },
-      "offline_spends": {
-        "rate": 1,
-        "type": "Cashback (%)",
-        "notes": "Includes utility bill payments."
-      },
-      "excluded_categories": {
-        "rate": 0,
-        "type": "Cashback (%)",
-        "notes": "Rent Payment, Wallet Loads, Merchant EMIs, Fuel, etc."
-      }
-    },
-    "welcome_benefits": "None.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "None. (Benefit discontinued)",
-      "international": "None."
-    },
-    "other_benefits": [
-      "1% fuel surcharge waiver, up to ₹100 per month."
-    ],
-    "suitability": "Excellent for users with high online spending across various merchants due to its high, uncategorized cashback rate."
-  },
-  {
-    "card_name": "HDFC Millennia",
-    "issuer": "HDFC",
-    "network": "Visa/Mastercard",
-    "card_type": ["Cashback", "Rewards"],
-    "joining_fee": 1000,
-    "annual_fee": 1000,
-    "fee_waiver": "Spend ₹1,00,000 in an anniversary year to get the renewal fee waived.",
-    "reward_rates": {
-      "partner_merchants": {
-        "rate": 5,
-        "type": "Cashback (%)",
-        "notes": "On Amazon, Flipkart, Myntra, Swiggy, Zomato, Uber etc. Capped at 1000 CashPoints per month."
-      },
-      "all_other_spends": {
-        "rate": 1,
-        "type": "Cashback (%)",
-        "notes": "Applies to all other spends, including EMIs and wallet loads. Capped at 1000 CashPoints per month."
-      }
-    },
-    "welcome_benefits": "1000 CashPoints after payment of joining fee.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹1,00,000 in a calendar quarter.",
-        "reward": "₹1000 worth of gift vouchers."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "8 complimentary visits per year (2 per quarter).",
-      "international": "None."
-    },
-    "other_benefits": [
-      "1% fuel surcharge waiver.",
-      "Redemption: 1 CashPoint = ₹1 for statement credit (min 500 points)."
-    ],
-    "suitability": "Ideal for young professionals with spending concentrated on major online platforms and who can meet quarterly spending milestones."
-  },
-  {
-    "card_name": "Axis Bank ACE",
-    "issuer": "Axis",
-    "network": "Visa",
-    "card_type": ["Cashback"],
-    "joining_fee": 499,
-    "annual_fee": 499,
-    "fee_waiver": "Annual fee waived on spends of ₹2,00,000 in a year.",
-    "reward_rates": {
-      "bill_payments_recharges_google_pay": {
-        "rate": 5,
-        "type": "Cashback (%)",
-        "notes": "Capped at ₹500 per month."
-      },
-      "swiggy_zomato_ola": {
-        "rate": 4,
-        "type": "Cashback (%)",
-        "notes": "Capped at ₹500 per month combined for 5% and 4% categories."
-      },
-      "other_spends": {
-        "rate": 2,
-        "type": "Cashback (%)",
-        "notes": "Unlimited cashback."
-      }
-    },
-    "welcome_benefits": "None.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "4 complimentary visits per year.",
-      "international": "None."
-    },
-    "other_benefits": [
-      "1% fuel surcharge waiver.",
-      "Up to 20% off at partner restaurants."
-    ],
-    "suitability": "Best for users who pay utility bills and recharges via Google Pay and have significant food delivery/cab spends."
-  },
-  {
-    "card_name": "ICICI Amazon Pay",
-    "issuer": "ICICI",
-    "network": "Visa",
-    "card_type": ["Co-branded", "Cashback", "Lifetime Free"],
-    "joining_fee": 0,
-    "annual_fee": 0,
-    "fee_waiver": "Lifetime Free.",
-    "reward_rates": {
-      "amazon_spends_prime_members": {
-        "rate": 5,
-        "type": "Cashback (%)",
-        "notes": "Unlimited cashback. Credited as Amazon Pay Balance."
-      },
-      "amazon_spends_non_prime": {
-        "rate": 3,
-        "type": "Cashback (%)",
-        "notes": "Unlimited cashback."
-      },
-      "amazon_pay_partner_merchants": {
-        "rate": 2,
-        "type": "Cashback (%)",
-        "notes": "When paying via Amazon Pay using the card."
-      },
-      "all_other_spends": {
-        "rate": 1,
-        "type": "Cashback (%)",
-        "notes": "Unlimited cashback."
-      }
-    },
-    "welcome_benefits": "Varies by offer, often includes Amazon vouchers.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "None.",
-      "international": "None."
-    },
-    "other_benefits": [
-      "1% fuel surcharge waiver.",
-      "No Cost EMI options on Amazon."
-    ],
-    "suitability": "A must-have for frequent Amazon shoppers, especially Prime members, due to its simplicity and direct cashback model."
-  },
-  {
-    "card_name": "Axis Bank My Zone",
-    "issuer": "Axis",
-    "network": "Visa",
-    "card_type": ["Lifestyle", "Entertainment"],
-    "joining_fee": 500,
-    "annual_fee": 500,
-    "fee_waiver": "Lifetime free for select customers or via special offers. Standard waiver on spends of ₹2,50,000.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 0.8,
-        "type": "Points (%)",
-        "notes": "4 EDGE Reward points per ₹200 spent."
-      }
-    },
-    "welcome_benefits": "Complimentary SonyLIV Premium annual subscription.",
-    "milestone_benefits": [
-      {
-        "condition": "On Paytm Movies",
-        "reward": "Buy One Get One free on movie tickets, up to ₹200 off on the second ticket, once a month."
-      },
-      {
-        "condition": "On Swiggy",
-        "reward": "40% off on food orders, up to ₹120 per order, four times a month."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "4 complimentary visits per year (1 per quarter).",
-      "international": "None."
-    },
-    "other_benefits": [
-      "1% fuel surcharge waiver.",
-      "Discounts on dining via Axis Bank Dining Delights."
-    ],
-    "suitability": "Excellent entry-level card for users who prioritize movie and food delivery benefits over a high reward rate."
-  },
-  {
-    "card_name": "ICICI HPCL Super Saver",
-    "issuer": "ICICI",
-    "network": "Visa",
-    "card_type": ["Co-branded", "Fuel"],
-    "joining_fee": 500,
-    "annual_fee": 500,
-    "fee_waiver": "Annual fee waived on spends of ₹1,50,000 in a year.",
-    "reward_rates": {
-      "hpcl_fuel_spends": {
-        "rate": 5.5,
-        "type": "Cashback & Points (%)",
-        "notes": "4% cashback on fuel at HPCL pumps + 1.5% back as points via HP Pay app."
-      },
-      "utility_grocery_spends": {
-        "rate": 5,
-        "type": "Points (%)",
-        "notes": "5% back as reward points on grocery, utilities, and department store spends."
-      },
-      "other_retail_spends": {
-        "rate": 1,
-        "type": "Points (%)",
-        "notes": "2 reward points per ₹100 spent (1 point = ₹0.25)."
-      }
-    },
-    "welcome_benefits": "2000 reward points on card activation and payment of joining fee. ₹100 cashback on your first transaction on HP Pay app.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "4 complimentary visits per year (1 per quarter), on spending ₹5,000 in the previous quarter.",
-      "international": "None."
-    },
-    "other_benefits": [
-      "25% off on movie tickets on BookMyShow and INOX.",
-      "1% fuel surcharge waiver is included in the 4% cashback."
-    ],
-    "suitability": "A strong contender for a primary fuel card, especially for users who fill up at HPCL pumps and have significant utility/grocery spends."
-  },
-  {
-    "card_name": "HDFC Regalia Gold",
-    "issuer": "HDFC",
-    "network": "Visa/Mastercard",
-    "card_type": ["Rewards", "Travel", "Lifestyle"],
-    "joining_fee": 2500,
-    "annual_fee": 2500,
-    "fee_waiver": "Spend ₹4,00,000 in an anniversary year to get the renewal fee waived.",
-    "reward_rates": {
-      "partner_brands": {
-        "rate": 5,
-        "type": "Multiplier (5x)",
-        "notes": "20 Reward Points per ₹150 spent at Marks & Spencer, Myntra, Nykaa, Reliance Digital. Capped at 5,000 points per month."
-      },
-      "other_retail_spends": {
-        "rate": 1.33,
-        "type": "Points (%)",
-        "notes": "4 Reward Points per ₹150 spent. (1 RP ≈ ₹0.33 on Smartbuy)"
-      }
-    },
-    "welcome_benefits": "Complimentary Club Vistara Silver Tier and MMT Black Elite membership on spending ₹1 lakh within 90 days.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹5,00,000 in an anniversary year.",
-        "reward": "₹1,500 worth of flight vouchers."
-      },
-      {
-        "condition": "On spending ₹7,50,000 in an anniversary year.",
-        "reward": "Additional ₹1,500 worth of flight vouchers."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "12 complimentary visits per year within India (both domestic & international terminals).",
-      "international": "6 complimentary visits per year using Priority Pass, for primary cardholder upon completing 4 retail transactions."
-    },
-    "other_benefits": [
-      "Low foreign currency markup of 2%.",
-      "Good redemption options for flights and hotels on SmartBuy portal."
-    ],
-    "suitability": "A strong mid-range card for those who spend on travel and premium brands, offering a good mix of rewards and travel perks."
-  },
-  {
-    "card_name": "Axis Bank Magnus",
-    "issuer": "Axis",
-    "network": "Visa",
-    "card_type": ["Super Premium", "Travel", "Rewards"],
-    "joining_fee": 12500,
-    "annual_fee": 12500,
-    "fee_waiver": "Annual fee waived on spends of ₹25,00,000 in a year. (Subject to change)",
-    "reward_rates": {
-      "general_spends": {
-        "rate": 2.4,
-        "type": "Miles (%)",
-        "notes": "12 EDGE Reward points per ₹200. Transfer value to airline partners is 5:4, making effective rate 4.8 airmiles per ₹200 (2.4%)."
-      },
-      "travel_edge_portal": {
-        "rate": 12,
-        "type": "Miles (%)",
-        "notes": "60 EDGE Reward points per ₹200. Effective rate 24 airmiles per ₹200 (12%)."
-      },
-      "excluded_categories": {
-        "rate": 0,
-        "type": "Points",
-        "notes": "No points on Insurance, Fuel, and Utility payments."
-      }
-    },
-    "welcome_benefits": "Choice of one: Luxe gift card, The Postcard Hotels voucher, or a Yatra voucher worth ₹12,500.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹1,00,000 in a calendar month.",
-        "reward": "25,000 EDGE Reward points. (Benefit has been devalued and might be discontinued, check latest T&C)."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "Unlimited complimentary visits for primary and 8 guest visits per year.",
-      "international": "Unlimited complimentary visits with Priority Pass for primary and 8 guest visits per year."
-    },
-    "other_benefits": [
-      "Buy One Get One free on movie/non-movie tickets on BookMyShow, up to ₹500 off on the second ticket, twice a month.",
-      "24x7 dedicated concierge service.",
-      "Low foreign currency markup of 2%."
-    ],
-    "suitability": "For high-spenders and frequent international travelers who can maximize travel benefits and point transfers to airlines."
-  },
-  {
-    "card_name": "American Express Platinum Charge Card",
-    "issuer": "Amex",
-    "network": "American Express",
-    "card_type": ["Super Premium", "Charge Card", "Travel", "Lifestyle"],
-    "joining_fee": 60000,
-    "annual_fee": 60000,
-    "fee_waiver": "None.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 0.5,
-        "type": "Points",
-        "notes": "1 Membership Rewards Point for every ₹40 spent. Not a rewards-focused card."
-      },
-      "accelerated_rate": {
-        "rate": 1.5,
-        "type": "Points",
-        "notes": "3X points on international spends."
-      }
-    },
-    "welcome_benefits": "100,000 bonus Membership Rewards points. (Often requires meeting a spending threshold, e.g., ₹10 lakhs in 6 months). Also, Taj Epicure and MMT Black memberships.",
-    "milestone_benefits": [
-      {
-        "condition": "On card renewal.",
-        "reward": "Vouchers from brands like Taj, SeleQtions, and Vivanta worth ₹10,000."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "Unlimited access to Amex's proprietary lounges and partner lounges in India.",
-      "international": "The best-in-class unlimited access globally to Centurion Lounges, Priority Pass Lounges, Delta Sky Clubs, etc. for primary and supplementary cardholders."
-    },
-    "other_benefits": [
-      "Complimentary elite tier status in hotel programs (Marriott Bonvoy Gold, Hilton Honors Gold, Radisson Rewards Premium).",
-      "₹40,000 in travel and lifestyle credits annually (subject to change).",
-      "Exclusive access to Fine Hotels & Resorts (FHR) program with benefits like room upgrades, daily breakfast, and credits.",
-      "24x7 Platinum Concierge service for travel and lifestyle requests.",
-      "No pre-set spending limit (it's a charge card, balance must be paid in full each month)."
-    ],
-    "suitability": "For ultra-high-net-worth individuals where unparalleled travel luxury, access, and service are more important than reward points."
-  },
-  {
-    "card_name": "IDFC First Millennia",
-    "issuer": "IDFC",
-    "network": "Visa",
-    "card_type": ["Rewards", "Lifetime Free"],
-    "joining_fee": 0,
-    "annual_fee": 0,
-    "fee_waiver": "Lifetime Free for initial applicants (may change to fee-based with waiver).",
-    "reward_rates": {
-      "accelerated_online": {
-        "rate": 10,
-        "type": "Multiplier (10x)",
-        "notes": "Applies on online spends for monthly spends above ₹20,000. Also on all spends on your birthday."
-      },
-      "online_spends": {
-        "rate": 6,
-        "type": "Multiplier (6x)",
-        "notes": "Applies on online spends up to a monthly total of ₹20,000."
-      },
-      "offline_spends": {
-        "rate": 3,
-        "type": "Multiplier (3x)",
-        "notes": "Applies to all offline point-of-sale transactions."
-      }
-    },
-    "welcome_benefits": "₹500 gift voucher on spending ₹15,000 within 90 days. 5% cashback on the transaction value of your first EMI.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "4 complimentary railway lounge visits per quarter.",
-      "international": "None."
-    },
-    "other_benefits": [
-      "Low interest rates (Dynamic APR from 9% to 42% p.a.).",
-      "1% fuel surcharge waiver.",
-      "1 Reward Point = ₹0.25."
-    ],
-    "suitability": "A great lifetime-free card for beginners or those seeking a secondary card, especially if their monthly spends cross the ₹20k threshold for 10x rewards."
-  },
-  {
     "card_name": "Tata Neu Infinity HDFC Bank",
     "issuer": "HDFC",
     "network": "Visa/RuPay",
@@ -415,371 +28,158 @@
     "milestone_benefits": [],
     "lounge_access": {
       "domestic": "8 complimentary visits per year (2 per quarter).",
-      "international": "4 complimentary visits per year with Priority Pass (capped at 1 per quarter)."
+      "international": "4 complimentary visits per year with Priority Pass (1 per quarter)."
     },
     "other_benefits": [
       "1% fuel surcharge waiver.",
-      "1 NeuCoin = ₹1, redeemable on the Tata Neu app and partner brands.",
-      "Special benefits on the RuPay variant like UPI payments."
+      "1 NeuCoin = ₹1, redeemable on the Tata Neu app and partner brands."
     ],
-    "suitability": "Extremely valuable for users deeply integrated into the Tata ecosystem (BigBasket, 1mg, Croma, Vistara, Taj)."
+    "suitability": "Extremely valuable for users deeply integrated into the Tata ecosystem, especially for grocery shopping on BigBasket and other Tata brands."
   },
   {
-    "card_name": "American Express Platinum Travel",
-    "issuer": "Amex",
-    "network": "American Express",
-    "card_type": ["Travel", "Miles", "Rewards"],
-    "joining_fee": 3500,
-    "annual_fee": 5000,
-    "fee_waiver": "None. Fee is charged from 2nd year onwards.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 1,
-        "type": "Points",
-        "notes": "1 MR Point per ₹50 spent, excluding fuel, insurance, utilities."
-      }
-    },
-    "welcome_benefits": "10,000 bonus Membership Rewards points redeemable for ₹3,000 worth of travel vouchers. (Requires spending ₹5,000 in first 60 days).",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹1,90,000 in a card membership year.",
-        "reward": "Travel vouchers worth more than ₹6,000."
-      },
-      {
-        "condition": "On spending ₹4,00,000 in a card membership year.",
-        "reward": "Additional travel vouchers worth more than ₹10,000 AND a ₹10,000 Taj Stay voucher."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "8 complimentary visits per year (2 per quarter) to partner lounges.",
-      "international": "None."
-    },
-    "other_benefits": [
-      "20% off at partner restaurants.",
-      "Points can be transferred to various airline and hotel partners."
-    ],
-    "suitability": "Perfect for users who can consolidate their annual spending to meet the milestone targets, offering one of the best reward rates in its class via milestone achievement."
-  },
-  {
-    "card_name": "Axis Bank Vistara Signature",
-    "issuer": "Axis",
+    "card_name": "Amazon Pay ICICI Bank",
+    "issuer": "ICICI",
     "network": "Visa",
-    "card_type": ["Co-branded", "Airline", "Travel"],
-    "joining_fee": 3000,
-    "annual_fee": 3000,
-    "fee_waiver": "None.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 4,
-        "type": "CV Points",
-        "notes": "4 Club Vistara (CV) Points for every ₹200 spent."
-      }
-    },
-    "welcome_benefits": "1 complimentary Premium Economy ticket voucher. Complimentary Club Vistara Silver membership.",
-    "milestone_benefits": [
-      {
-        "condition": "Spend ₹1.5 Lakhs in an anniversary year.",
-        "reward": "1 Premium Economy ticket voucher."
-      },
-      {
-        "condition": "Spend ₹3 Lakhs in an anniversary year.",
-        "reward": "1 Premium Economy ticket voucher."
-      },
-      {
-        "condition": "Spend ₹4.5 Lakhs in an anniversary year.",
-        "reward": "1 Premium Economy ticket voucher."
-      },
-      {
-        "condition": "Spend ₹9 Lakhs in an anniversary year.",
-        "reward": "Complimentary Club Vistara Gold membership."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "8 complimentary visits per year (2 per quarter).",
-      "international": "None."
-    },
-    "other_benefits": [
-      "Lifestyle benefits like discounts on dining.",
-      "3 complimentary rounds of golf."
-    ],
-    "suitability": "A must-have for loyal Vistara flyers. The milestone-based tickets provide immense value, often far exceeding the annual fee."
-  },
-  {
-    "card_name": "HDFC Diners Club Black",
-    "issuer": "HDFC",
-    "network": "Diners Club",
-    "card_type": ["Super Premium", "Travel", "Rewards"],
-    "joining_fee": 10000,
-    "annual_fee": 10000,
-    "fee_waiver": "Spend ₹8,00,000 in an anniversary year to get the renewal fee waived.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 3.33,
-        "type": "Points (%)",
-        "notes": "5 Reward Points for every ₹150 spent. (1 RP = ₹1 on Smartbuy for flights)."
-      },
-      "smartbuy_portal": {
-        "rate": "Up to 10x",
-        "type": "Multiplier",
-        "notes": "Get up to 10x points on travel, shopping via SmartBuy portal. Capped at 7,500 points per month."
-      }
-    },
-    "welcome_benefits": "Complimentary annual memberships of Club Marriott, Forbes, Amazon Prime, Swiggy One, and MMT BLACK on spending ₹1.5 lakhs within 90 days.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹80,000 in a calendar month.",
-        "reward": "Choice of vouchers from Ola Cabs, cult.fit Live, BookMyShow, or TataCLiQ worth ₹500."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "Unlimited complimentary access for primary and add-on members.",
-      "international": "Unlimited complimentary access for primary and add-on members."
-    },
-    "other_benefits": [
-      "Low foreign currency markup of 2%.",
-      "6 complimentary golf games per quarter.",
-      "1 Reward Point can be converted to 1 Airmile with partners like Vistara, Singapore Airlines."
-    ],
-    "suitability": "An iconic premium card, excellent for high-spenders who can leverage the SmartBuy portal for accelerated rewards and enjoy unlimited lounge access. Diners Club acceptance can be a minor issue in smaller towns."
-  },
-  {
-    "card_name": "Standard Chartered Ultimate",
-    "issuer": "Standard Chartered",
-    "network": "Visa",
-    "card_type": ["Premium", "Rewards"],
-    "joining_fee": 5000,
-    "annual_fee": 5000,
-    "fee_waiver": "None.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 3.33,
-        "type": "Points (%)",
-        "notes": "5 Reward Points for every ₹150 spent. 1 RP = ₹1."
-      }
-    },
-    "welcome_benefits": "6,000 Reward Points on card activation.",
-    "milestone_benefits": [],
-    "lounge_access": {
-      "domestic": "4 complimentary visits per quarter.",
-      "international": "1 complimentary visit per month via Priority Pass."
-    },
-    "other_benefits": [
-      "Low foreign currency markup of 2%.",
-      "5% cashback on duty-free spends (capped at ₹1000/month).",
-      "Access to golf courses."
-    ],
-    "suitability": "A simple, high-value proposition for users who want a straightforward high reward rate (3.33%) without complex category restrictions or milestone tracking."
-  },
-  {
-    "card_name": "IndusInd Bank Legend",
-    "issuer": "IndusInd",
-    "network": "Visa",
-    "card_type": ["Premium", "Rewards", "Lifetime Free"],
+    "card_type": ["Co-branded", "Cashback", "Lifetime Free"],
     "joining_fee": 0,
     "annual_fee": 0,
-    "fee_waiver": "Lifetime Free (often as an offer).",
+    "fee_waiver": "Lifetime Free.",
     "reward_rates": {
-      "weekday_spends": {
-        "rate": 1,
-        "type": "Points",
-        "notes": "1 Reward Point for every ₹100 spent."
-      },
-      "weekend_spends": {
-        "rate": 2,
-        "type": "Points",
-        "notes": "2 Reward Points for every ₹100 spent."
-      }
-    },
-    "welcome_benefits": "Vouchers from premium brands like Oberoi Hotels, Montblanc, etc.",
-    "milestone_benefits": [
-      {
-        "condition": "Spend ₹6,00,000 or more in a year.",
-        "reward": "4,000 bonus reward points."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "8 complimentary visits per year (2 per quarter).",
-      "international": "Complimentary Priority Pass membership with 8 visits per year."
-    },
-    "other_benefits": [
-      "Buy One Get One free on movie tickets from BookMyShow (up to 3 free tickets per month).",
-      "Low foreign currency markup of 1.8%.",
-      "2 complimentary golf games and lessons per month."
-    ],
-    "suitability": "A solid lifetime-free premium card, especially for those with high weekend spending and who enjoy movie and golf benefits."
-  },
-  {
-    "card_name": "HDFC Diners Club Privilege",
-    "issuer": "HDFC",
-    "network": "Diners Club",
-    "card_type": ["Premium", "Rewards", "Lifestyle"],
-    "joining_fee": 2500,
-    "annual_fee": 2500,
-    "fee_waiver": "Spend ₹3,00,000 in a year.",
-    "reward_rates": {
-      "base_rate": {
-        "rate": 1.33,
-        "type": "Points (%)",
-        "notes": "4 Reward Points for every ₹150 spent (1 RP = ~₹0.50)."
-      },
-      "smartbuy_portal": {
-        "rate": "Up to 10x",
-        "type": "Multiplier",
-        "notes": "Accelerated rewards on travel and shopping via SmartBuy."
-      },
-      "weekend_dining": {
-        "rate": "2x",
-        "type": "Multiplier",
-        "notes": "2X Reward Points on weekend dining at partner restaurants."
-      }
-    },
-    "welcome_benefits": "Complimentary annual memberships for Swiggy One and Amazon Prime on spending ₹50,000 within the first 90 days.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹40,000 in a calendar month.",
-        "reward": "Choice of vouchers from BookMyShow, TataCLiQ, Ola, or cult.fit Live worth ₹500."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "8 complimentary visits per year.",
-      "international": "8 complimentary visits per year."
-    },
-    "other_benefits": [
-      "Low foreign currency markup of 2%.",
-      "Buy 1 Get 1 free on movie tickets on BookMyShow on weekends (up to ₹250)."
-    ],
-    "suitability": "A great mid-range premium card for users who can leverage monthly spending milestones and the SmartBuy portal for significant value."
-  },
-  {
-    "card_name": "ICICI Sapphiro",
-    "issuer": "ICICI",
-    "network": "American Express/Mastercard",
-    "card_type": ["Premium", "Lifestyle", "Travel"],
-    "joining_fee": 6500,
-    "annual_fee": 3500,
-    "fee_waiver": "Annual fee (from 2nd year) waived on spends of ₹6,00,000 in the previous year.",
-    "reward_rates": {
-      "international_spends": {
-        "rate": 2,
-        "type": "Points (%)",
-        "notes": "4 PAYBACK points per ₹100 (1 point = ₹0.25)."
-      },
-      "domestic_spends": {
-        "rate": 1,
-        "type": "Points (%)",
-        "notes": "2 PAYBACK points per ₹100."
-      },
-      "utility_fuel_spends": {
-        "rate": 0.25,
-        "type": "Points (%)",
-        "notes": "1 PAYBACK point per ₹100."
-      }
-    },
-    "welcome_benefits": "Welcome vouchers for travel and shopping worth over ₹9,000.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹4,00,000 in an anniversary year.",
-        "reward": "4,000 PAYBACK points."
-      },
-      {
-        "condition": "For every ₹1,00,000 spent thereafter in the year.",
-        "reward": "2,000 PAYBACK points (up to 20,000 points per year)."
-      }
-    ],
-    "lounge_access": {
-      "domestic": "4 complimentary visits per quarter through the Amex network.",
-      "international": "2 complimentary visits per year via Dreamfolks DragonPass."
-    },
-    "other_benefits": [
-      "Buy One Get One free on movie tickets on BookMyShow, up to ₹500 off, twice a month.",
-      "4 complimentary rounds of golf per month based on spending.",
-      "Comes as a dual-card set (Amex and Mastercard) for wider acceptance."
-    ],
-    "suitability": "Ideal for users who value lifestyle perks like movies and golf, and can meet spending milestones to maximize reward points."
-  },
-  {
-    "card_name": "HDFC Freedom",
-    "issuer": "HDFC",
-    "network": "Visa/Mastercard",
-    "card_type": ["Entry-level", "Rewards"],
-    "joining_fee": 500,
-    "annual_fee": 500,
-    "fee_waiver": "Spend ₹50,000 in a year.",
-    "reward_rates": {
-      "payzapp_smartbuy": {
-        "rate": "10x",
-        "type": "Multiplier",
-        "notes": "10X CashPoints on spends via PayZapp and SmartBuy. Capped at 2500 points per month."
-      },
-      "emi_spends": {
-        "rate": "5x",
-        "type": "Multiplier",
-        "notes": "5X CashPoints on EMI spends at merchant locations."
-      },
-      "base_rate": {
-        "rate": 0.16,
+      "amazon_prime": {
+        "rate": 5,
         "type": "Cashback (%)",
-        "notes": "1 CashPoint per ₹150 spent (1 CP = ₹0.25)."
+        "notes": "5% unlimited cashback on Amazon.in for Prime members."
+      },
+      "amazon_non_prime": {
+        "rate": 3,
+        "type": "Cashback (%)",
+        "notes": "3% unlimited cashback on Amazon.in for non-Prime members."
+      },
+      "amazon_pay_partners": {
+        "rate": 2,
+        "type": "Cashback (%)",
+        "notes": "2% cashback on bill payments and recharges through Amazon Pay."
+      },
+      "other_spends": {
+        "rate": 1,
+        "type": "Cashback (%)",
+        "notes": "1% cashback on all other spends."
       }
     },
-    "welcome_benefits": "500 CashPoints upon joining fee realization.",
-    "milestone_benefits": [
-      {
-        "condition": "On spending ₹90,000 or more in a quarter.",
-        "reward": "₹1,000 gift voucher."
-      }
-    ],
+    "welcome_benefits": "Varies by offer, often includes Amazon vouchers.",
+    "milestone_benefits": [],
     "lounge_access": {
       "domestic": "None.",
       "international": "None."
     },
     "other_benefits": [
       "1% fuel surcharge waiver.",
-      "Low annual fee waiver threshold."
+      "No Cost EMI options on Amazon."
     ],
-    "suitability": "A solid entry-level card for beginners, offering good value through quarterly milestone vouchers and accelerated rewards on specific platforms."
+    "suitability": "A must-have for heavy Amazon shoppers, especially Prime members. Best-in-class rewards for Amazon purchases."
   },
   {
-    "card_name": "IDFC First Power",
-    "issuer": "IDFC",
-    "network": "RuPay",
-    "card_type": ["Co-branded", "Fuel", "Rewards"],
-    "joining_fee": 499,
-    "annual_fee": 499,
-    "fee_waiver": "Annual fee waived on spends of ₹1,50,000 in a year.",
+    "card_name": "Flipkart Axis Bank",
+    "issuer": "Axis",
+    "network": "Mastercard",
+    "card_type": ["Co-branded", "Cashback"],
+    "joining_fee": 500,
+    "annual_fee": 500,
+    "fee_waiver": "Annual fee waived on spends of ₹3,50,000 in a year.",
     "reward_rates": {
-      "hpcl_fuel_spends": {
-        "rate": "Up to 6.5%",
-        "type": "Savings (%)",
-        "notes": "Includes 4% back as rewards (up to 1200 rewards/month), 1.5% via HP Pay app (up to 600 rewards/month), and 1% surcharge waiver."
+      "flipkart_myntra": {
+        "rate": 5,
+        "type": "Cashback (%)",
+        "notes": "Unlimited 5% cashback on Flipkart and Myntra."
       },
-      "utility_grocery_spends": {
-        "rate": "5%",
-        "type": "Savings (%)",
-        "notes": "5% savings as rewards on grocery and utility spends. Capped at 1000 rewards/month."
+      "preferred_partners": {
+        "rate": 4,
+        "type": "Cashback (%)",
+        "notes": "4% cashback on preferred partners like Swiggy, Uber, PVR, Curefit."
       },
-      "fastag_recharge": {
-        "rate": "5%",
-        "type": "Savings (%)",
-        "notes": "5% savings as rewards on IDFC First FASTag recharges. Capped at 400 rewards/month."
-      },
-      "other_retail_spends": {
-        "rate": "1.5%",
-        "type": "Savings (%)",
-        "notes": "3X rewards on other retail spends."
+      "other_spends": {
+        "rate": 1.5,
+        "type": "Cashback (%)",
+        "notes": "1.5% cashback on all other spends."
       }
     },
-    "welcome_benefits": "₹250 cashback on first HPCL fuel transaction of ₹250 or more. ₹100 cashback on first FASTag recharge.",
+    "welcome_benefits": "Welcome benefits include Flipkart vouchers and Swiggy discounts.",
     "milestone_benefits": [],
     "lounge_access": {
-      "domestic": "4 complimentary visits per year (1 per quarter), on spending ₹5,000 in the previous quarter.",
+      "domestic": "4 complimentary visits per year.",
       "international": "None."
     },
     "other_benefits": [
-      "Complimentary Roadside Assistance (RSA) worth ₹1,399.",
-      "Up to 50% off on movie tickets via the RuPay network offers.",
-      "Personal Accident cover of ₹2,00,000."
+      "Direct statement credit for cashback"
     ],
-    "suitability": "An excellent choice for users with high fuel spends at HPCL outlets, who also spend on groceries, utilities, and use IDFC's FASTag."
+    "suitability": "The default choice for frequent shoppers on Flipkart and Myntra, with solid returns on other popular lifestyle categories."
+  },
+  {
+    "card_name": "SBI Cashback Card",
+    "issuer": "SBI",
+    "network": "Mastercard",
+    "card_type": ["Cashback"],
+    "joining_fee": 999,
+    "annual_fee": 999,
+    "fee_waiver": "Annual fee reversed on spending ₹2,00,000 or more in the preceding year.",
+    "reward_rates": {
+      "online_spends": {
+        "rate": 5,
+        "type": "Cashback (%)",
+        "notes": "No merchant restrictions. Capped at ₹5,000 cashback per monthly statement cycle."
+      },
+      "offline_spends": {
+        "rate": 1,
+        "type": "Cashback (%)",
+        "notes": "Includes utility bill payments. Excludes rent, fuel, wallet loads."
+      }
+    },
+    "welcome_benefits": "None.",
+    "milestone_benefits": [],
+    "lounge_access": {
+      "domestic": "None (Benefit was discontinued).",
+      "international": "None."
+    },
+    "other_benefits": [
+      "1% fuel surcharge waiver, up to ₹100 per month."
+    ],
+    "suitability": "Excellent for users with high and diverse online spending across various merchants due to its high, uncategorized cashback rate."
+  },
+  {
+    "card_name": "HDFC Millennia",
+    "issuer": "HDFC",
+    "network": "Visa/Mastercard",
+    "card_type": ["Cashback", "Rewards"],
+    "joining_fee": 1000,
+    "annual_fee": 1000,
+    "fee_waiver": "Spend ₹1,00,000 in an anniversary year.",
+    "reward_rates": {
+      "partner_merchants": {
+        "rate": 5,
+        "type": "Cashback (%)",
+        "notes": "On Amazon, Flipkart, Myntra, Swiggy, Zomato, Uber etc. Capped at 1000 CashPoints per month."
+      },
+      "all_other_spends": {
+        "rate": 1,
+        "type": "Cashback (%)",
+        "notes": "Applies to all other spends, including EMIs and wallet loads. Capped at 1000 CashPoints per month."
+      }
+    },
+    "welcome_benefits": "1000 CashPoints after payment of joining fee.",
+    "milestone_benefits": [
+      {
+        "condition": "On spending ₹1,00,000 in a calendar quarter.",
+        "reward": "₹1000 worth of gift vouchers."
+      }
+    ],
+    "lounge_access": {
+      "domestic": "8 complimentary visits per year (2 per quarter).",
+      "international": "None."
+    },
+    "other_benefits": [
+      "1% fuel surcharge waiver.",
+      "Redemption: 1 CashPoint = ₹1 for statement credit (min 500 points)."
+    ],
+    "suitability": "Ideal for young professionals with spending concentrated on major online platforms and who can meet quarterly spending milestones."
   }
 ]
