@@ -45,16 +45,19 @@ export function TransactionTestButton({ user, userCards, onTransactionProcessed 
     onTransactionProcessed();
   };
 
-  if (userCards.length === 0) return null;
-
+  // Debug: Always show button with card count
   return (
     <>
       <button
         onClick={handleTestTransaction}
-        className="fixed bottom-4 right-4 z-30 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-        title="Test Transaction Prompt"
+        className="fixed bottom-4 right-4 z-50 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors"
+        title={`Test Transaction (${userCards.length} cards)`}
+        style={{ zIndex: 9999 }}
       >
         <BellIcon className="w-5 h-5" />
+        <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          {userCards.length}
+        </span>
       </button>
 
       {currentTransaction && (
