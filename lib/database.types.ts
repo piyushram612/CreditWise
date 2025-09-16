@@ -107,6 +107,41 @@ export type Database = {
           card_name?: string
         }
       }
+      transactions: {
+        Row: {
+          id: string
+          created_at: string
+          user_id: string
+          card_id: string
+          amount: number
+          merchant_name: string
+          transaction_date: string
+          status: string
+          category: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          user_id: string
+          card_id: string
+          amount: number
+          merchant_name: string
+          transaction_date: string
+          status: string
+          category?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          user_id?: string
+          card_id?: string
+          amount?: number
+          merchant_name?: string
+          transaction_date?: string
+          status?: string
+          category?: string | null
+        }
+      }
     }
     Views: {
       [_ in never]: never

@@ -3,6 +3,8 @@ import type { User, UserOwnedCard } from '@/app/types';
 import { useCards } from '@/app/hooks/useCards';
 import { getIssuerColorCode } from '@/app/utils/constants';
 import { PlusIcon, PencilSquareIcon, TrashIcon } from '@/app/components/shared/Icons';
+import { TransactionPrompt } from './TransactionPrompt';
+import { TransactionTestButton } from './TransactionTestButton';
 
 interface MyCardsViewProps {
   user: User;
@@ -10,13 +12,29 @@ interface MyCardsViewProps {
   onEditCard: (card: UserOwnedCard) => void;
   onDeleteCard: (card: UserOwnedCard) => void;
   refreshKey: number;
+  onTransactionProcessed?: () => void;
 }
 
-export function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, refreshKey }: MyCardsViewProps) {
+export function MyCardsView({ user, onAddCardClick, onEditCard, onDeleteCard, refreshKey, onTransactionProcessed }: MyCardsViewProps) {
   const { userCards, isLoading } = useCards(user, refreshKey);
 
   return (
     <div>
+      {/* Transaction Prompt Component */}
+      {userCards.length > 0 && (
+        <>
+          <TransactionPrompt
+            user={user}
+            userCards={userCards}
+            onTransactionProcessed={onTransactionProcessed || (() => {})}
+          />
+          <TransactionTestButton
+            user={user}
+            userCards={userCards}
+            onTransactionProcessed={onTransactionProcessed || (() => {})}
+          />
+        </>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">My Cards</h2>
         <button 

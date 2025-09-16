@@ -22,14 +22,22 @@
           "notes": "Applies to all other domestic and international spends."
         }
       },
-      "joining_fee": 1499,
-      "annual_fee": 1499,
-      "fee_waiver": "Annual fee waived on spends of ₹3,00,000 in a year.",
+      "welcome_benefits": "1499 NeuCoins on the Tata Neu app after the first transaction within 30 days.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "8 complimentary visits per year (2 per quarter).",
         "international": "4 complimentary visits per year with Priority Pass (1 per quarter)."
       },
-      "suitability": "Extremely valuable for users deeply integrated into the Tata ecosystem, especially for grocery shopping on BigBasket and other Tata brands."
+      "other_benefits": [
+        "1% fuel surcharge waiver.",
+        "1 NeuCoin = ₹1, redeemable on the Tata Neu app and partner brands."
+      ],
+      "fees": {
+      9,
+        "annu99,
+        "fee_waiver": "Ann year."
+      },
+      "suitability": "Extremely valuable for users deeply integrated into
     }
   },
   {
@@ -49,20 +57,33 @@
           "type": "Cashback (%)",
           "notes": "3% unlimited cashback on Amazon.in for non-Prime members."
         },
+        "amazon_pay_partners": {
+          "rate": 2,
+          "type": "Cashback (%)",
+          "notes": "2% cashback on bill payments and recharges through Amazon Pay."
+        },
         "other_spends": {
           "rate": 1,
           "type": "Cashback (%)",
           "notes": "1% cashback on all other spends."
         }
       },
-      "joining_fee": 0,
-      "annual_fee": 0,
-      "fee_waiver": "Lifetime Free.",
+      "welcome_benefits": "Varies by offer, often includes Amazon vouchers.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "None.",
         "international": "None."
       },
-      "suitability": "A must-have for heavy Amazon shoppers, especially Prime members. Best-in-class rewards for Amazon purchases."
+      "other_benefits": [
+        "1% fuel surcharge waiver.",
+        "No Cost EMI options on Amazon."
+      ],
+      "fees": {
+      ,
+        "annu
+        "fee_waiver": "
+      },
+      "suitability": "A must-have fo"
     }
   },
   {
@@ -88,14 +109,21 @@
           "notes": "1.5% cashback on all other spends."
         }
       },
-      "joining_fee": 500,
-      "annual_fee": 500,
-      "fee_waiver": "Annual fee waived on spends of ₹3,50,000 in a year.",
+      "welcome_benefits": "Welcome benefits include Flipkart vouchers and Swiggy discounts.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "4 complimentary visits per year.",
         "international": "None."
       },
-      "suitability": "The default choice for frequent shoppers on Flipkart and Myntra, with solid returns on other popular lifestyle categories."
+      "other_benefits": [
+        "Direct statement credit for cashback"
+      ],
+      "fees": {
+      
+        "annu 500,
+        "fee_waiver": "Ana year."
+      },
+      "suitability": "The default choice for frequent shoppers on Flipkar"
     }
   },
   {
@@ -116,14 +144,21 @@
           "notes": "Includes utility bill payments. Excludes rent, fuel, wallet loads."
         }
       },
-      "joining_fee": 999,
-      "annual_fee": 999,
-      "fee_waiver": "Annual fee reversed on spending ₹2,00,000 or more in the preceding year.",
+      "welcome_benefits": "None.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "None (Benefit was discontinued).",
         "international": "None."
       },
-      "suitability": "Excellent for users with high and diverse online spending across various merchants due to its high, uncategorized cashback rate."
+      "other_benefits": [
+        "1% fuel surcharge waiver, up to ₹100 per month."
+      ],
+      "fees": {
+      9,
+        "annu
+        "fee_waiver": "Anr."
+      },
+      "suitability": "Excellent for users with high and diverse online spending across various
     }
   },
   {
@@ -144,14 +179,27 @@
           "notes": "Applies to all other spends, including EMIs and wallet loads. Capped at 1000 CashPoints per month."
         }
       },
-      "joining_fee": 1000,
-      "annual_fee": 1000,
-      "fee_waiver": "Spend ₹1,00,000 in an anniversary year.",
+      "welcome_benefits": "1000 CashPoints after payment of joining fee.",
+      "milestone_benefits": [
+        {
+          "condition": "On spending ₹1,00,000 in a calendar quarter.",
+          "reward": "₹1000 worth of gift vouchers."
+        }
+      ],
       "lounge_access": {
         "domestic": "8 complimentary visits per year (2 per quarter).",
         "international": "None."
       },
-      "suitability": "Ideal for young professionals with spending concentrated on major online platforms and who can meet quarterly spending milestones."
+      "other_benefits": [
+        "1% fuel surcharge waiver.",
+        "Redemption: 1 CashPoint = ₹1 for statement credit (min 500 points)."
+      ],
+      "fees": {
+      ,
+        "annu00,
+        "fee_waiver": "Spe
+      },
+      "suitability": "Ideal for young professionals with spen
     }
   },
   {
@@ -177,14 +225,22 @@
           "notes": "Unlimited cashback on all other spends."
         }
       },
-      "joining_fee": 499,
-      "annual_fee": 499,
-      "fee_waiver": "Annual fee waived on spends of ₹2,00,000 in a year.",
+      "welcome_benefits": "None.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "4 complimentary visits per year.",
         "international": "None."
       },
-      "suitability": "Best for users who pay utility bills and recharges via Google Pay and have significant food delivery/cab spends."
+      "other_benefits": [
+        "1% fuel surcharge waiver.",
+        "Up to 20% off at partner restaurants."
+      ],
+      "fees": {
+      ,
+        "annu99,
+        "fee_waiver": "Anr."
+      },
+      "suitability": "Best for users who pay utility bills and recharges "
     }
   },
   {
@@ -205,15 +261,21 @@
           "notes": "10% Scapia coins on all online and offline spends."
         }
       },
-      "joining_fee": 0,
-      "annual_fee": 0,
-      "fee_waiver": "Lifetime Free.",
+      "welcome_benefits": "None.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "Unlimited (conditional on spending ₹5k in previous billing cycle).",
         "international": "None."
       },
-      "other_benefits": ["Zero forex markup on all international transactions"],
-      "suitability": "The best lifetime-free card for international travelers due to its zero forex markup. Ideal for those who can meet the minimum spend for unlimited lounge access."
+      "other_benefits": [
+        "Zero forex markup on all international transactions"
+      ],
+      "fees": {
+      
+        "annu: 0,
+        "fee_waiver": "e."
+      },
+      "suitability": "The best lifet
     }
   },
   {
@@ -239,14 +301,26 @@
           "notes": "Unlimited 1.25% cashback on all other spends."
         }
       },
-      "joining_fee": 500,
-      "annual_fee": 500,
-      "fee_waiver": "Annual fee waived on spends of ₹2,00,000 in a year.",
+      "welcome_benefits": "Complimentary Myntra Insider membership.",
+      "milestone_benefits": [
+        {
+          "condition": "On spending milestones.",
+          "reward": "Free access to PVR movie tickets."
+        }
+      ],
       "lounge_access": {
         "domestic": "8 complimentary visits per year (2 per quarter), on spending ₹50,000 in the previous quarter.",
         "international": "None."
       },
-      "suitability": "A must-have for frequent Myntra shoppers and users who spend on its partner brands like Swiggy and PVR."
+      "other_benefits": [
+        "7.5% instant discount on Myntra"
+      ],
+      "fees": {
+      : 500,
+        "annu500,
+        "fee_waiver": "Anear."
+      },
+      "suitability": "A must-have for frequent Myntra shoppers and users ."
     }
   },
   {
@@ -272,15 +346,21 @@
           "notes": "1% cashback on all other spends. Capped at ₹200/month."
         }
       },
-      "joining_fee": 499,
-      "annual_fee": 499,
-      "fee_waiver": "Annual fee waived on spends of ₹2,00,000 in a year.",
+      "welcome_benefits": "None.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "None.",
         "international": "None."
       },
-      "other_benefits": ["RuPay variant can be linked to UPI"],
-      "suitability": "Best for users who extensively use the PhonePe app for various payments and want a simple cashback card integrated with the app."
+      "other_benefits": [
+        "RuPay variant can be linked to UPI"
+      ],
+      "fees": {
+      ": 499,
+        "annu99,
+        "fee_waiver": "An"
+      },
+      "suitability": "Best for users who extensively use the PhonePe app app."
     }
   },
   {
@@ -301,14 +381,31 @@
           "notes": "4 Reward Points per ₹150 spent. Good redemption value on SmartBuy portal for flights."
         }
       },
-      "joining_fee": 2500,
-      "annual_fee": 2500,
-      "fee_waiver": "Spend ₹4,00,000 in an anniversary year.",
+      "welcome_benefits": "Complimentary Club Vistara Silver & MMT Black Elite memberships on spending ₹1 lakh within 90 days.",
+      "milestone_benefits": [
+        {
+          "condition": "On spending ₹5,00,000 in an anniversary year.",
+          "reward": "₹1,500 worth of flight vouchers."
+        },
+        {
+          "condition": "On spending ₹7,50,000 in an anniversary year.",
+          "reward": "Additional ₹1,500 worth of flight vouchers."
+        }
+      ],
       "lounge_access": {
         "domestic": "12 complimentary visits per year.",
         "international": "6 complimentary visits per year via Priority Pass."
       },
-      "suitability": "A strong mid-range card for those who spend on travel and premium brands, offering a good mix of rewards and travel perks."
+      "other_benefits": [
+        "Low foreign currency markup of 2%.",
+        "Good redemption options for flights and hotels on SmartBuy portal."
+      ],
+      "fees": {
+      ,
+        "annu2500,
+        "fee_waiver": "Sper."
+      },
+      "suitability": "A strong mid-range card for those who s"
     }
   },
   {
@@ -329,14 +426,23 @@
           "notes": "30 EDGE Reward points per ₹200 on Axis Travel Edge portal."
         }
       },
-      "joining_fee": 12500,
-      "annual_fee": 12500,
-      "fee_waiver": "Fee is mandatory.",
+      "welcome_benefits": "Choice of one: Luxe gift card, The Postcard Hotels voucher, or a Yatra voucher worth ₹12,500.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "Unlimited, plus 8 guest visits per year.",
         "international": "Unlimited with Priority Pass, plus 8 guest visits per year."
       },
-      "suitability": "For high-spenders and frequent international travelers who can maximize travel benefits and point transfers to airlines."
+      "other_benefits": [
+        "Buy One Get One on BookMyShow up to ₹500 twice a month.",
+        "24x7 dedicated concierge service.",
+        "Low foreign currency markup of 2%."
+      ],
+      "fees": {
+      0,
+        "annu12500,
+        "fee_waiver": "Fee "
+      },
+      "suitability": "For high-spenders
     }
   },
   {
@@ -357,14 +463,28 @@
           "notes": "Get up to 10x points (33.3% value) on travel & shopping via SmartBuy. Capped at 7,500 points per month."
         }
       },
-      "joining_fee": 10000,
-      "annual_fee": 10000,
-      "fee_waiver": "Spend ₹8,00,000 in an anniversary year.",
+      "welcome_benefits": "Complimentary annual memberships (Amazon Prime, Swiggy One etc.) on spending ₹1.5 lakhs within 90 days.",
+      "milestone_benefits": [
+        {
+          "condition": "On spending ₹80,000 in a calendar month.",
+          "reward": "Choice of vouchers from Ola Cabs, cult.fit Live, BookMyShow, or TataCLiQ worth ₹500."
+        }
+      ],
       "lounge_access": {
         "domestic": "Unlimited for primary and add-on members.",
         "international": "Unlimited for primary and add-on members."
       },
-      "suitability": "An iconic premium card, excellent for high-spenders who can leverage the SmartBuy portal for accelerated rewards and enjoy unlimited lounge access."
+      "other_benefits": [
+        "Low foreign currency markup of 2%.",
+        "6 complimentary golf games per quarter.",
+        "1:1 point transfer to major airlines."
+      ],
+      "fees": {
+      
+        "annu000,
+        "fee_waiver": "Spen
+      },
+      "suitability": "An iconic premium card, excellent for hccess."
     }
   },
   {
@@ -385,9 +505,8 @@
           "notes": "3X rewards on offline spends."
         }
       },
-      "joining_fee": 0,
-      "annual_fee": 0,
-      "fee_waiver": "Lifetime Free.",
+      "welcome_benefits": "None.",
+      "milestone_benefits": [],
       "lounge_access": {
         "domestic": "4 complimentary airport and spa visits per quarter.",
         "international": "4 complimentary airport visits per quarter."
@@ -397,7 +516,12 @@
         "Complimentary golf access.",
         "Low forex markup of 1.5%."
       ],
-      "suitability": "One of the best Lifetime Free premium cards, offering great rewards, comprehensive travel benefits, and low forex markup."
+      "fees": {
+      
+        "annu 0,
+        "fee_waiver": ""
+      },
+      "suitability": "One of the besrkup."
     }
   },
   {
@@ -413,13 +537,7 @@
           "notes": "1 MR Point per ₹50 spent. Value comes from milestone benefits."
         }
       },
-      "joining_fee": 3500,
-      "annual_fee": 5000,
-      "fee_waiver": "None.",
-      "lounge_access": {
-        "domestic": "8 complimentary visits per year (2 per quarter).",
-        "international": "None."
-      },
+      "welcome_benefits": "10,000 bonus Membership Rewards points redeemable for ₹3,000 worth of travel vouchers.",
       "milestone_benefits": [
         {
           "condition": "Spend ₹1.9L in a year.",
@@ -430,7 +548,20 @@
           "reward": "Additional vouchers plus a ₹10,000 Taj Stay voucher."
         }
       ],
-      "suitability": "Perfect for users who can consolidate their annual spending to meet milestone targets, offering one of the best reward rates in its class via milestone achievement."
+      "lounge_access": {
+        "domestic": "8 complimentary visits per year (2 per quarter).",
+        "international": "None."
+      },
+      "other_benefits": [
+        "20% off at partner restaurants.",
+        "Points can be transferred to airline/hotel partners."
+      ],
+      "fees": {
+      0,
+        "annu,
+        "fee_waiver": "Non"
+      },
+      "suitability": "Perfe
     }
   }
 ]

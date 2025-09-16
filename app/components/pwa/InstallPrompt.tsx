@@ -20,8 +20,8 @@ export default function InstallPrompt() {
     setIsIOS(iOS);
 
     // Check if already installed (standalone mode)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
-                      (window.navigator as { standalone?: boolean }).standalone === true;
+    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as { standalone?: boolean }).standalone === true;
     setIsStandalone(standalone);
 
     // Android install prompt
@@ -39,7 +39,7 @@ export default function InstallPrompt() {
       const dismissed = localStorage.getItem('ios-install-dismissed');
       const dismissedTime = dismissed ? parseInt(dismissed) : 0;
       const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
-      
+
       if (dismissedTime < oneDayAgo) {
         setShowInstallButton(true);
       }
@@ -55,7 +55,7 @@ export default function InstallPrompt() {
       // Android
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
         setShowInstallButton(false);
@@ -85,14 +85,14 @@ export default function InstallPrompt() {
                 <span className="text-blue-400">1.</span>
                 <span>Tap the Share button</span>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                  <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
                 </svg>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-blue-400">2.</span>
                 <span>Select &quot;Add to Home Screen&quot;</span>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>

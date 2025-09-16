@@ -50,3 +50,15 @@ export interface SidebarProps {
   toggleTheme: () => void;
   onLinkClick: () => void;
 }
+
+export interface Transaction {
+  id: string;
+  created_at: string;
+  user_id: string;
+  card_id: string;
+  amount: number;
+  merchant_name: string;
+  transaction_date: string;
+  status: 'confirmed' | 'pending' | 'declined';
+  category: string | null;
+}

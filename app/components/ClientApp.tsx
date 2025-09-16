@@ -114,6 +114,7 @@ export default function ClientApp() {
             onAddCardClick={handleAddCardClick}
             onEditCard={handleEditCardClick}
             onDeleteCard={handleDeleteCardClick}
+            onTransactionProcessed={handleCardSaved}
           />
         ) : null;
       case 'optimizer':
