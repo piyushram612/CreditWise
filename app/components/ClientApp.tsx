@@ -118,7 +118,7 @@ export default function ClientApp() {
           />
         ) : null;
       case 'optimizer':
-        return <SpendOptimizerView />;
+        return <SpendOptimizerView user={user} onTransactionProcessed={handleCardSaved} />;
       case 'advisor':
         return <AICardAdvisorView />;
       case 'settings':

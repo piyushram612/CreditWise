@@ -2,14 +2,28 @@ import React, { useState, useRef } from 'react';
 import { getSupabaseClient } from '@/app/utils/supabase';
 import { apiCall } from '@/app/utils/api';
 import { mockSpendCategories } from '@/app/utils/constants';
-import type { OptimizationResult } from '@/app/types';
-import { SparklesIcon } from '@/app/components/shared/Icons';
+import type { OptimizationResult, User, UserOwnedCard } from '@/app/types';
+import { SparklesIcon, BellIcon } from '@/app/components/shared/Icons';
 import { OptimizationResult as OptimizationResultComponent } from './OptimizationResult';
+import { TransactionConfirmModal } from '@/app/components/cards/TransactionConfirmModal';
+import { selectBestCardForTransaction } from '@/app/utils/transactionGenerator';
 
-export function SpendOptimizerView() {
+interface SpendOptimizerViewProps {
+  user?: User | null;
+  onTransactionProcessed?: () => void;
+}
+
+export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimizerViewProps = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<OptimizationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userCards, setUserCards] = useState<UserOwnedCard[]>([]);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [currentSpend, setCurrentSpend] = useState<{
+    amount: number;
+    category: string;
+    vendor: string | null;
+  } | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleOptimization = async (e: React.FormEvent) => {
@@ -51,6 +65,9 @@ export function SpendOptimizerView() {
       return;
     }
 
+    // Store user cards for transaction simulation
+    setUserCards(userCards);
+
     const formData = new FormData(formRef.current!);
     const spendAmount = formData.get('amount');
     const spendCategory = formData.get('category');
@@ -58,9 +75,12 @@ export function SpendOptimizerView() {
 
     const spendData = {
       amount: Number(spendAmount),
-      category: spendCategory,
-      vendor: vendor || null
+      category: spendCategory as string,
+      vendor: vendor as string || null
     };
+
+    // Store current spend data for transaction simulation
+    setCurrentSpend(spendData);
 
     try {
       console.log('Making API call to optimize with data:', { 
@@ -231,7 +251,54 @@ export function SpendOptimizerView() {
 
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
 
-      {result && <OptimizationResultComponent result={result} />}
+      {result && (
+        <div className="mt-6">
+          <OptimizationResultComponent result={result} />
+          
+          {/* Transaction Simulation Button */}
+          {user && currentSpend && userCards.length > 0 && (
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                    Test This Transaction
+                  </h4>
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    Simulate making this ₹{currentSpend.amount.toLocaleString('en-IN')} purchase
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowTransactionModal(true)}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                >
+                  <BellIcon className="w-4 h-4" />
+                  Simulate Transaction
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Transaction Confirmation Modal */}
+      {user && currentSpend && userCards.length > 0 && (
+        <TransactionConfirmModal
+          isOpen={showTransactionModal}
+          onClose={() => setShowTransactionModal(false)}
+          user={user}
+          card={selectBestCardForTransaction(
+            userCards, 
+            currentSpend.vendor || 'Generic Merchant', 
+            currentSpend.amount
+          ) || userCards[0]}
+          transactionAmount={currentSpend.amount}
+          merchantName={currentSpend.vendor || `${currentSpend.category} Purchase`}
+          onTransactionConfirmed={() => {
+            setShowTransactionModal(false);
+            onTransactionProcessed?.();
+          }}
+        />
+      )}
     </div>
   );
 }
