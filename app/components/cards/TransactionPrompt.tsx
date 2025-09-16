@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { User, UserOwnedCard } from '@/app/types';
 import { TransactionConfirmModal } from './TransactionConfirmModal';
-import { generateRandomTransaction, selectBestCardForTransaction, getTransactionInsight } from '@/app/utils/transactionGenerator';
+import { generateRandomTransaction, selectBestCardForTransaction } from '@/app/utils/transactionGenerator';
 import { BellIcon, CreditCardIcon } from '@/app/components/shared/Icons';
 
 interface TransactionPromptProps {
