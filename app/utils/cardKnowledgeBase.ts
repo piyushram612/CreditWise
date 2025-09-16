@@ -697,7 +697,7 @@ export function findBestCardForMerchant(userCards: UserOwnedCard[], merchant: st
 }
 
 // Function to get merchant-specific recommendations
-export function getMerchantSpecificAdvice(merchant: string, _category: string): string {
+export function getMerchantSpecificAdvice(merchant: string): string {
   const merchantAdvice: { [key: string]: string } = {
     "bigbasket": "For BigBasket purchases, Tata Neu Infinity HDFC card offers 5% NeuCoins due to Tata's strategic partnership with BigBasket. This is significantly better than generic grocery rewards (typically 1-2%). The partnership also includes priority delivery and exclusive offers.",
     "amazon": "For Amazon purchases, Amazon Pay ICICI Bank card offers 5% unlimited cashback for Prime members (3% for non-Prime). This beats most generic online shopping rewards. HDFC Millennia also offers 5% on Amazon but with monthly caps.",

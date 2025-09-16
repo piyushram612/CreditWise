@@ -164,7 +164,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
 
         // Extract milestone benefits if they exist
         if (benefitsObj.milestone_benefits && Array.isArray(benefitsObj.milestone_benefits)) {
-          benefitsObj.milestone_benefits.forEach((milestone: any, index: number) => {
+          benefitsObj.milestone_benefits.forEach((milestone: Record<string, unknown>, index: number) => {
             if (milestone.condition && milestone.reward) {
               newBenefits.push({ 
                 key: `Milestone ${index + 1}`, 

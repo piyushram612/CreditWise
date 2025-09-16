@@ -76,11 +76,11 @@ export function TransactionPrompt({ user, userCards, onTransactionProcessed }: T
 
   if (!currentTransaction) return null;
 
-  const insight = getTransactionInsight(
-    currentTransaction.suggestedCard, 
-    currentTransaction.merchantName, 
-    currentTransaction.amount
-  );
+  // const insight = getTransactionInsight(
+  //   currentTransaction.suggestedCard, 
+  //   currentTransaction.merchantName, 
+  //   currentTransaction.amount
+  // );
 
   return (
     <>

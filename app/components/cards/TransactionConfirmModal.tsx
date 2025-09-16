@@ -69,7 +69,7 @@ export function TransactionConfirmModal({
             transaction_date: new Date().toISOString(),
             status: 'confirmed'
           });
-      } catch (transactionError) {
+      } catch {
         // If transactions table doesn't exist, we'll continue without recording
         console.log('Transactions table not available, continuing without recording transaction');
       }
