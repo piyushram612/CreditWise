@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import DashboardClient from '../components/dashboard/DashboardClient';
 import type { Card } from '@/lib/types';

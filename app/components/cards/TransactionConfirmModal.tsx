@@ -182,7 +182,7 @@ export function TransactionConfirmModal({
             className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             <XMarkIcon className="w-4 h-4 mr-2" />
-            No, I didn't
+            No, I didn&apos;t
           </button>
           <button
             onClick={handleConfirmTransaction}

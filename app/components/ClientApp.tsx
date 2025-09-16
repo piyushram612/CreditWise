@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { initializeApp, hapticFeedback, isNativeApp } from '@/app/utils/capacitor';
+import { initializeApp, hapticFeedback } from '@/app/utils/capacitor';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTheme } from '@/app/hooks/useTheme';
 import { getSupabaseClient } from '@/app/utils/supabase';

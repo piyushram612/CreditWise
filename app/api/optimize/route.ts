@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       });
 
       // Get merchant-specific advice
-      const merchantAdvice = spend.vendor ? getMerchantSpecificAdvice(spend.vendor, spend.category) : "";
+      const merchantAdvice = spend.vendor ? getMerchantSpecificAdvice(spend.vendor) : "";
 
       const prompt = `
         You are a credit card optimization expert. Analyze the user's existing cards and recommend the BEST card from their wallet for this specific spend.
