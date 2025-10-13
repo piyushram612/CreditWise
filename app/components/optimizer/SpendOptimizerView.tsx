@@ -6,7 +6,20 @@ import type { OptimizationResult, User, UserOwnedCard } from '@/app/types';
 import { SparklesIcon, BellIcon } from '@/app/components/shared/Icons';
 import { OptimizationResult as OptimizationResultComponent } from './OptimizationResult';
 import { TransactionConfirmModal } from '@/app/components/cards/TransactionConfirmModal';
-import { selectBestCardForTransaction } from '@/app/utils/transactionGenerator';
+
+// Simple function to select the best card (first available card with sufficient limit)
+const selectBestCard = (cards: UserOwnedCard[], amount: number): UserOwnedCard | null => {
+  if (!cards.length) return null;
+  
+  // Find card with sufficient available credit
+  const cardWithCredit = cards.find(card => {
+    const available = (card.credit_limit || 0) - (card.used_amount || 0);
+    return available >= amount;
+  });
+  
+  // Return card with credit or first card as fallback
+  return cardWithCredit || cards[0];
+};
 
 interface SpendOptimizerViewProps {
   user?: User | null;
@@ -286,11 +299,7 @@ export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimi
           isOpen={showTransactionModal}
           onClose={() => setShowTransactionModal(false)}
           user={user}
-          card={selectBestCardForTransaction(
-            userCards, 
-            currentSpend.vendor || 'Generic Merchant', 
-            currentSpend.amount
-          ) || userCards[0]}
+          card={selectBestCard(userCards, currentSpend.amount) || userCards[0]}
           transactionAmount={currentSpend.amount}
           merchantName={currentSpend.vendor || `${currentSpend.category} Purchase`}
           onTransactionConfirmed={() => {
