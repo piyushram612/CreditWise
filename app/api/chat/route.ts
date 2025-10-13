@@ -187,7 +187,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
     const requestBody = {
       contents: [{ parts: [{ text: prompt }] }],
     };

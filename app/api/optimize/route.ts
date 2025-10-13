@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         Keep total response under 200 words. Be direct and actionable.
       `;
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
       const requestBody = {
         contents: [{ parts: [{ text: prompt }] }],
       };
