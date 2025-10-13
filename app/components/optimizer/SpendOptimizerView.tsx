@@ -63,7 +63,7 @@ export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimi
     // First, fetch user's cards
     const { data: userCards, error: cardsError } = await supabase
       .from('user_owned_cards')
-      .select('*')
+      .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
       .eq('user_id', session.user.id);
 
     if (cardsError) {

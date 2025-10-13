@@ -45,7 +45,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       setCardName(existingCard.card_name || '');
       setIssuer(existingCard.issuer || '');
       setCardType(existingCard.card_type || 'Points');
-      setNetwork(existingCard.network || '');
+      // Network field removed - not in database schema
       setCreditLimit(existingCard.credit_limit?.toString() || '');
       setUsedAmount(existingCard.used_amount?.toString() || '0');
       setBenefits(
@@ -272,7 +272,6 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       card_name: cardName,
       issuer: issuer,
       card_type: cardType,
-      network: network || null,
       credit_limit: parseInt(creditLimit, 10),
       used_amount: parseInt(usedAmount, 10) || 0,
       benefits: benefitsAsObject,

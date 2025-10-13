@@ -23,7 +23,7 @@ export function useCards(user: User | null, refreshKey: number) {
       
       const { data, error } = await supabase
         .from('user_owned_cards')
-        .select('*')
+        .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
         .eq('user_id', user.id);
       
       if (error) {
