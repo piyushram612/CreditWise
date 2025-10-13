@@ -16,8 +16,9 @@ import { AuthModal } from '@/app/components/layout/AuthModal';
 import { DashboardView } from '@/app/components/dasboard/DashboardView';
 import { MyCardsView } from '@/app/components/cards/MyCardsView';
 
-// Placeholder components for views not yet refactored
+// Feature Components
 import { SpendOptimizerView } from '@/app/components/optimizer/SpendOptimizerView';
+import { SmartTipsView } from '@/app/components/insights/SmartTipsView';
 import { AICardAdvisorView } from '@/app/components/advisor/AICardAdvisorView';
 import { SettingsView } from '@/app/components/settings/SettingsView';
 
@@ -119,6 +120,8 @@ export default function ClientApp() {
         ) : null;
       case 'optimizer':
         return <SpendOptimizerView user={user} onTransactionProcessed={handleCardSaved} />;
+      case 'smart-tips':
+        return <SmartTipsView user={user} />;
       case 'advisor':
         return <AICardAdvisorView />;
       case 'settings':

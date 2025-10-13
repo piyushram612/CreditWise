@@ -27,6 +27,7 @@ const Cog6ToothIcon = () => <Icon path="M9.594 3.94c.09-.542.56-.94 1.11-1.153L1
 const SettingsIcon = () => <Icon path="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />;
 const BellIcon = ({ className }: { className?: string }) => <Icon path="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" className={className} />;
 const CheckIcon = ({ className }: { className?: string }) => <Icon path="M4.5 12.75l6 6 9-13.5" className={className} />;
+const LightBulbIcon = ({ className }: { className?: string }) => <Icon path="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18a2.25 2.25 0 00-2.25-2.25M9.75 15.75c0-1.24 1.002-2.25 2.25-2.25m0 0c2.21 0 4.005-1.79 4.005-4.012 0-2.22-1.795-4.988-4.005-4.988s-4.005 2.767-4.005 4.988c0 2.222 1.795 4.012 4.005 4.012z" className={className} />;
 
 // CreditWise Logo Components
 const CreditWiseLogo = ({ className = "w-32 h-32", showText = true }: { className?: string; showText?: boolean }) => (
@@ -182,6 +183,7 @@ export {
   SettingsIcon,
   BellIcon,
   CheckIcon,
+  LightBulbIcon,
   CreditWiseLogo,
   CreditWiseIcon
 };
