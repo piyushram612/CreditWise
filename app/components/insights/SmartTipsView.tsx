@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { User, UserOwnedCard } from '@/app/types';
 import { useCards } from '@/app/hooks/useCards';
 // import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
-import { SparklesIcon, CreditCardIcon, BellIcon } from '@/app/components/shared/Icons';
+import { CreditCardIcon, BellIcon } from '@/app/components/shared/Icons';
 
 interface SmartTip {
   id: string;
@@ -35,77 +35,127 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
     const generatedTips: SmartTip[] = [];
 
     cards.forEach(card => {
-      // Get detailed card info for future enhancements
-      // const detailedInfo = getDetailedCardInfo(card.card_name || '', card.issuer || '');
+      const cardNameLower = card.card_name?.toLowerCase() || '';
+      // const issuerLower = card.issuer?.toLowerCase() || '';
       
-      // Points Transfer Tips
-      if (card.card_name?.toLowerCase().includes('infinia')) {
+      // HDFC Infinia - Premium Hacks
+      if (cardNameLower.includes('infinia')) {
+        generatedTips.push({
+          id: `infinia-smartbuy-${card.id}`,
+          category: 'points_transfer',
+          title: '🎯 Infinia SmartBuy 10X Hack',
+          description: 'Book flights through SmartBuy portal for 10X points instead of 3.3X direct booking',
+          actionText: 'Always check SmartBuy before booking flights - can save ₹10,000+ on international tickets',
+          cardName: card.card_name || '',
+          value: '10X vs 3.3X points',
+          urgency: 'high'
+        });
+
         generatedTips.push({
           id: `infinia-transfer-${card.id}`,
           category: 'points_transfer',
-          title: 'Premium Airline Miles Transfer',
-          description: 'Transfer your HDFC Infinia points to airline partners at 1:1 ratio for premium redemptions',
-          actionText: 'Gather 25,000 points and transfer to Singapore Airlines for business class flights',
+          title: '✈️ Singapore Airlines Transfer Sweet Spot',
+          description: 'Transfer Infinia points 1:1 to Singapore Airlines for premium cabin redemptions',
+          actionText: 'Save 80,000 points for business class to Europe (worth ₹3+ lakhs)',
           cardName: card.card_name || '',
-          value: '₹1,25,000+ value',
+          value: '₹3,00,000+ value',
           urgency: 'medium'
         });
       }
 
-      if (card.card_name?.toLowerCase().includes('magnus')) {
+      // Axis Magnus - Advanced Strategies
+      if (cardNameLower.includes('magnus')) {
+        generatedTips.push({
+          id: `magnus-milestone-${card.id}`,
+          category: 'milestone',
+          title: '🎯 Magnus ₹1L Monthly Milestone Hack',
+          description: 'Hit ₹1 lakh monthly spend for 25,000 bonus points (25% extra rewards)',
+          actionText: 'Time rent, insurance, and large purchases to hit milestone consistently',
+          cardName: card.card_name || '',
+          value: '25% bonus rewards',
+          urgency: 'high'
+        });
+
         generatedTips.push({
           id: `magnus-transfer-${card.id}`,
           category: 'points_transfer',
-          title: 'Axis Magnus Sweet Spot',
-          description: 'Transfer 25,000 Edge Reward points to get 5,000 airline miles - best value transfer ratio',
-          actionText: 'Accumulate 25,000 points for maximum transfer efficiency',
+          title: '🏆 25K Points = 5K Miles Sweet Spot',
+          description: 'Transfer exactly 25,000 Edge Rewards for 5,000 airline miles (best ratio)',
+          actionText: 'Never transfer less than 25K - wait to accumulate for optimal value',
           cardName: card.card_name || '',
-          value: '₹25,000+ value',
-          urgency: 'high'
-        });
-      }
-
-      if (card.card_name?.toLowerCase().includes('tata neu')) {
-        generatedTips.push({
-          id: `tata-bigbasket-${card.id}`,
-          category: 'partnership',
-          title: 'BigBasket 5% NeuCoins',
-          description: 'Earn 5% NeuCoins on BigBasket purchases due to Tata&apos;s strategic partnership',
-          actionText: 'Use for grocery shopping and convert NeuCoins to airline miles',
-          cardName: card.card_name || '',
-          value: '5% returns',
+          value: '5:1 transfer ratio',
           urgency: 'medium'
         });
       }
 
-      if (card.card_name?.toLowerCase().includes('amazon pay')) {
+      // SBI Cashback - Unlimited Hack
+      if (cardNameLower.includes('sbi') && cardNameLower.includes('cashback')) {
         generatedTips.push({
-          id: `amazon-cashback-${card.id}`,
+          id: `sbi-wallet-${card.id}`,
           category: 'cashback',
-          title: 'Amazon 5% Cashback',
-          description: 'Get 5% cashback on Amazon purchases with no upper limit',
-          actionText: 'Use for all Amazon shopping including Prime membership',
+          title: '💰 Unlimited 5% Offline Hack',
+          description: 'Load wallets online (5% cashback) then use offline for effective 5% everywhere',
+          actionText: 'Load Paytm/PhonePe online monthly, use for offline merchants',
           cardName: card.card_name || '',
-          value: '5% unlimited',
+          value: '5% unlimited offline',
+          urgency: 'high'
+        });
+
+        generatedTips.push({
+          id: `sbi-bill-${card.id}`,
+          category: 'cashback',
+          title: '🔥 Bill Payment 5% Hack',
+          description: 'Pay rent, insurance, utilities online for 5% cashback (no limits)',
+          actionText: 'Set up all recurring payments online - save ₹1000s monthly',
+          cardName: card.card_name || '',
+          value: '5% on all bills',
           urgency: 'high'
         });
       }
 
-      // Milestone Benefits
-      if (card.card_name?.toLowerCase().includes('platinum travel')) {
+      // IDFC First Power+ HP
+      if (cardNameLower.includes('idfc') && cardNameLower.includes('hp')) {
         generatedTips.push({
-          id: `amex-milestone-${card.id}`,
-          category: 'milestone',
-          title: 'Amex Platinum Travel Milestone',
-          description: 'Spend ₹4 lakhs annually to get 40,000 bonus points',
-          actionText: 'Plan your annual spends to hit this milestone for maximum rewards',
+          id: `idfc-hp-${card.id}`,
+          category: 'partnership',
+          title: '⛽ HP Pay 10X Points Hack',
+          description: 'Use HP Pay app for 10X points (5% return) vs 2X for direct card swipe',
+          actionText: 'Always load HP Pay wallet first, then fuel - never swipe directly',
           cardName: card.card_name || '',
-          value: '₹20,000+ bonus value',
+          value: '5X more rewards',
+          urgency: 'high'
+        });
+      }
+
+      // Amazon Pay ICICI
+      if (cardNameLower.includes('amazon')) {
+        generatedTips.push({
+          id: `amazon-prime-${card.id}`,
+          category: 'cashback',
+          title: '📦 Amazon Prime Day Strategy',
+          description: 'Combine 5% cashback with Prime Day deals for 15-20% total savings',
+          actionText: 'Stock up on annual needs during Prime sales with this card',
+          cardName: card.card_name || '',
+          value: '15-20% total savings',
           urgency: 'medium'
         });
       }
 
-      // Utilization Tips
+      // Tata Neu Cards
+      if (cardNameLower.includes('tata neu')) {
+        generatedTips.push({
+          id: `tata-neu-${card.id}`,
+          category: 'partnership',
+          title: '🛒 Tata Ecosystem Multiplier',
+          description: 'Use across Tata brands (BigBasket, Croma, Westside) for 5% NeuCoins',
+          actionText: 'Plan monthly shopping across Tata ecosystem for maximum NeuCoins',
+          cardName: card.card_name || '',
+          value: '5% across ecosystem',
+          urgency: 'medium'
+        });
+      }
+
+      // Credit Utilization Optimization
       const utilization = card.credit_limit && card.used_amount ? 
         (card.used_amount / card.credit_limit) * 100 : 0;
       
@@ -113,42 +163,130 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
         generatedTips.push({
           id: `utilization-${card.id}`,
           category: 'milestone',
-          title: 'Credit Utilization Alert',
-          description: `Your ${card.card_name} utilization is ${Math.round(utilization)}% - keep it below 30% for better credit score`,
-          actionText: 'Pay down balance or request credit limit increase',
+          title: '📊 Credit Score Optimization',
+          description: `Your utilization is ${Math.round(utilization)}% - reduce to <30% for 50+ point credit score boost`,
+          actionText: 'Pay before statement generation or request limit increase',
           cardName: card.card_name || '',
-          value: 'Credit Score Impact',
+          value: '+50 credit score points',
           urgency: 'high'
         });
       }
 
-      // Seasonal Tips
-      const currentMonth = new Date().getMonth();
-      if (currentMonth >= 9 && currentMonth <= 11) { // Oct-Dec
+      // Low utilization opportunity
+      if (utilization < 10 && card.credit_limit && card.credit_limit > 100000) {
         generatedTips.push({
-          id: `festive-${card.id}`,
-          category: 'seasonal',
-          title: 'Festive Season Bonus',
-          description: 'Many cards offer bonus rewards during festive season',
-          actionText: 'Check for temporary bonus categories and accelerated rewards',
+          id: `underutilized-${card.id}`,
+          category: 'milestone',
+          title: '💎 Underutilized Premium Card',
+          description: 'You have high limit but low usage - maximize rewards potential',
+          actionText: 'Use for large purchases, rent payments, or business expenses',
           cardName: card.card_name || '',
-          value: 'Up to 10x rewards',
-          urgency: 'high',
-          expiryDate: '31st December'
+          value: 'Untapped rewards potential',
+          urgency: 'medium'
         });
       }
     });
 
-    // Add general tips if user has multiple cards
-    if (cards.length > 1) {
+    // Advanced Multi-Card Strategies
+    if (cards.length >= 2) {
       generatedTips.push({
-        id: 'multi-card-strategy',
+        id: 'multi-card-rotation',
         category: 'partnership',
-        title: 'Multi-Card Strategy',
-        description: 'Optimize spending across your cards based on category bonuses',
-        actionText: 'Use different cards for groceries, fuel, online shopping for maximum rewards',
+        title: '🔄 Card Rotation Strategy',
+        description: 'Rotate cards based on quarterly bonus categories and monthly milestones',
+        actionText: 'Create spending calendar to maximize each card\'s peak earning periods',
+        cardName: 'Portfolio Strategy',
+        value: '3-5X more rewards',
+        urgency: 'medium'
+      });
+
+      // Check for complementary cards
+      const hasInfinia = cards.some(c => c.card_name?.toLowerCase().includes('infinia'));
+      const hasMagnus = cards.some(c => c.card_name?.toLowerCase().includes('magnus'));
+      const hasSBICashback = cards.some(c => c.card_name?.toLowerCase().includes('sbi') && c.card_name?.toLowerCase().includes('cashback'));
+
+      if (hasInfinia && hasMagnus) {
+        generatedTips.push({
+          id: 'infinia-magnus-combo',
+          category: 'points_transfer',
+          title: '👑 Premium Card Combo Strategy',
+          description: 'Use Magnus for milestones, Infinia for travel - transfer both to same airline',
+          actionText: 'Accumulate points on both, transfer to Singapore Airlines for maximum value',
+          cardName: 'Infinia + Magnus',
+          value: 'Premium redemptions',
+          urgency: 'high'
+        });
+      }
+
+      if (hasSBICashback) {
+        generatedTips.push({
+          id: 'sbi-complement',
+          category: 'cashback',
+          title: '💡 SBI Cashback as Base Card',
+          description: 'Use SBI Cashback for all online spends, other cards for their specialties',
+          actionText: 'Make SBI your default online card, others for specific categories',
+          cardName: 'SBI + Others',
+          value: '5% baseline + bonuses',
+          urgency: 'medium'
+        });
+      }
+    }
+
+    // Seasonal and Time-Sensitive Hacks
+    const currentMonth = new Date().getMonth();
+    // const currentDate = new Date();
+    
+    // Festive Season (Oct-Dec)
+    if (currentMonth >= 9 && currentMonth <= 11) {
+      generatedTips.push({
+        id: 'festive-season',
+        category: 'seasonal',
+        title: '🎉 Festive Season Multiplier',
+        description: 'Many cards offer 2-5X bonus during festive season on specific categories',
+        actionText: 'Check for temporary bonus offers and plan major purchases accordingly',
         cardName: 'All Cards',
-        value: '2-5x more rewards',
+        value: 'Up to 5X bonus',
+        urgency: 'high',
+        expiryDate: '31st December'
+      });
+    }
+
+    // Year-end strategies
+    if (currentMonth === 11) {
+      generatedTips.push({
+        id: 'year-end-milestone',
+        category: 'milestone',
+        title: '📅 Year-End Milestone Rush',
+        description: 'December is last chance to hit annual milestones for fee waivers',
+        actionText: 'Calculate remaining spend needed and plan purchases strategically',
+        cardName: 'All Cards',
+        value: 'Fee waiver savings',
+        urgency: 'high',
+        expiryDate: '31st December'
+      });
+    }
+
+    // Advanced Hacks for Power Users
+    if (cards.length >= 3) {
+      generatedTips.push({
+        id: 'manufactured-spending',
+        category: 'partnership',
+        title: '🎯 Advanced Points Earning',
+        description: 'Use gift cards, prepaid reloads, and bill payments to manufacture spending',
+        actionText: 'Buy gift cards online (5% SBI), use for offline purchases, reload wallets strategically',
+        cardName: 'Advanced Strategy',
+        value: 'Unlimited earning potential',
+        urgency: 'medium'
+      });
+
+      generatedTips.push({
+        id: 'credit-cycling',
+        category: 'milestone',
+        title: '🔄 Credit Cycling for Milestones',
+        description: 'Pay off balances mid-cycle to increase effective spending capacity',
+        actionText: 'Pay before statement to reset available credit for milestone chasing',
+        cardName: 'Portfolio Management',
+        value: 'Double milestone potential',
         urgency: 'medium'
       });
     }
@@ -177,12 +315,12 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
   };
 
   const categories = [
-    { id: 'all', name: 'All Tips', icon: '💡' },
-    { id: 'points_transfer', name: 'Point Transfers', icon: '✈️' },
+    { id: 'all', name: 'All Hacks', icon: '🔥' },
+    { id: 'points_transfer', name: 'Miles & Points', icon: '✈️' },
     { id: 'milestone', name: 'Milestones', icon: '🎯' },
-    { id: 'cashback', name: 'Cashback', icon: '💰' },
+    { id: 'cashback', name: 'Cashback Hacks', icon: '💰' },
     { id: 'partnership', name: 'Partnerships', icon: '🤝' },
-    { id: 'seasonal', name: 'Seasonal', icon: '🎉' }
+    { id: 'seasonal', name: 'Limited Time', icon: '⏰' }
   ];
 
   const filteredTips = selectedCategory === 'all' 
@@ -191,17 +329,69 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
 
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-center p-4">
-        <SparklesIcon className="w-16 h-16 text-gray-400 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          Smart Tips & Insights
-        </h2>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">
-          Get personalized tips to maximize your credit card rewards
-        </p>
-        <p className="text-gray-400 dark:text-gray-500">
-          Please log in to see personalized tips based on your cards
-        </p>
+      <div>
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            🔥 Credit Card Hacks & Strategies
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Advanced optimization techniques from credit card experts
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-3">🎯 Expert Milestone Strategies</h3>
+            <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+              <li>• Hit Axis Magnus ₹1L monthly for 25% bonus rewards</li>
+              <li>• Time large purchases around milestone deadlines</li>
+              <li>• Use rent payments to reach spending thresholds</li>
+              <li>• Pay insurance premiums strategically</li>
+            </ul>
+          </div>
+
+          <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <h3 className="font-bold text-green-900 dark:text-green-100 mb-3">💰 Cashback Multiplication</h3>
+            <ul className="text-sm text-green-800 dark:text-green-200 space-y-2">
+              <li>• SBI Cashback: Load wallets online for 5% offline</li>
+              <li>• Amazon Pay: 5% + Prime Day deals = 20% savings</li>
+              <li>• Stack cashback with merchant offers</li>
+              <li>• Use bill payments for guaranteed returns</li>
+            </ul>
+          </div>
+
+          <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+            <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-3">✈️ Points Transfer Mastery</h3>
+            <ul className="text-sm text-purple-800 dark:text-purple-200 space-y-2">
+              <li>• Transfer 25K Axis points = 5K airline miles</li>
+              <li>• HDFC Infinia 1:1 to Singapore Airlines</li>
+              <li>• Book business class for 80K points (₹3L value)</li>
+              <li>• Never transfer less than optimal ratios</li>
+            </ul>
+          </div>
+
+          <div className="p-6 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+            <h3 className="font-bold text-orange-900 dark:text-orange-100 mb-3">🔄 Advanced Techniques</h3>
+            <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-2">
+              <li>• Manufactured spending via gift cards</li>
+              <li>• Credit cycling for milestone chasing</li>
+              <li>• Multi-card rotation strategies</li>
+              <li>• Seasonal bonus optimization</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="text-center p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            🚀 Get Personalized Hacks
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Log in to get specific optimization strategies for your credit cards
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">
+            We&apos;ll analyze your portfolio and suggest expert-level hacks to maximize your rewards
+          </p>
+        </div>
       </div>
     );
   }
@@ -210,11 +400,14 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
     <div>
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          Smart Tips & Insights
+          🔥 Credit Card Hacks & Strategies
         </h2>
         <p className="text-gray-500 dark:text-gray-400">
-          Proactive suggestions to maximize your rewards and benefits
+          Advanced optimization techniques from credit card experts - maximize every rupee spent
         </p>
+        <div className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+          💡 Inspired by strategies from TheCreditCardGuy, DJSuvan, and other experts
+        </div>
       </div>
 
       {/* Category Filter */}
