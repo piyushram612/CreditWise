@@ -109,6 +109,8 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       
       // First try to get benefits from knowledge base (more detailed)
       if (detailedInfo) {
+        console.log('Found detailed info for:', template.card_name, 'from knowledge base');
+        
         // Add reward rates from knowledge base
         Object.entries(detailedInfo.reward_rates).forEach(([category, info]) => {
           const formattedCategory = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -127,14 +129,18 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             value: `${info.reward_rate}% rewards - ${info.benefits.join(', ')}` 
           });
         });
+      } else {
+        console.log('No detailed info found for:', template.card_name, 'issuer:', template.issuer, 'falling back to template benefits');
       }
 
       // Fallback to template benefits if knowledge base doesn't have info
       if (newBenefits.length === 0 && template.benefits && typeof template.benefits === 'object') {
+        console.log('Using template benefits for:', template.card_name);
         const benefitsObj = template.benefits as Record<string, unknown>;
         
         // Extract reward rates if they exist
-        if (benefitsObj.reward_rates) {
+        if (benefitsObj.reward_rates && typeof benefitsObj.reward_rates === 'object') {
+          console.log('Found reward_rates in template:', benefitsObj.reward_rates);
           for (const [key, value] of Object.entries(benefitsObj.reward_rates)) {
             const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             const valueObj = value as Record<string, unknown>;
@@ -144,6 +150,8 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             const notes = valueObj?.notes ? ` (${valueObj.notes})` : '';
             newBenefits.push({ key: formattedKey, value: String(`${rateDisplay}${notes}`) });
           }
+        } else {
+          console.log('No reward_rates found in template benefits');
         }
 
         // Extract welcome benefits if they exist
@@ -183,6 +191,34 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
         // Extract suitability as a benefit
         if (benefitsObj.suitability) {
           newBenefits.push({ key: 'Best For', value: String(benefitsObj.suitability) });
+        }
+      }
+
+      // If no benefits were found, add some basic ones based on card type
+      if (newBenefits.length === 0) {
+        console.log('No benefits found, adding basic benefits for:', template.card_name);
+        
+        // Add basic benefits based on issuer or card name patterns
+        if (template.card_name?.toLowerCase().includes('cashback')) {
+          newBenefits.push({ key: 'Cashback', value: 'Cashback rewards on purchases' });
+        } else if (template.card_name?.toLowerCase().includes('travel')) {
+          newBenefits.push({ key: 'Travel Rewards', value: 'Rewards on travel purchases' });
+        } else {
+          newBenefits.push({ key: 'Reward Points', value: 'Earn reward points on purchases' });
+        }
+        
+        // Add common benefits
+        newBenefits.push({ key: 'Welcome Benefit', value: 'Welcome bonus on card activation' });
+        
+        // Try to extract any other benefits from the raw template data
+        if (template.benefits && typeof template.benefits === 'object') {
+          const benefitsObj = template.benefits as Record<string, unknown>;
+          Object.entries(benefitsObj).forEach(([key, value]) => {
+            if (key !== 'reward_rates' && key !== 'network' && key !== 'card_type' && typeof value === 'string' && value.length > 0) {
+              const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              newBenefits.push({ key: formattedKey, value: String(value) });
+            }
+          });
         }
       }
 
