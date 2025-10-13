@@ -29,9 +29,18 @@ export interface UserOwnedCard {
   card_name: string | null;
   issuer: string | null;
   card_type?: string | null;
-  network?: string | null;
+  network?: string | null; // This is extracted from benefits.network
   benefits: Json | null;
   fees: Json | null;
+}
+
+// Helper function to extract network from benefits
+export function getCardNetwork(card: UserOwnedCard): string | null {
+  if (card.benefits && typeof card.benefits === 'object') {
+    const benefitsObj = card.benefits as Record<string, unknown>;
+    return (benefitsObj.network as string) || null;
+  }
+  return null;
 }
 
 export interface User {

@@ -45,12 +45,18 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       setCardName(existingCard.card_name || '');
       setIssuer(existingCard.issuer || '');
       setCardType(existingCard.card_type || 'Points');
-      // Network field removed - not in database schema
+      
+      // Get network from benefits object since it's stored there
+      const benefitsObj = existingCard.benefits as Record<string, unknown> | null;
+      setNetwork((benefitsObj?.network as string) || '');
+      
       setCreditLimit(existingCard.credit_limit?.toString() || '');
       setUsedAmount(existingCard.used_amount?.toString() || '0');
       setBenefits(
         existingCard.benefits && Object.keys(existingCard.benefits).length > 0
-          ? Object.entries(existingCard.benefits).map(([key, value]) => ({ key, value: String(value) }))
+          ? Object.entries(existingCard.benefits)
+              .filter(([key]) => key !== 'network') // Exclude network from benefits display
+              .map(([key, value]) => ({ key, value: String(value) }))
           : [{ key: '', value: '' }]
       );
       setFees(
@@ -267,6 +273,9 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       item.key ? ({ ...obj, [item.key]: item.value }) : obj, {}
     );
 
+    // Include network in benefits object since it's not a separate column
+    const benefitsWithNetwork = network ? { ...benefitsAsObject, network: network } : benefitsAsObject;
+
     const cardData = {
       user_id: user.id,
       card_name: cardName,
@@ -274,7 +283,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       card_type: cardType,
       credit_limit: parseInt(creditLimit, 10),
       used_amount: parseInt(usedAmount, 10) || 0,
-      benefits: benefitsAsObject,
+      benefits: benefitsWithNetwork,
       fees: feesAsObject,
     };
 

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 import { getCardOptimizationTips } from '@/app/utils/cardOptimizationDatabase';
 import type { UserOwnedCard } from '@/app/types';
+import { getCardNetwork } from '@/app/types';
 
 // Explicitly set the runtime to Node.js to support Supabase server-side operations
 export const runtime = 'nodejs';
@@ -69,7 +70,7 @@ ${Object.entries(detailedInfo.partnerships)
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Card Type: ${card.card_type || 'N/A'}
-Network: ${card.network || 'Not specified'} ${card.network === 'RuPay' ? '(UPI Compatible)' : card.network && card.network !== 'Not specified' ? '(No UPI)' : ''}
+Network: ${getCardNetwork(card) || 'Not specified'} ${getCardNetwork(card) === 'RuPay' ? '(UPI Compatible)' : getCardNetwork(card) && getCardNetwork(card) !== 'Not specified' ? '(No UPI)' : ''}
 Credit Limit: ₹${card.credit_limit?.toLocaleString() || 'Not specified'}
 Used Amount: ₹${card.used_amount?.toLocaleString() || '0'}
 Available Credit: ₹${card.credit_limit && card.used_amount ? (card.credit_limit - card.used_amount).toLocaleString() : 'Not calculated'}
