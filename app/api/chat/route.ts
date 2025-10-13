@@ -158,7 +158,7 @@ export async function POST(request: Request) {
       Conversation History:
       ${history}
       
-      EXPERT KNOWLEDGE:
+      CARD OPTIMIZATION KNOWLEDGE:
       - IDFC FIRST Power+ HP: 10X points on HP Pay app (5% return), use HP Pay wallet for fuel
       - Tata Neu Infinity: 5% NeuCoins on BigBasket, Tata CLiQ (convert to airline miles)
       - HDFC Infinia: Transfer points to airline partners at 1:1 ratio, use SmartBuy portal for 5X

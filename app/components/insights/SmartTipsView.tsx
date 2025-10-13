@@ -20,16 +20,186 @@ interface SmartTipsViewProps {
   user: User | null;
 }
 
+interface TipDetails {
+  fullDescription: string;
+  steps: string[];
+  examples: string[];
+  warnings?: string[];
+  relatedTips?: string[];
+}
+
 export function SmartTipsView({ user }: SmartTipsViewProps) {
   const { userCards, isLoading } = useCards(user, 0);
   const [tips, setTips] = useState<SmartTip[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedTip, setSelectedTip] = useState<SmartTip | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (userCards.length > 0) {
       generateSmartTips(userCards);
     }
   }, [userCards]);
+
+  const getTipDetails = (tipId: string): TipDetails => {
+    const tipDetailsMap: { [key: string]: TipDetails } = {
+      'infinia-smartbuy': {
+        fullDescription: 'HDFC Infinia SmartBuy portal offers 10X reward points on flight bookings compared to 3.3X points for direct bookings. This can result in significant savings on travel expenses.',
+        steps: [
+          'Visit HDFC SmartBuy portal (smartbuy.hdfcbank.com)',
+          'Login with your HDFC credentials',
+          'Navigate to Travel > Flights section',
+          'Search and book your flights',
+          'Pay using your Infinia card',
+          'Earn 10X points instead of regular 3.3X'
+        ],
+        examples: [
+          'Domestic flight ₹10,000: Direct booking = 330 points, SmartBuy = 1,000 points',
+          'International flight ₹50,000: Direct booking = 1,650 points, SmartBuy = 5,000 points',
+          'Business class ₹2,00,000: Direct booking = 6,600 points, SmartBuy = 20,000 points'
+        ],
+        warnings: [
+          'Check flight prices on SmartBuy vs direct booking',
+          'Consider cancellation policies',
+          'Points credit may take 60-90 days'
+        ]
+      },
+      'magnus-milestone': {
+        fullDescription: 'Axis Magnus offers 25,000 bonus Edge Reward points when you spend ₹1 lakh in a calendar month, effectively giving you 25% extra rewards on your spending.',
+        steps: [
+          'Track your monthly spending on Magnus card',
+          'Plan large purchases around month-end/start',
+          'Use for rent payments, insurance premiums',
+          'Pay utility bills and subscriptions',
+          'Monitor spending via Axis Mobile app',
+          'Receive bonus points in next statement'
+        ],
+        examples: [
+          'Monthly spend ₹1,00,000 = 12,000 base points + 25,000 bonus = 37,000 total points',
+          'Effective reward rate becomes 3.7% instead of 1.2%',
+          'Annual potential: 12 months × 25,000 = 3,00,000 bonus points'
+        ],
+        warnings: [
+          'Milestone resets every calendar month',
+          'Only eligible spends count towards milestone',
+          'Bonus points have 24-month expiry'
+        ]
+      },
+      'sbi-wallet': {
+        fullDescription: 'SBI Cashback card gives 5% cashback on online transactions. By loading digital wallets online, you can effectively get 5% cashback on offline purchases too.',
+        steps: [
+          'Load Paytm/PhonePe wallet using SBI Cashback card online',
+          'Earn 5% cashback on wallet loading',
+          'Use loaded wallet for offline merchant payments',
+          'Effectively get 5% return on offline spends',
+          'Repeat monthly to maximize benefits'
+        ],
+        examples: [
+          'Load ₹10,000 to Paytm = ₹500 cashback',
+          'Use wallet for grocery, fuel, dining = effective 5% offline',
+          'Monthly limit: ₹1,00,000 online spend = ₹5,000 cashback'
+        ],
+        warnings: [
+          'Monthly cashback cap of ₹5,000',
+          'Some wallet loads may not qualify',
+          'Check terms for eligible wallet partners'
+        ]
+      },
+      'idfc-hp': {
+        fullDescription: 'IDFC First Power+ HP card offers 10X points when you use HP Pay app instead of direct card swipe, giving you 5% effective return on fuel purchases.',
+        steps: [
+          'Download HP Pay app from Play Store/App Store',
+          'Register and link your IDFC HP card',
+          'Load wallet in HP Pay app',
+          'Visit any HP petrol pump',
+          'Pay using HP Pay app instead of card swipe',
+          'Earn 10X points (5% return) vs 2X for direct swipe'
+        ],
+        examples: [
+          'Fuel purchase ₹2,000: Direct swipe = 40 points, HP Pay = 200 points',
+          'Monthly fuel ₹5,000: HP Pay gives ₹250 extra value vs direct payment',
+          'Annual fuel ₹60,000: Extra ₹3,000 value through HP Pay'
+        ],
+        warnings: [
+          'Ensure HP Pay app is working before visiting pump',
+          'Keep backup payment method ready',
+          'Points credit takes 2-3 days'
+        ]
+      },
+      'amazon-prime': {
+        fullDescription: 'Amazon Pay ICICI card combined with Prime membership and Prime Day sales can give you 15-20% total savings through stacked benefits.',
+        steps: [
+          'Ensure you have Amazon Prime membership',
+          'Use Amazon Pay ICICI card for purchases',
+          'Shop during Prime Day/Great Indian Festival',
+          'Look for additional bank offers',
+          'Combine with Amazon Pay balance offers',
+          'Stack with product-specific discounts'
+        ],
+        examples: [
+          'Prime Day: 10% sale discount + 5% card cashback = 15% total savings',
+          'Electronics: 15% sale + 5% cashback + 5% exchange = 25% total value',
+          'Annual Prime shopping ₹50,000 can save ₹7,500-10,000'
+        ],
+        warnings: [
+          'Prime Day deals are time-limited',
+          'Check actual vs inflated MRP prices',
+          'Cashback caps may apply on large purchases'
+        ]
+      },
+      'utilization-optimization': {
+        fullDescription: 'Keeping credit utilization below 30% can boost your credit score by 50+ points, improving your eligibility for premium cards and better loan rates.',
+        steps: [
+          'Calculate current utilization: (Used Amount ÷ Credit Limit) × 100',
+          'Pay before statement generation to reduce reported utilization',
+          'Request credit limit increase if needed',
+          'Spread spending across multiple cards',
+          'Set up alerts at 20% utilization',
+          'Monitor credit score monthly'
+        ],
+        examples: [
+          'Utilization 60% → 25% can increase score by 50-75 points',
+          'Score improvement: 720 → 780 opens premium card eligibility',
+          'Better loan rates: 12% → 10.5% on ₹10L loan saves ₹75,000'
+        ],
+        warnings: [
+          'Very low utilization (<5%) may also hurt score',
+          'Score changes take 1-2 months to reflect',
+          'Multiple factors affect credit score'
+        ]
+      }
+    };
+
+    // Extract the key part of the tip ID for matching
+    let tipKey = tipId;
+    if (tipId.includes('infinia-smartbuy')) tipKey = 'infinia-smartbuy';
+    else if (tipId.includes('magnus-milestone')) tipKey = 'magnus-milestone';
+    else if (tipId.includes('sbi-wallet')) tipKey = 'sbi-wallet';
+    else if (tipId.includes('idfc-hp')) tipKey = 'idfc-hp';
+    else if (tipId.includes('amazon-prime')) tipKey = 'amazon-prime';
+    else if (tipId.includes('utilization')) tipKey = 'utilization-optimization';
+    else tipKey = 'default';
+
+    return tipDetailsMap[tipKey] || {
+      fullDescription: 'This tip helps you optimize your credit card usage for better rewards and benefits. Click to explore specific strategies for your card.',
+      steps: [
+        'Review your current card benefits and reward structure',
+        'Identify the best spending categories for this card',
+        'Plan your purchases to maximize rewards',
+        'Track your progress and adjust strategy as needed'
+      ],
+      examples: [
+        'Strategic spending can increase your effective reward rate by 2-3X',
+        'Proper optimization can save ₹5,000-15,000 annually per card'
+      ],
+      warnings: ['Always verify current terms and conditions', 'Reward structures may change periodically']
+    };
+  };
+
+  const handleTipClick = (tip: SmartTip) => {
+    setSelectedTip(tip);
+    setShowModal(true);
+  };
 
   const generateSmartTips = (cards: UserOwnedCard[]) => {
     const generatedTips: SmartTip[] = [];
@@ -335,61 +505,20 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
             🔥 Credit Card Hacks & Strategies
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Advanced optimization techniques from credit card experts
+            Smart tips and strategies to maximize your credit card rewards
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-3">🎯 Expert Milestone Strategies</h3>
-            <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
-              <li>• Hit Axis Magnus ₹1L monthly for 25% bonus rewards</li>
-              <li>• Time large purchases around milestone deadlines</li>
-              <li>• Use rent payments to reach spending thresholds</li>
-              <li>• Pay insurance premiums strategically</li>
-            </ul>
-          </div>
-
-          <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <h3 className="font-bold text-green-900 dark:text-green-100 mb-3">💰 Cashback Multiplication</h3>
-            <ul className="text-sm text-green-800 dark:text-green-200 space-y-2">
-              <li>• SBI Cashback: Load wallets online for 5% offline</li>
-              <li>• Amazon Pay: 5% + Prime Day deals = 20% savings</li>
-              <li>• Stack cashback with merchant offers</li>
-              <li>• Use bill payments for guaranteed returns</li>
-            </ul>
-          </div>
-
-          <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-            <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-3">✈️ Points Transfer Mastery</h3>
-            <ul className="text-sm text-purple-800 dark:text-purple-200 space-y-2">
-              <li>• Transfer 25K Axis points = 5K airline miles</li>
-              <li>• HDFC Infinia 1:1 to Singapore Airlines</li>
-              <li>• Book business class for 80K points (₹3L value)</li>
-              <li>• Never transfer less than optimal ratios</li>
-            </ul>
-          </div>
-
-          <div className="p-6 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
-            <h3 className="font-bold text-orange-900 dark:text-orange-100 mb-3">🔄 Advanced Techniques</h3>
-            <ul className="text-sm text-orange-800 dark:text-orange-200 space-y-2">
-              <li>• Manufactured spending via gift cards</li>
-              <li>• Credit cycling for milestone chasing</li>
-              <li>• Multi-card rotation strategies</li>
-              <li>• Seasonal bonus optimization</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="text-center p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <div className="text-center p-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="text-6xl mb-4">💳</div>
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            🚀 Get Personalized Hacks
+            🚀 Get Personalized Smart Tips
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Log in to get specific optimization strategies for your credit cards
+            Log in to get interactive tips and strategies tailored to your credit cards
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500">
-            We&apos;ll analyze your portfolio and suggest expert-level hacks to maximize your rewards
+            We&apos;ll analyze your portfolio and provide clickable tips with detailed guides to maximize your rewards
           </p>
         </div>
       </div>
@@ -403,11 +532,8 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
           🔥 Credit Card Hacks & Strategies
         </h2>
         <p className="text-gray-500 dark:text-gray-400">
-          Advanced optimization techniques from credit card experts - maximize every rupee spent
+          Smart tips and strategies to maximize your credit card rewards
         </p>
-        <div className="mt-2 text-sm text-blue-600 dark:text-blue-400">
-          💡 Inspired by strategies from TheCreditCardGuy, DJSuvan, and other experts
-        </div>
       </div>
 
       {/* Category Filter */}
@@ -456,7 +582,8 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
           {filteredTips.map(tip => (
             <div
               key={tip.id}
-              className={`p-6 rounded-lg border-2 ${getUrgencyColor(tip.urgency)} transition-all hover:shadow-lg`}
+              onClick={() => handleTipClick(tip)}
+              className={`p-6 rounded-lg border-2 ${getUrgencyColor(tip.urgency)} transition-all duration-200 hover:shadow-lg cursor-pointer hover:scale-105 transform hover:border-blue-300 dark:hover:border-blue-600`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -496,6 +623,9 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
                     ⏰ Valid until: {tip.expiryDate}
                   </p>
                 )}
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
+                  👆 Click for detailed guide
+                </p>
               </div>
             </div>
           ))}
@@ -528,6 +658,95 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
             <div>
               <div className="font-medium text-blue-800 dark:text-blue-200">Active Cards</div>
               <div className="text-blue-600 dark:text-blue-400">{userCards.length}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tip Details Modal */}
+      {showModal && selectedTip && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{getCategoryIcon(selectedTip.category)}</span>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                      {selectedTip.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedTip.cardName}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Overview</h4>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {getTipDetails(selectedTip.id).fullDescription}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">How to Execute</h4>
+                  <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                    {getTipDetails(selectedTip.id).steps.map((step, index) => (
+                      <li key={index} className="text-sm">{step}</li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Examples & Calculations</h4>
+                  <div className="space-y-2">
+                    {getTipDetails(selectedTip.id).examples.map((example, index) => (
+                      <div key={index} className="bg-green-50 dark:bg-green-900/20 p-3 rounded-md border border-green-200 dark:border-green-800">
+                        <p className="text-sm text-green-800 dark:text-green-200">{example}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {getTipDetails(selectedTip.id).warnings && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Important Notes</h4>
+                    <div className="space-y-2">
+                      {getTipDetails(selectedTip.id).warnings!.map((warning, index) => (
+                        <div key={index} className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800">
+                          <p className="text-sm text-yellow-800 dark:text-yellow-200">⚠️ {warning}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Expected Value</h4>
+                  <p className="text-blue-800 dark:text-blue-200 font-medium">{selectedTip.value}</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">{selectedTip.actionText}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Got it!
+                </button>
+              </div>
             </div>
           </div>
         </div>
