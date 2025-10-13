@@ -4,7 +4,7 @@ import {
   DashboardIcon, 
   CreditCardIcon, 
   SparklesIcon, 
-  LightBulbIcon,
+  StarIcon,
   ChatBubbleIcon, 
   UserCircleIcon, 
   SettingsIcon,
@@ -27,7 +27,7 @@ export function Sidebar({
     { name: 'Dashboard', icon: <DashboardIcon />, view: 'dashboard' },
     { name: 'My Cards', icon: <CreditCardIcon />, view: 'my-cards' },
     { name: 'Spend Optimizer', icon: <SparklesIcon />, view: 'optimizer' },
-    { name: 'Smart Tips', icon: <LightBulbIcon className="text-yellow-500" />, view: 'smart-tips' },
+    { name: 'Smart Tips', icon: <StarIcon className="text-yellow-500" />, view: 'smart-tips' },
     { name: 'AI Card Advisor', icon: <ChatBubbleIcon />, view: 'advisor' },
     { name: 'Settings', icon: <SettingsIcon />, view: 'settings' },
   ];
