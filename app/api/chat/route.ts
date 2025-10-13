@@ -2,22 +2,10 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 import { getCardOptimizationTips } from '@/app/utils/cardOptimizationDatabase';
+import type { UserOwnedCard } from '@/app/types';
 
 // Explicitly set the runtime to Node.js to support Supabase server-side operations
 export const runtime = 'nodejs';
-
-// --- Type Definitions ---
-interface UserOwnedCard {
-  id: string;
-  credit_limit?: number;
-  used_amount?: number;
-  card_name: string;
-  issuer: string;
-  card_type?: string;
-  network?: string;
-  benefits?: Record<string, string>;
-  fees?: Record<string, string>;
-}
 
 interface ChatMessage {
   from: 'ai' | 'user';
@@ -81,7 +69,7 @@ ${Object.entries(detailedInfo.partnerships)
 Card Name: ${card.card_name}
 Issuer: ${card.issuer}
 Card Type: ${card.card_type || 'N/A'}
-Network: ${card.network || 'Not specified'} ${card.network === 'RuPay' ? '(UPI Compatible)' : card.network ? '(No UPI)' : ''}
+Network: ${card.network || 'Not specified'} ${card.network === 'RuPay' ? '(UPI Compatible)' : card.network && card.network !== 'Not specified' ? '(No UPI)' : ''}
 Credit Limit: ₹${card.credit_limit?.toLocaleString() || 'Not specified'}
 Used Amount: ₹${card.used_amount?.toLocaleString() || '0'}
 Available Credit: ₹${card.credit_limit && card.used_amount ? (card.credit_limit - card.used_amount).toLocaleString() : 'Not calculated'}
@@ -122,7 +110,7 @@ export async function POST(request: Request) {
         console.log('User authenticated, fetching cards');
         const { data: fetchedCards, error: dbError } = await supabase
           .from('user_owned_cards')
-          .select('*')
+          .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
           .eq('user_id', user.id);
 
         if (dbError) {
@@ -156,7 +144,7 @@ export async function POST(request: Request) {
         }
         return `\n**${card.card_name}:** General optimization advice available`;
       }).join('\n');
-      
+
       optimizationAdvice = `\nUSER'S CARD OPTIMIZATION STRATEGIES:${cardOptimizations}`;
     }
 
