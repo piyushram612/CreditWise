@@ -14,57 +14,99 @@ export type Database = {
           id: string
           card_name: string
           issuer: string
-          benefits: Json | null
-          fees: Json | null
+          network: string | null
+          annual_fee: number | null
+          reward_rates: Json | null
+          benefits: string | null
+          created_at: string | null
+          card_type: string[] | null
+          joining_fee: number | null
+          fee_waiver: string | null
+          welcome_benefits: string | null
+          milestone_benefits: Json | null
+          lounge_access: Json | null
+          other_benefits: string[] | null
+          suitability: string | null
         }
         Insert: {
           id?: string
           card_name: string
           issuer: string
-          benefits?: Json | null
-          fees?: Json | null
+          network?: string | null
+          annual_fee?: number | null
+          reward_rates?: Json | null
+          benefits?: string | null
+          created_at?: string | null
+          card_type?: string[] | null
+          joining_fee?: number | null
+          fee_waiver?: string | null
+          welcome_benefits?: string | null
+          milestone_benefits?: Json | null
+          lounge_access?: Json | null
+          other_benefits?: string[] | null
+          suitability?: string | null
         }
         Update: {
           id?: string
           card_name?: string
           issuer?: string
-          benefits?: Json | null
-          fees?: Json | null
+          network?: string | null
+          annual_fee?: number | null
+          reward_rates?: Json | null
+          benefits?: string | null
+          created_at?: string | null
+          card_type?: string[] | null
+          joining_fee?: number | null
+          fee_waiver?: string | null
+          welcome_benefits?: string | null
+          milestone_benefits?: Json | null
+          lounge_access?: Json | null
+          other_benefits?: string[] | null
+          suitability?: string | null
         }
       }
       user_owned_cards: {
         Row: {
           id: string
           user_id: string
-          card_id: string
+          card_id: string | null
           credit_limit: number | null
-          used_amount: number | null
+          created_at: string | null
+          custom_benefits: string | null
           card_name: string | null
           issuer: string | null
+          card_type: string | null
           benefits: Json | null
           fees: Json | null
+          used_amount: number | null
         }
         Insert: {
           id?: string
           user_id: string
-          card_id: string
+          card_id?: string | null
           credit_limit?: number | null
-          used_amount?: number | null
+          created_at?: string | null
+          custom_benefits?: string | null
           card_name?: string | null
           issuer?: string | null
+          card_type?: string | null
           benefits?: Json | null
           fees?: Json | null
+          used_amount?: number | null
         }
         Update: {
           id?: string
           user_id?: string
-          card_id?: string
+          card_id?: string | null
           credit_limit?: number | null
-          used_amount?: number | null
+          created_at?: string | null
+          custom_benefits?: string | null
           card_name?: string | null
           issuer?: string | null
+          card_type?: string | null
           benefits?: Json | null
           fees?: Json | null
+          used_amount?: number | null
         }
       }
       feedback: {

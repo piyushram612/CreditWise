@@ -38,8 +38,20 @@ export default async function DashboardPage() {
       used_amount: item.used_amount,
       card_name: item.card_name || item.cards?.card_name || null,
       issuer: item.issuer || item.cards?.issuer || null,
-      benefits: item.benefits || item.cards?.benefits || null,
-      fees: item.fees || item.cards?.fees || null,
+      benefits: item.benefits || null, // Use user's benefits (Json) not template benefits (string)
+      fees: item.fees || null,
+      // Add template fields if available
+      network: item.cards?.network || null,
+      annual_fee: item.cards?.annual_fee || null,
+      reward_rates: item.cards?.reward_rates || null,
+      card_type: item.cards?.card_type || null,
+      joining_fee: item.cards?.joining_fee || null,
+      fee_waiver: item.cards?.fee_waiver || null,
+      welcome_benefits: item.cards?.welcome_benefits || null,
+      milestone_benefits: item.cards?.milestone_benefits || null,
+      lounge_access: item.cards?.lounge_access || null,
+      other_benefits: item.cards?.other_benefits || null,
+      suitability: item.cards?.suitability || null,
   }));
 
   const allMasterCards: Card[] = (allCardsData || []).map(card => ({
@@ -48,10 +60,22 @@ export default async function DashboardPage() {
       card_id: card.id,
       card_name: card.card_name,
       issuer: card.issuer,
-      benefits: card.benefits,
-      fees: card.fees,
+      benefits: null, // Template cards don't have user-specific benefits
+      fees: null, // Template cards don't have user-specific fees
       credit_limit: null,
       used_amount: null,
+      // Include template-specific fields
+      network: card.network,
+      annual_fee: card.annual_fee,
+      reward_rates: card.reward_rates,
+      card_type: card.card_type,
+      joining_fee: card.joining_fee,
+      fee_waiver: card.fee_waiver,
+      welcome_benefits: card.welcome_benefits,
+      milestone_benefits: card.milestone_benefits,
+      lounge_access: card.lounge_access,
+      other_benefits: card.other_benefits,
+      suitability: card.suitability,
   }));
 
   return (

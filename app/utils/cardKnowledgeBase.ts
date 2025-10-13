@@ -638,10 +638,40 @@ export const cardKnowledgeBase: DetailedCardInfo[] = [
 
 // Function to get detailed card information
 export function getDetailedCardInfo(cardName: string, issuer: string): DetailedCardInfo | null {
-  return cardKnowledgeBase.find(card =>
+  // First try exact match
+  let match = cardKnowledgeBase.find(card =>
+    card.card_name.toLowerCase() === cardName.toLowerCase() &&
+    card.issuer.toLowerCase() === issuer.toLowerCase()
+  );
+  
+  if (match) return match;
+  
+  // Then try partial match (original logic)
+  match = cardKnowledgeBase.find(card =>
     card.card_name.toLowerCase().includes(cardName.toLowerCase()) &&
     card.issuer.toLowerCase() === issuer.toLowerCase()
-  ) || null;
+  );
+  
+  if (match) return match;
+  
+  // Try reverse partial match (card name contains knowledge base name)
+  match = cardKnowledgeBase.find(card =>
+    cardName.toLowerCase().includes(card.card_name.toLowerCase()) &&
+    card.issuer.toLowerCase() === issuer.toLowerCase()
+  );
+  
+  if (match) return match;
+  
+  // Try fuzzy matching by removing common words and checking key terms
+  const cleanCardName = cardName.toLowerCase().replace(/\b(card|bank|credit)\b/g, '').trim();
+  match = cardKnowledgeBase.find(card => {
+    const cleanKnowledgeName = card.card_name.toLowerCase().replace(/\b(card|bank|credit)\b/g, '').trim();
+    return cleanKnowledgeName.includes(cleanCardName) || cleanCardName.includes(cleanKnowledgeName);
+  });
+  
+  console.log('Card matching attempt:', { cardName, issuer, found: !!match, matchedCard: match?.card_name });
+  
+  return match || null;
 }
 
 // Function to find best card for specific merchant
@@ -723,3 +753,225 @@ export function getMerchantSpecificAdvice(merchant: string): string {
 
   return merchantAdvice[merchant.toLowerCase()] || "";
 }
+
+// Detailed card optimization strategies
+export interface CardOptimizationTips {
+  card_name: string;
+  issuer: string;
+  optimization_strategies: {
+    primary_benefits: string[];
+    payment_methods: {
+      direct_payment: {
+        recommended: boolean;
+        scenarios: string[];
+        reward_rate: string;
+      };
+      wallet_loading: {
+        recommended: boolean;
+        scenarios: string[];
+        reward_rate: string;
+        best_wallets: string[];
+      };
+      app_specific: {
+        recommended_apps: string[];
+        benefits: string[];
+        tips: string[];
+      };
+    };
+    spending_strategies: {
+      category: string;
+      strategy: string;
+      expected_return: string;
+    }[];
+    milestone_optimization: {
+      annual_targets: string[];
+      quarterly_benefits: string[];
+      monthly_tips: string[];
+    };
+    point_redemption: {
+      best_options: string[];
+      transfer_partners: string[];
+      cash_equivalent_value: string;
+    };
+    common_mistakes: string[];
+    pro_tips: string[];
+  };
+}
+
+export const cardOptimizationDatabase: CardOptimizationTips[] = [
+  {
+    card_name: "IDFC FIRST Power+ HP Card",
+    issuer: "IDFC FIRST Bank",
+    optimization_strategies: {
+      primary_benefits: [
+        "10X reward points on HP Pay app transactions",
+        "5X points on fuel at HP petrol pumps",
+        "2X points on all other spends",
+        "Complimentary fuel delivery service"
+      ],
+      payment_methods: {
+        direct_payment: {
+          recommended: false,
+          scenarios: ["Emergency fuel purchases when HP Pay is not working"],
+          reward_rate: "2X points (1% return)"
+        },
+        wallet_loading: {
+          recommended: true,
+          scenarios: ["All HP fuel purchases", "HP Pay app transactions"],
+          reward_rate: "10X points (5% return)",
+          best_wallets: ["HP Pay app wallet", "Direct HP Pay transactions"]
+        },
+        app_specific: {
+          recommended_apps: ["HP Pay app"],
+          benefits: [
+            "10X reward points on all transactions",
+            "Fuel delivery to your location",
+            "Skip queue at petrol pumps",
+            "Digital payment convenience"
+          ],
+          tips: [
+            "Always load money to HP Pay wallet first, then use for fuel",
+            "Use HP Pay for non-fuel purchases at HP outlets for 10X points",
+            "Link your IDFC card as primary payment method in HP Pay",
+            "Check for HP Pay cashback offers before fueling"
+          ]
+        }
+      },
+      spending_strategies: [
+        {
+          category: "Fuel",
+          strategy: "Use HP Pay app exclusively for 10X points. Load wallet monthly based on fuel needs.",
+          expected_return: "5% effective return on fuel spends"
+        },
+        {
+          category: "Groceries at HP outlets",
+          strategy: "Use HP Pay app for grocery purchases at HP outlets for 10X points",
+          expected_return: "5% return on grocery spends"
+        },
+        {
+          category: "Other spends",
+          strategy: "Use for general spends only if no better category card available",
+          expected_return: "1% return on other spends"
+        }
+      ],
+      milestone_optimization: {
+        annual_targets: [
+          "Spend ₹1 lakh annually to waive annual fee",
+          "Focus spending on HP Pay transactions for maximum returns"
+        ],
+        quarterly_benefits: [
+          "Track quarterly fuel spends to optimize HP Pay usage",
+          "Plan major fuel expenses around HP Pay offers"
+        ],
+        monthly_tips: [
+          "Load HP Pay wallet at month start for better tracking",
+          "Use HP fuel delivery service for convenience",
+          "Check HP Pay app for monthly cashback offers"
+        ]
+      },
+      point_redemption: {
+        best_options: [
+          "Redeem against statement balance for 1 point = ₹0.50",
+          "Gift vouchers for better value (check current rates)",
+          "Travel bookings through IDFC portal"
+        ],
+        transfer_partners: ["Limited transfer options - focus on direct redemption"],
+        cash_equivalent_value: "₹0.50 per point for statement credit"
+      },
+      common_mistakes: [
+        "Using card directly at HP pumps instead of HP Pay app",
+        "Not loading HP Pay wallet before transactions",
+        "Using for non-HP fuel purchases where other cards give better returns",
+        "Ignoring annual fee waiver spending requirement"
+      ],
+      pro_tips: [
+        "Set up auto-debit from IDFC card to HP Pay wallet monthly",
+        "Use HP fuel delivery service for convenience and same 10X points",
+        "Combine with other fuel cards for non-HP stations",
+        "Track spending to ensure annual fee waiver eligibility",
+        "Use HP Pay for snacks/beverages at HP outlets for 10X points"
+      ]
+    }
+  },
+  {
+    card_name: "HDFC Infinia",
+    issuer: "HDFC Bank",
+    optimization_strategies: {
+      primary_benefits: [
+        "3.3% return on most spends",
+        "1:1 airline mile transfers",
+        "Premium lounge access",
+        "Comprehensive travel insurance"
+      ],
+      payment_methods: {
+        direct_payment: {
+          recommended: true,
+          scenarios: ["All high-value transactions", "Travel bookings", "Dining"],
+          reward_rate: "3.3% effective return"
+        },
+        wallet_loading: {
+          recommended: false,
+          scenarios: ["Only if wallet offers additional cashback"],
+          reward_rate: "May not earn points on wallet loads",
+          best_wallets: ["Check current HDFC policy on wallet loads"]
+        },
+        app_specific: {
+          recommended_apps: ["HDFC SmartBuy portal", "Airline websites"],
+          benefits: [
+            "5X points on SmartBuy portal",
+            "Direct airline bookings for miles",
+            "Hotel bookings for points"
+          ],
+          tips: [
+            "Always check SmartBuy portal before online purchases",
+            "Book flights directly with airlines for miles + points",
+            "Use for high-value purchases to maximize 3.3% return"
+          ]
+        }
+      },
+      spending_strategies: [
+        {
+          category: "Travel",
+          strategy: "Book flights directly with airlines, hotels through SmartBuy for 5X points",
+          expected_return: "5-10% effective return with mile transfers"
+        },
+        {
+          category: "Dining",
+          strategy: "Use for all restaurant spends for 3.3% return + dining benefits",
+          expected_return: "3.3% + additional dining perks"
+        },
+        {
+          category: "Online Shopping",
+          strategy: "Use SmartBuy portal for 5X points on major retailers",
+          expected_return: "5% effective return"
+        }
+      ],
+      milestone_optimization: {
+        annual_targets: [
+          "Spend ₹10 lakhs for fee waiver"
+        ],
+        quarterly_benefits: [
+          "Track quarterly spending for bonus rewards"
+        ],
+        monthly_tips: [
+          "Use SmartBuy portal for maximum points"
+        ]
+      },
+      point_redemption: {
+        best_options: [
+          "Transfer to airline partners for maximum value"
+        ],
+        transfer_partners: [
+          "Singapore Airlines", "Vistara"
+        ],
+        cash_equivalent_value: "1 point = ₹0.30-1.00 depending on redemption"
+      },
+      common_mistakes: [
+        "Not using SmartBuy portal for online purchases"
+      ],
+      pro_tips: [
+        "Always check SmartBuy before making online purchases"
+      ]
+    }
+  }
+];

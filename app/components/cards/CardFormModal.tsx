@@ -91,7 +91,11 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       let networkString = '';
       if (detailedInfo?.network) {
         networkString = detailedInfo.network;
+      } else if (template.network) {
+        // Use the network field from the database schema
+        networkString = template.network;
       } else if (template.benefits && typeof template.benefits === 'object') {
+        // Legacy fallback for old data structure
         const benefitsObj = template.benefits as Record<string, unknown>;
         networkString = String(benefitsObj.network || '');
       }
@@ -134,14 +138,14 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       }
 
       // Fallback to template benefits if knowledge base doesn't have info
-      if (newBenefits.length === 0 && template.benefits && typeof template.benefits === 'object') {
-        console.log('Using template benefits for:', template.card_name);
-        const benefitsObj = template.benefits as Record<string, unknown>;
+      if (newBenefits.length === 0) {
+        console.log('Using template data for:', template.card_name);
         
-        // Extract reward rates if they exist
-        if (benefitsObj.reward_rates && typeof benefitsObj.reward_rates === 'object') {
-          console.log('Found reward_rates in template:', benefitsObj.reward_rates);
-          for (const [key, value] of Object.entries(benefitsObj.reward_rates)) {
+        // Extract reward rates from template.reward_rates (jsonb field)
+        if (template.reward_rates && typeof template.reward_rates === 'object') {
+          console.log('Found reward_rates in template:', template.reward_rates);
+          const rewardRates = template.reward_rates as Record<string, unknown>;
+          for (const [key, value] of Object.entries(rewardRates)) {
             const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             const valueObj = value as Record<string, unknown>;
             const rate = valueObj?.rate ?? 'N/A';
@@ -150,9 +154,74 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             const notes = valueObj?.notes ? ` (${valueObj.notes})` : '';
             newBenefits.push({ key: formattedKey, value: String(`${rateDisplay}${notes}`) });
           }
-        } else {
-          console.log('No reward_rates found in template benefits');
         }
+
+        // Add welcome benefits if they exist
+        if (template.welcome_benefits && template.welcome_benefits !== "None.") {
+          newBenefits.push({ key: 'Welcome Benefit', value: String(template.welcome_benefits) });
+        }
+
+        // Add milestone benefits if they exist
+        if (template.milestone_benefits && typeof template.milestone_benefits === 'object') {
+          const milestones = template.milestone_benefits as Record<string, unknown>[];
+          if (Array.isArray(milestones)) {
+            milestones.forEach((milestone, index) => {
+              if (milestone.condition && milestone.reward) {
+                newBenefits.push({ 
+                  key: `Milestone ${index + 1}`, 
+                  value: `${milestone.condition} - ${milestone.reward}` 
+                });
+              }
+            });
+          }
+        }
+
+        // Add lounge access if it exists
+        if (template.lounge_access && typeof template.lounge_access === 'object') {
+          const loungeAccess = template.lounge_access as Record<string, unknown>;
+          if (loungeAccess.domestic && loungeAccess.domestic !== "None.") {
+            newBenefits.push({ key: 'Domestic Lounge Access', value: String(loungeAccess.domestic) });
+          }
+          if (loungeAccess.international && loungeAccess.international !== "None.") {
+            newBenefits.push({ key: 'International Lounge Access', value: String(loungeAccess.international) });
+          }
+        }
+
+        // Add other benefits if they exist
+        if (template.other_benefits && Array.isArray(template.other_benefits)) {
+          template.other_benefits.forEach((benefit, index) => {
+            newBenefits.push({ key: `Other Benefit ${index + 1}`, value: String(benefit) });
+          });
+        }
+
+        // Add suitability as a benefit
+        if (template.suitability) {
+          newBenefits.push({ key: 'Best For', value: String(template.suitability) });
+        }
+
+        // Add general benefits text if it exists and is not empty
+        if (template.benefits && typeof template.benefits === 'string' && template.benefits.trim().length > 0) {
+          newBenefits.push({ key: 'Additional Benefits', value: String(template.benefits) });
+        }
+
+        // Legacy support: Check if template.benefits is actually JSON (from old data)
+        if (template.benefits && typeof template.benefits === 'object') {
+          console.log('Found legacy JSON benefits structure');
+          const benefitsObj = template.benefits as Record<string, unknown>;
+          
+          // Extract reward rates if they exist in legacy format
+          if (benefitsObj.reward_rates && typeof benefitsObj.reward_rates === 'object') {
+            const rewardRates = benefitsObj.reward_rates as Record<string, unknown>;
+            for (const [key, value] of Object.entries(rewardRates)) {
+              const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              const valueObj = value as Record<string, unknown>;
+              const rate = valueObj?.rate ?? 'N/A';
+              const type = valueObj?.type ?? '';
+              const rateDisplay = `${rate}${typeof type === 'string' && type.includes('%') ? '%' : 'x'}`;
+              const notes = valueObj?.notes ? ` (${valueObj.notes})` : '';
+              newBenefits.push({ key: formattedKey, value: String(`${rateDisplay}${notes}`) });
+            }
+          }
 
         // Extract welcome benefits if they exist
         if (benefitsObj.welcome_benefits && benefitsObj.welcome_benefits !== "None.") {
@@ -191,6 +260,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
         // Extract suitability as a benefit
         if (benefitsObj.suitability) {
           newBenefits.push({ key: 'Best For', value: String(benefitsObj.suitability) });
+        }
         }
       }
 
@@ -234,32 +304,16 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
           newFees.push({ key: 'Fee Waiver', value: detailedInfo.fee_waiver });
         }
       }
-      // Fallback to template fees (now inside benefits object)
-      else if (template.benefits && typeof template.benefits === 'object') {
-        const benefitsObj = template.benefits as Record<string, unknown>;
-        
-        if (benefitsObj.joining_fee !== undefined) {
-          newFees.push({ key: 'Joining Fee', value: `₹${String(benefitsObj.joining_fee)}` });
+      // Fallback to template database fields
+      else {
+        if (template.joining_fee !== undefined) {
+          newFees.push({ key: 'Joining Fee', value: `₹${String(template.joining_fee)}` });
         }
-        if (benefitsObj.annual_fee !== undefined) {
-          newFees.push({ key: 'Annual Fee', value: `₹${String(benefitsObj.annual_fee)}` });
+        if (template.annual_fee !== undefined) {
+          newFees.push({ key: 'Annual Fee', value: `₹${String(template.annual_fee)}` });
         }
-        if (benefitsObj.fee_waiver && benefitsObj.fee_waiver !== "None.") {
-          newFees.push({ key: 'Fee Waiver', value: String(benefitsObj.fee_waiver) });
-        }
-      }
-      // Legacy support for old template structure
-      else if (template.fees && typeof template.fees === 'object') {
-        const feesObj = template.fees as Record<string, unknown>;
-        
-        if (feesObj.joining_fee) {
-          newFees.push({ key: 'Joining Fee', value: `₹${String(feesObj.joining_fee)}` });
-        }
-        if (feesObj.annual_fee) {
-          newFees.push({ key: 'Annual Fee', value: `₹${String(feesObj.annual_fee)}` });
-        }
-        if (feesObj.fee_waiver && feesObj.fee_waiver !== "None.") {
-          newFees.push({ key: 'Fee Waiver', value: String(feesObj.fee_waiver) });
+        if (template.fee_waiver && template.fee_waiver !== "None.") {
+          newFees.push({ key: 'Fee Waiver', value: String(template.fee_waiver) });
         }
       }
 
