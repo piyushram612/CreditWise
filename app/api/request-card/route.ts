@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Card name is required.' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('card_requests')
       .insert({ card_name: cardName, user_id: user.id });
 

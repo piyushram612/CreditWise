@@ -13,10 +13,6 @@ interface ChatMessage {
   text: string;
 }
 
-interface ChatRequestBody {
-  messages: ChatMessage[];
-}
-
 // Defines the expected structure of the response from the Gemini API
 interface GeminiResponse {
   candidates: {
@@ -92,8 +88,8 @@ export async function POST(request: Request) {
   console.log('Chat API called');
 
   try {
-    const { messages }: ChatRequestBody = await request.json();
-    console.log('Chat request body:', { messageCount: messages?.length });
+    const { messages, cards }: { messages: ChatMessage[]; cards?: UserOwnedCard[] } = await request.json();
+    console.log('Chat request body:', { messageCount: messages?.length, hasBodyCards: !!cards });
 
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: 'No messages provided.' }, { status: 400 });
@@ -102,30 +98,36 @@ export async function POST(request: Request) {
     let userCards: UserOwnedCard[] = [];
     let cardsInfo = "The user has not added any cards to their wallet yet.";
 
-    // Try to fetch user cards (skip auth errors for native app compatibility)
-    try {
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+    if (cards && cards.length > 0) {
+      userCards = cards;
+      cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
+      console.log(`Using ${userCards.length} cards passed from the request body (demo/direct mode)`);
+    } else {
+      // Try to fetch user cards (skip auth errors for native app compatibility)
+      try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-      if (user) {
-        console.log('User authenticated, fetching cards');
-        const { data: fetchedCards, error: dbError } = await supabase
-          .from('user_owned_cards')
-          .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
-          .eq('user_id', user.id);
+        if (user) {
+          console.log('User authenticated, fetching cards');
+          const { data: fetchedCards, error: dbError } = await supabase
+            .from('user_owned_cards')
+            .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
+            .eq('user_id', user.id);
 
-        if (dbError) {
-          console.error('Supabase DB Error:', dbError);
-        } else if (fetchedCards && fetchedCards.length > 0) {
-          userCards = fetchedCards;
-          cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
-          console.log(`Found ${userCards.length} cards for user`);
+          if (dbError) {
+            console.error('Supabase DB Error:', dbError);
+          } else if (fetchedCards && fetchedCards.length > 0) {
+            userCards = fetchedCards;
+            cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
+            console.log(`Found ${userCards.length} cards for user`);
+          }
+        } else {
+          console.log('No user session found, continuing with general advice');
         }
-      } else {
-        console.log('No user session found, continuing with general advice');
+      } catch (authError) {
+        console.warn('Auth/DB error, continuing with general advice:', authError);
       }
-    } catch (authError) {
-      console.warn('Auth/DB error, continuing with general advice:', authError);
     }
 
     // Format conversation history

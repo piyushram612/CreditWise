@@ -23,6 +23,9 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const [cards, setCards] = useState(initialUserCards);
   const [activeView, setActiveView] = useState('optimizer');
   
+  const isDemo = user.id === 'demo-guest-user-id';
+  const [showDemoBanner, setShowDemoBanner] = useState(isDemo);
+
   const supabase = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -30,44 +33,49 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const router = useRouter();
 
   const handleCardUpdate = useCallback(async () => {
+    if (isDemo) return;
+
     const { data, error } = await supabase
-      .from('user_cards')
-      .select(`
-        *,
-        card_details (*)
-      `)
+      .from('user_owned_cards')
+      .select(`*, cards(*)`)
       .eq('user_id', user.id);
 
     if (error) {
       console.error('Error fetching user cards:', error);
     } else if (data) {
-      const mappedData = data.map((item): Card | null => {
-        const cardDetails = item.card_details;
-
-        if (!cardDetails) {
-          return null;
-        }
-
-        return {
-          id: item.id.toString(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const formattedCards: Card[] = (data as any[]).map((item) => ({
+          id: item.id,
           user_id: item.user_id,
-          card_id: item.card_details_id.toString(),
+          card_id: item.card_id,
           credit_limit: item.credit_limit,
-          used_amount: item.amount_used,
-          card_name: cardDetails.card_name,
-          issuer: cardDetails.issuer,
-          benefits: cardDetails.benefits ?? null,
-          fees: cardDetails.fees ?? null,
-        };
-      });
-
-      const formattedCards: Card[] = mappedData.filter((c): c is Card => c !== null);
+          used_amount: item.used_amount,
+          card_name: item.card_name || item.cards?.card_name || null,
+          issuer: item.issuer || item.cards?.issuer || null,
+          benefits: item.benefits || null,
+          fees: item.fees || null,
+          network: item.cards?.network || null,
+          annual_fee: item.cards?.annual_fee || null,
+          reward_rates: item.cards?.reward_rates || null,
+          card_type: item.cards?.card_type || null,
+          joining_fee: item.cards?.joining_fee || null,
+          fee_waiver: item.cards?.fee_waiver || null,
+          welcome_benefits: item.cards?.welcome_benefits || null,
+          milestone_benefits: item.cards?.milestone_benefits || null,
+          lounge_access: item.cards?.lounge_access || null,
+          other_benefits: item.cards?.other_benefits || null,
+          suitability: item.cards?.suitability || null,
+      }));
 
       setCards(formattedCards);
     }
-  }, [supabase, user.id]);
+  }, [supabase, user.id, isDemo]);
 
   const handleLogout = async () => {
+    if (isDemo) {
+      router.push('/');
+      return;
+    }
     await supabase.auth.signOut();
     router.push('/');
   };
@@ -94,6 +102,22 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
         setActiveView={setActiveView}
       />
       <main className="flex-1 p-6 overflow-y-auto">
+        {showDemoBanner && (
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg shadow-md mb-6 flex justify-between items-center transition-all duration-200">
+            <div className="flex items-center gap-2">
+              <span className="bg-white/20 text-white text-xs font-semibold px-2 py-0.5 rounded uppercase">Demo Mode</span>
+              <p className="text-sm font-medium">You&apos;re in demo mode — sign up to save your cards.</p>
+            </div>
+            <button 
+              onClick={() => setShowDemoBanner(false)}
+              className="text-white/80 hover:text-white hover:bg-white/10 rounded p-1 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {renderActiveView()}
@@ -103,6 +127,8 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
               cards={cards}
               allCards={allMasterCards}
               onCardUpdate={handleCardUpdate}
+              isDemo={isDemo}
+              setCards={setCards}
             />
             <Settings />
           </div>

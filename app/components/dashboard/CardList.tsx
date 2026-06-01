@@ -53,9 +53,11 @@ interface AddCardModalProps {
     allCards: Card[];
     onCardAdded: () => void;
     onClose: () => void;
+    isDemo?: boolean;
+    setCards?: React.Dispatch<React.SetStateAction<Card[]>>;
 }
 
-const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => {
+const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards }: AddCardModalProps) => {
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
@@ -66,12 +68,47 @@ const AddCardModal = ({ allCards, onCardAdded, onClose }: AddCardModalProps) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !selectedCardId || !creditLimit) return;
+        if (!selectedCardId || !creditLimit) return;
         
         const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
 
-        const { error } = await supabase.from('user_owned_cards').insert({
+        if (isDemo) {
+            const newCard: Card = {
+                id: `demo-card-${Date.now()}`,
+                user_id: 'demo-guest-user-id',
+                card_id: selectedCardId,
+                credit_limit: parseFloat(creditLimit),
+                used_amount: parseFloat(amountUsed) || 0,
+                card_name: selectedMasterCard?.card_name || 'Demo Card',
+                issuer: selectedMasterCard?.issuer || 'Unknown',
+                benefits: selectedMasterCard?.benefits || null,
+                fees: selectedMasterCard?.fees || null,
+                network: selectedMasterCard?.network || null,
+                annual_fee: selectedMasterCard?.annual_fee || null,
+                reward_rates: selectedMasterCard?.reward_rates || null,
+                card_type: selectedMasterCard?.card_type || null,
+                joining_fee: selectedMasterCard?.joining_fee || null,
+                fee_waiver: selectedMasterCard?.fee_waiver || null,
+                welcome_benefits: selectedMasterCard?.welcome_benefits || null,
+                milestone_benefits: selectedMasterCard?.milestone_benefits || null,
+                lounge_access: selectedMasterCard?.lounge_access || null,
+                other_benefits: selectedMasterCard?.other_benefits || null,
+                suitability: selectedMasterCard?.suitability || null,
+            };
+
+            if (setCards) {
+                setCards(prev => [...prev, newCard]);
+            }
+            alert('Card added successfully (demo mode)!');
+            onClose();
+            return;
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('user_owned_cards').insert({
             user_id: user.id,
             card_id: selectedCardId,
             credit_limit: parseFloat(creditLimit),
@@ -127,9 +164,11 @@ interface EditCardModalProps {
     card: Card;
     onCardUpdated: () => void;
     onClose: () => void;
+    isDemo?: boolean;
+    setCards?: React.Dispatch<React.SetStateAction<Card[]>>;
 }
 
-const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => {
+const EditCardModal = ({ card, onCardUpdated, onClose, isDemo = false, setCards }: EditCardModalProps) => {
     const [creditLimit, setCreditLimit] = useState(card.credit_limit?.toString() ?? '');
     const [amountUsed, setAmountUsed] = useState(card.used_amount?.toString() ?? '');
     const supabase = createBrowserClient<Database>(
@@ -139,7 +178,22 @@ const EditCardModal = ({ card, onCardUpdated, onClose }: EditCardModalProps) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const { error } = await supabase.from('user_owned_cards').update({
+        
+        if (isDemo) {
+            if (setCards) {
+                setCards(prev => prev.map(c => c.id === card.id ? {
+                    ...c,
+                    credit_limit: parseFloat(creditLimit) || 0,
+                    used_amount: parseFloat(amountUsed) || 0,
+                } : c));
+            }
+            alert('Card updated (demo mode)!');
+            onClose();
+            return;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('user_owned_cards').update({
             credit_limit: parseFloat(creditLimit),
             used_amount: parseFloat(amountUsed),
         }).eq('id', card.id);
@@ -180,9 +234,11 @@ interface CardListProps {
     cards: Card[];
     onCardUpdate: () => void;
     allCards: Card[];
+    isDemo?: boolean;
+    setCards?: React.Dispatch<React.SetStateAction<Card[]>>;
 }
 
-export default function CardList({ cards, onCardUpdate, allCards }: CardListProps) {
+export default function CardList({ cards, onCardUpdate, allCards, isDemo = false, setCards }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
@@ -194,7 +250,16 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
     const handleDelete = async (cardId: string) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         
-        const { error } = await supabase.from('user_owned_cards').delete().eq('id', cardId);
+        if (isDemo) {
+            if (setCards) {
+                setCards(prev => prev.filter(c => c.id !== cardId));
+            }
+            alert('Card deleted (demo mode).');
+            return;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('user_owned_cards').delete().eq('id', cardId);
         if (error) {
             alert('Error deleting card: ' + error.message);
         } else {
@@ -205,8 +270,8 @@ export default function CardList({ cards, onCardUpdate, allCards }: CardListProp
 
     return (
         <div className="bg-gray-800/50 rounded-xl p-6 h-full">
-            {showAddCardModal && <AddCardModal allCards={allCards} onCardAdded={onCardUpdate} onClose={() => setShowAddCardModal(false)} />}
-            {editingCard && <EditCardModal card={editingCard} onCardUpdated={onCardUpdate} onClose={() => setEditingCard(null)} />}
+            {showAddCardModal && <AddCardModal allCards={allCards} onCardAdded={onCardUpdate} onClose={() => setShowAddCardModal(false)} isDemo={isDemo} setCards={setCards} />}
+            {editingCard && <EditCardModal card={editingCard} onCardUpdated={onCardUpdate} onClose={() => setEditingCard(null)} isDemo={isDemo} setCards={setCards} />}
             {viewingCard && <CardDetailsModal card={viewingCard} onClose={() => setViewingCard(null)} />}
 
             <div className="flex justify-between items-center mb-6">

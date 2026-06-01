@@ -1,5 +1,3 @@
-import type { Database } from './database.types';
-
 // Re-export the Json type from database.types
 export type Json =
   | string

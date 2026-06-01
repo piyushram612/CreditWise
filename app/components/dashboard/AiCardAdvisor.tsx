@@ -32,7 +32,7 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
             });
             const data = await response.json();
             if (response.ok) {
-                setMessages([...newMessages, { role: 'assistant', content: data.response }]);
+                setMessages([...newMessages, { role: 'assistant', content: data.reply || data.response }]);
             } else {
                 throw new Error(data.error || 'Failed to get response.');
             }

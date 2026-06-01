@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Feedback text is required.' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('feedback')
       .insert({ feedback_text: feedbackText, user_id: user.id });
 
