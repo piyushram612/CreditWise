@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import type { Card, Message } from '../../../lib/types';
 import { BotIcon, UserIcon } from '../icons';
 
@@ -152,8 +153,6 @@ export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[];
     };
 
     const getCalculatedOutcome = (text: string) => {
-        const lower = text.toLowerCase();
-        
         const pointsRegex = /\b([0-9,]+)\s*(?:points|reward points|miles|NeuCoins|coins)\b/i;
         const percentRegex = /\b([0-9.]+)\b%\s*(?:cashback|rewards|return)/i;
         const rupeeRegex = /₹\s*([0-9,]+)\s*(?:cashback|savings|benefit|off|back|return|credited)?\b/i;
@@ -408,7 +407,7 @@ export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[];
             {trialsLeft !== null && (
                 <div className="text-[11px] text-center text-[#82889A] mt-1.5 select-none font-semibold">
                     ⚡ Demo Mode: <span className="text-blue-400">{trialsLeft}</span> of 3 trials remaining. 
-                    <a href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</a> for full features.
+                    <Link href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</Link> for full features.
                 </div>
             )}
         </div>

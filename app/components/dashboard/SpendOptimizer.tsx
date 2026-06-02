@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import type { Card } from '../../../lib/types';
 import { SparklesIcon, CreditCardIcon } from '../icons';
 import { createClient } from '@/lib/supabase/client';
@@ -247,7 +248,7 @@ export default function SpendOptimizer({ cards, onTrialAction }: { cards: Card[]
                     {trialsLeft !== null && (
                         <div className="text-[11px] text-center text-[#82889A] mt-3 select-none font-semibold">
                             ⚡ Demo Mode: <span className="text-blue-400">{trialsLeft}</span> of 3 trials remaining. 
-                            <a href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</a> for full features.
+                            <Link href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</Link> for full features.
                         </div>
                     )}
                 </form>
