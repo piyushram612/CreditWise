@@ -7,6 +7,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { useTheme } from "@/app/hooks/useTheme";
 import { getSupabaseClient } from "@/app/utils/supabase";
 import { AuthModal } from "@/app/components/layout/AuthModal";
+import { CreditWiseIcon } from "@/app/components/shared/Icons";
 
 const features = [
   {
@@ -97,12 +98,8 @@ export default function LandingPage() {
 
       {/* ── Nav ── */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-5 max-w-6xl mx-auto">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-            </svg>
-          </div>
+        <div className="flex items-center gap-2">
+          <CreditWiseIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           <span className="font-semibold text-[15px] tracking-tight">CreditWise</span>
         </div>
 

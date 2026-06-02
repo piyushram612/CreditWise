@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { User } from '@supabase/supabase-js';
-import { LogoIcon, BotIcon, SettingsIcon, SlidersHorizontalIcon, LogOutIcon } from '../icons';
+import { LogoIcon, BotIcon, SettingsIcon, SlidersHorizontalIcon, LogOutIcon, StarIcon } from '../icons';
 
 interface NavItemProps {
     icon: React.ReactNode;
@@ -33,6 +33,7 @@ export default function Sidebar({ user, onLogout, activeView, setActiveView }: S
             </div>
             <nav className="flex-1 space-y-2">
                 <NavItem icon={<SlidersHorizontalIcon className="h-5 w-5" />} label="Spend Optimizer" isActive={activeView === 'optimizer'} onClick={() => setActiveView('optimizer')} />
+                <NavItem icon={<StarIcon className="h-5 w-5" />} label="Smart Tips" isActive={activeView === 'tips'} onClick={() => setActiveView('tips')} />
                 <NavItem icon={<BotIcon className="h-5 w-5" />} label="AI Card Advisor" isActive={activeView === 'chat'} onClick={() => setActiveView('chat')} />
                 <NavItem icon={<SettingsIcon className="h-5 w-5" />} label="Settings" isActive={activeView === 'settings'} onClick={() => setActiveView('settings')} />
             </nav>

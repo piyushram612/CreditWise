@@ -40,7 +40,70 @@ export const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
 );
 export const LogoIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Z"/><path d="M12 6v12"/><path d="M17.5 17.5 9 9"/></svg>
+  <svg 
+    viewBox="0 0 200 200" 
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    {/* Credit Card */}
+    <rect 
+      x="30" 
+      y="60" 
+      width="120" 
+      height="75" 
+      rx="8" 
+      ry="8" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="4"
+    />
+    {/* Card stripe */}
+    <rect 
+      x="30" 
+      y="75" 
+      width="120" 
+      height="8" 
+      fill="currentColor"
+    />
+    {/* Card chip */}
+    <rect 
+      x="45" 
+      y="95" 
+      width="20" 
+      height="15" 
+      rx="2" 
+      ry="2" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2"
+    />
+    {/* Card numbers representation */}
+    <rect x="45" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="57" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="69" y="115" width="8" height="3" fill="currentColor" />
+    <rect x="81" y="115" width="8" height="3" fill="currentColor" />
+    
+    {/* Checkmark circle */}
+    <circle 
+      cx="140" 
+      cy="140" 
+      r="25" 
+      fill="currentColor"
+    />
+    {/* Checkmark */}
+    <path 
+      d="M130 140 L137 147 L150 130" 
+      fill="none" 
+      stroke="white" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
 );
 export const SettingsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
@@ -53,4 +116,7 @@ export const LogOutIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 export const SparklesIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9z"/></svg>
+);
+export const StarIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
 );

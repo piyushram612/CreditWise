@@ -10,6 +10,7 @@ import CardList from './CardList';
 import SpendOptimizer from './SpendOptimizer';
 import AiCardAdvisor from './AiCardAdvisor';
 import Settings from './Settings';
+import { SmartTipsView } from '@/app/components/insights/SmartTipsView';
 import type { Card } from '@/lib/types';
 import type { Database } from '@/lib/database.types';
 
@@ -84,6 +85,8 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     switch (activeView) {
       case 'optimizer':
         return <SpendOptimizer cards={cards} />;
+      case 'tips':
+        return <SmartTipsView user={user} />;
       case 'chat':
         return <AiCardAdvisor cards={cards} />;
       case 'settings':
@@ -94,16 +97,16 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
       <Sidebar 
         user={user} 
         onLogout={handleLogout}
         activeView={activeView}
         setActiveView={setActiveView}
       />
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-6 flex flex-col h-full overflow-hidden">
         {showDemoBanner && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg shadow-md mb-6 flex justify-between items-center transition-all duration-200">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg shadow-md mb-6 flex justify-between items-center transition-all duration-200 shrink-0">
             <div className="flex items-center gap-2">
               <span className="bg-white/20 text-white text-xs font-semibold px-2 py-0.5 rounded uppercase">Demo Mode</span>
               <p className="text-sm font-medium">You&apos;re in demo mode — sign up to save your cards.</p>
@@ -118,11 +121,11 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
             </button>
           </div>
         )}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 h-full overflow-y-auto pr-1">
             {renderActiveView()}
           </div>
-          <div className="space-y-6">
+          <div className="h-full overflow-y-auto pr-1">
             <CardList 
               cards={cards}
               allCards={allMasterCards}
@@ -130,7 +133,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
               isDemo={isDemo}
               setCards={setCards}
             />
-            <Settings />
           </div>
         </div>
       </main>
