@@ -20,7 +20,7 @@ export const initializeApp = async () => {
     await StatusBar.setBackgroundColor({ color: '#000000' });
 
     // Handle app state changes
-    App.addListener('appStateChange', ({ isActive }) => {
+    App.addListener('appStateChange', () => {
       // App state changed
     });
 
@@ -33,7 +33,7 @@ export const initializeApp = async () => {
       }
     });
 
-  } catch (error) {
+  } catch {
     // Error initializing native app
   }
 };
@@ -43,7 +43,7 @@ export const hapticFeedback = async (style: ImpactStyle = ImpactStyle.Medium) =>
   if (isNativeApp()) {
     try {
       await Haptics.impact({ style });
-    } catch (error) {
+    } catch {
       // Haptic feedback error
     }
   }
