@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -68,7 +69,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
         full_name: editingName
       }
     };
-    setCurrentUser(updatedUser as any);
+    setCurrentUser(updatedUser as User);
 
     if (isDemo) {
       alert("Profile updated successfully (demo mode)!");
