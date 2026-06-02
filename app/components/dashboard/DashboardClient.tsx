@@ -23,6 +23,7 @@ interface DashboardClientProps {
 export default function DashboardClient({ user, initialUserCards, allMasterCards }: DashboardClientProps) {
   const [cards, setCards] = useState(initialUserCards);
   const [activeView, setActiveView] = useState('optimizer');
+  const [isWalletCollapsed, setIsWalletCollapsed] = useState(false);
   
   const isDemo = user.id === 'demo-guest-user-id';
   const [showDemoBanner, setShowDemoBanner] = useState(isDemo);
@@ -143,20 +144,36 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
             </button>
           </div>
         )}
-        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-full overflow-y-auto pr-1">
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
+          <div className={`${isWalletCollapsed ? 'lg:col-span-3' : 'lg:col-span-2'} h-full overflow-y-auto pr-1 transition-all duration-300`}>
             {renderActiveView()}
           </div>
-          <div className="h-full overflow-y-auto pr-1">
-            <CardList 
-              cards={cards}
-              allCards={allMasterCards}
-              onCardUpdate={handleCardUpdate}
-              isDemo={isDemo}
-              setCards={setCards}
-            />
-          </div>
+          {!isWalletCollapsed && (
+            <div className="h-full overflow-y-auto pr-1 transition-all duration-300">
+              <CardList 
+                cards={cards}
+                allCards={allMasterCards}
+                onCardUpdate={handleCardUpdate}
+                isDemo={isDemo}
+                setCards={setCards}
+                onCollapseToggle={() => setIsWalletCollapsed(true)}
+              />
+            </div>
+          )}
         </div>
+
+        {/* Floating Expand Wallet Button */}
+        {isWalletCollapsed && (
+          <button 
+            onClick={() => setIsWalletCollapsed(false)}
+            className="fixed right-0 top-1/2 -translate-y-1/2 bg-[#131622] border-l border-t border-b border-[#1E2538] hover:border-gray-600/40 text-blue-400 p-2.5 rounded-l-xl shadow-lg transition-all z-40 select-none hover:text-white cursor-pointer"
+            title="Expand Wallet"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+        )}
       </main>
     </div>
   );

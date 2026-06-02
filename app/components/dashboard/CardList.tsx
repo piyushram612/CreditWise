@@ -20,10 +20,10 @@ const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; 
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-2xl">
-                <div className="flex justify-between items-center mb-4">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-md shadow-2xl text-white">
+                <div className="flex justify-between items-center mb-4 select-none">
                     <h2 className="text-xl font-bold text-white">{card.card_name} Details</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
                 </div>
                 <div className="space-y-4 text-gray-300 max-h-96 overflow-y-auto pr-2">
                     <div>
@@ -42,7 +42,7 @@ const CardDetailsModal = ({ card, onClose }: { card: Card; onClose: () => void; 
                     )}
                 </div>
                 <div className="mt-6 text-right">
-                    <button onClick={onClose} className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Close</button>
+                    <button onClick={onClose} className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer">Close</button>
                 </div>
             </div>
         </div>
@@ -128,31 +128,106 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
         }
     };
 
+    const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
+    const cardNamePreview = selectedMasterCard?.card_name || 'Select Bank & Card';
+    const cardIssuerPreview = selectedMasterCard?.issuer || 'BANK';
+
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-2xl">
-                <h2 className="text-xl font-bold mb-4 text-white">Add a New Card</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-md shadow-2xl relative text-white">
+                <div className="flex justify-between items-center mb-6 select-none">
+                    <h2 className="text-lg font-bold text-white tracking-wide">Add Card</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white text-xl p-1 leading-none transition-colors">&times;</button>
+                </div>
+                
+                {/* Visual Card Preview matching mockup */}
+                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-5 h-44 flex flex-col justify-between shadow-inner relative overflow-hidden mb-6 select-none">
+                    <div className="flex justify-between items-start z-10">
+                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded tracking-wider bg-white/10 text-white border border-white/10 uppercase">
+                            PREVIEW
+                        </span>
+                        {/* Wireless symbol */}
+                        <svg className="w-5 h-5 text-gray-400 rotate-90" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 00-6-6M12 22.5c-5.799 0-10.5-4.701-10.5-10.5S6.201 1.5 12 1.5M12 15a2.25 2.25 0 00-2.25-2.25" />
+                        </svg>
+                    </div>
+                    
+                    {/* Metallic Chip illustration */}
+                    <div className="w-9 h-7 rounded bg-amber-500/10 border border-amber-500/25 flex items-center justify-center z-10 shrink-0">
+                        <div className="grid grid-cols-3 gap-0.5 w-6 h-4 opacity-50">
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-end mt-2 z-10">
+                        <div className="space-y-1">
+                            <p className="text-white font-extrabold text-sm leading-none tracking-wide truncate max-w-[200px]">{cardNamePreview}</p>
+                            <p className="font-mono text-[10px] text-[#82889A] tracking-widest leading-none">•••• •••• •••• ••••</p>
+                        </div>
+                        <span className="text-xs font-black italic text-[#82889A] tracking-wider leading-none">
+                            {cardIssuerPreview.slice(0, 8).toUpperCase()}
+                        </span>
+                    </div>
+                    {/* Background glow overlay */}
+                    <div className="absolute -right-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Card</label>
-                        <select value={selectedCardId} onChange={(e) => setSelectedCardId(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-indigo-500 focus:border-indigo-500">
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Select Bank & Card</label>
+                        <select 
+                            value={selectedCardId} 
+                            onChange={(e) => setSelectedCardId(e.target.value)} 
+                            className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200 cursor-pointer"
+                        >
                             <option value="">Select a card from the database</option>
                             {allCards.map((card) => (
                                 <option key={card.id} value={card.id}>{card.card_name}</option>
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Credit Limit</label>
-                        <input type="number" value={creditLimit} onChange={(e) => setCreditLimit(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 100000" />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
+                            <input 
+                                type="number" 
+                                value={creditLimit} 
+                                onChange={(e) => setCreditLimit(e.target.value)} 
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                                placeholder="₹ 0.00" 
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount</label>
+                            <input 
+                                type="number" 
+                                value={amountUsed} 
+                                onChange={(e) => setAmountUsed(e.target.value)} 
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                                placeholder="₹ 0.00"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Amount Used (Optional)</label>
-                        <input type="number" value={amountUsed} onChange={(e) => setAmountUsed(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 25000"/>
-                    </div>
-                    <div className="flex justify-end space-x-4 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded text-gray-300 hover:bg-gray-700">Cancel</button>
-                        <button type="submit" className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Add Card</button>
+                    
+                    <div className="flex justify-end space-x-3 pt-3 border-t border-[#1E2538] select-none">
+                        <button 
+                            type="button" 
+                            onClick={onClose} 
+                            className="px-5 py-2.5 rounded-xl border border-[#1E2538] hover:bg-gray-800/40 text-gray-400 hover:text-white text-sm font-semibold transition-all cursor-pointer"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                        >
+                            Add Card
+                        </button>
                     </div>
                 </form>
             </div>
@@ -207,22 +282,90 @@ const EditCardModal = ({ card, onCardUpdated, onClose, isDemo = false, setCards 
         }
     };
 
+    const cardNamePreview = card.card_name || 'Credit Card';
+    const cardIssuerPreview = card.issuer || 'BANK';
+
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg w-full max-w-md shadow-2xl">
-                <h2 className="text-xl font-bold mb-4 text-white">Edit {card.card_name}</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Credit Limit</label>
-                        <input type="number" value={creditLimit} onChange={(e) => setCreditLimit(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" />
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-md shadow-2xl relative text-white">
+                <div className="flex justify-between items-center mb-6 select-none">
+                    <h2 className="text-lg font-bold text-white tracking-wide">Edit {cardNamePreview}</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white text-xl p-1 leading-none transition-colors">&times;</button>
+                </div>
+                
+                {/* Visual Card Preview matching mockup */}
+                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-5 h-44 flex flex-col justify-between shadow-inner relative overflow-hidden mb-6 select-none">
+                    <div className="flex justify-between items-start z-10">
+                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded tracking-wider bg-white/10 text-white border border-white/10 uppercase">
+                            PREVIEW
+                        </span>
+                        {/* Wireless symbol */}
+                        <svg className="w-5 h-5 text-gray-400 rotate-90" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 00-6-6M12 22.5c-5.799 0-10.5-4.701-10.5-10.5S6.201 1.5 12 1.5M12 15a2.25 2.25 0 00-2.25-2.25" />
+                        </svg>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Amount Used</label>
-                        <input type="number" value={amountUsed} onChange={(e) => setAmountUsed(e.target.value)} className="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" />
+                    
+                    {/* Metallic Chip illustration */}
+                    <div className="w-9 h-7 rounded bg-amber-500/10 border border-amber-500/25 flex items-center justify-center z-10 shrink-0">
+                        <div className="grid grid-cols-3 gap-0.5 w-6 h-4 opacity-50">
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                            <div className="border border-amber-500/40 rounded-sm"></div>
+                        </div>
                     </div>
-                    <div className="flex justify-end space-x-4 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded text-gray-300 hover:bg-gray-700">Cancel</button>
-                        <button type="submit" className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Update Card</button>
+
+                    <div className="flex justify-between items-end mt-2 z-10">
+                        <div className="space-y-1">
+                            <p className="text-white font-extrabold text-sm leading-none tracking-wide truncate max-w-[200px]">{cardNamePreview}</p>
+                            <p className="font-mono text-[10px] text-[#82889A] tracking-widest leading-none">•••• •••• •••• ••••</p>
+                        </div>
+                        <span className="text-xs font-black italic text-[#82889A] tracking-wider leading-none">
+                            {cardIssuerPreview.slice(0, 8).toUpperCase()}
+                        </span>
+                    </div>
+                    {/* Background glow overlay */}
+                    <div className="absolute -right-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
+                            <input 
+                                type="number" 
+                                value={creditLimit} 
+                                onChange={(e) => setCreditLimit(e.target.value)} 
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount</label>
+                            <input 
+                                type="number" 
+                                value={amountUsed} 
+                                onChange={(e) => setAmountUsed(e.target.value)} 
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end space-x-3 pt-3 border-t border-[#1E2538] select-none">
+                        <button 
+                            type="button" 
+                            onClick={onClose} 
+                            className="px-5 py-2.5 rounded-xl border border-[#1E2538] hover:bg-gray-800/40 text-gray-400 hover:text-white text-sm font-semibold transition-all cursor-pointer"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                        >
+                            Update Card
+                        </button>
                     </div>
                 </form>
             </div>
@@ -236,9 +379,10 @@ interface CardListProps {
     allCards: Card[];
     isDemo?: boolean;
     setCards?: React.Dispatch<React.SetStateAction<Card[]>>;
+    onCollapseToggle?: () => void;
 }
 
-export default function CardList({ cards, onCardUpdate, allCards, isDemo = false, setCards }: CardListProps) {
+export default function CardList({ cards, onCardUpdate, allCards, isDemo = false, setCards, onCollapseToggle }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
@@ -278,13 +422,8 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
         return { bg: 'bg-[#1E2538] text-[#82889A] border border-gray-700/20', text: (issuer || 'CARD').slice(0, 4).toUpperCase(), gradient: 'from-blue-600 to-indigo-600' };
     };
 
-    const getMaskedNumber = (cardId: string) => {
-        let hash = 0;
-        for (let i = 0; i < cardId.length; i++) {
-            hash = cardId.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const suffix = Math.abs(hash % 9000) + 1000;
-        return `•••• •••• •••• ${suffix}`;
+    const getMaskedNumber = () => {
+        return '•••• •••• •••• ••••';
     };
 
     return (
@@ -293,14 +432,27 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
             {editingCard && <EditCardModal card={editingCard} onCardUpdated={onCardUpdate} onClose={() => setEditingCard(null)} isDemo={isDemo} setCards={setCards} />}
             {viewingCard && <CardDetailsModal card={viewingCard} onClose={() => setViewingCard(null)} />}
 
-            {/* Header with Ellipsis Menu */}
+            {/* Header with Ellipsis Menu and Collapse Button */}
             <div className="flex justify-between items-center mb-6 shrink-0 select-none">
                 <h2 className="text-lg font-bold text-white tracking-wide">Your Wallet</h2>
-                <button className="text-gray-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-800/40">
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                    </svg>
-                </button>
+                <div className="flex items-center gap-1">
+                    {onCollapseToggle && (
+                        <button 
+                            onClick={onCollapseToggle} 
+                            className="text-[#82889A] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-800/40"
+                            title="Collapse Wallet"
+                        >
+                            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5M4.5 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    )}
+                    <button className="text-gray-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-800/40">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             {/* Scrollable Card List Container */}
@@ -325,7 +477,7 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
                                         </div>
                                     </div>
                                     <p className="text-xs font-mono text-[#82889A] tracking-wider">
-                                        {getMaskedNumber(card.id)}
+                                        {getMaskedNumber()}
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-0.5 shrink-0 bg-[#0E111A]/80 border border-[#1E2538] rounded-xl p-1">

@@ -191,7 +191,7 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                                 id="amount" 
                                 value={amount} 
                                 onChange={(e) => setAmount(e.target.value)} 
-                                className="w-full bg-white text-black font-semibold text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm" 
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white placeholder-gray-500 font-semibold text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                                 placeholder="₹ 0.00" 
                             />
                         </div>
@@ -201,7 +201,7 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                                 id="category" 
                                 value={category} 
                                 onChange={(e) => setCategory(e.target.value)} 
-                                className="w-full bg-[#1E2538] border border-[#2A334B] text-white text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
                             >
                                 <option value="">Select Category</option>
                                 {spendCategories.map(c => <option key={c} value={c}>{c}</option>)}
@@ -215,7 +215,7 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                             id="vendor" 
                             value={vendor} 
                             onChange={(e) => setVendor(e.target.value)} 
-                            className="w-full bg-white text-black font-semibold text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm" 
+                            className="w-full bg-[#131622] border border-[#1E2538] text-white placeholder-gray-500 font-semibold text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                             placeholder="e.g. Swiggy, Amazon, MakeMyTrip" 
                         />
                     </div>
