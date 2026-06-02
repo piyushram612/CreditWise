@@ -50,7 +50,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     .select('*');
 
   if (userCardsError || allCardsError) {
-    console.error('Error fetching cards:', userCardsError || allCardsError);
   }
 
   let initialUserCards: Card[] = [];

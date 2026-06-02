@@ -29,7 +29,6 @@ export function DashboardView({ user, setActiveView, onAddCardClick }: Dashboard
           .eq('user_id', user.id);
 
         if (error) {
-          console.error("Error fetching dashboard stats:", error);
         } else if (data) {
           const totalLimit = data.reduce((sum, card) => sum + (card.credit_limit || 0), 0);
           setStats({ cardCount: count ?? 0, totalLimit });

@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 import { getCardOptimizationTips } from '@/app/utils/cardOptimizationDatabase';
 import type { UserOwnedCard } from '@/app/types';
 import { getCardNetwork } from '@/app/types';
+import { checkRateLimit } from '@/lib/ratelimit';
+import { getClientIdentifier, sanitizeInput } from '@/lib/security';
 
 // Explicitly set the runtime to Node.js to support Supabase server-side operations
 export const runtime = 'nodejs';
@@ -86,16 +88,44 @@ ${enhancedInfo}
  * It takes the conversation history, fetches user card data,
  * and calls the Gemini API to get a contextual response.
  */
-export async function POST(request: Request) {
-  console.log('Chat API called');
-
+export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Rate limiting
+    const identifier = getClientIdentifier(request, user?.id);
+    const rateLimitResult = await checkRateLimit(identifier);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Too many requests. Please try again later.',
+          retryAfter: rateLimitResult.reset 
+        }, 
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.reset.toString(),
+          }
+        }
+      );
+    }
+
     const { messages, cards }: { messages: ChatMessage[]; cards?: UserOwnedCard[] } = await request.json();
-    console.log('Chat request body:', { messageCount: messages?.length, hasBodyCards: !!cards });
 
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: 'No messages provided.' }, { status: 400 });
     }
+    
+    // Sanitize message content
+    const sanitizedMessages = messages.map(msg => ({
+      ...msg,
+      text: msg.text ? sanitizeInput(msg.text, 2000) : '',
+      content: msg.content ? sanitizeInput(msg.content, 2000) : '',
+    }));
 
     let userCards: UserOwnedCard[] = [];
     let cardsInfo = "The user has not added any cards to their wallet yet.";
@@ -103,37 +133,27 @@ export async function POST(request: Request) {
     if (cards && cards.length > 0) {
       userCards = cards;
       cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
-      console.log(`Using ${userCards.length} cards passed from the request body (demo/direct mode)`);
     } else {
       // Try to fetch user cards (skip auth errors for native app compatibility)
       try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
         if (user) {
-          console.log('User authenticated, fetching cards');
           const { data: fetchedCards, error: dbError } = await supabase
             .from('user_owned_cards')
             .select('id, user_id, card_id, credit_limit, used_amount, card_name, issuer, card_type, benefits, fees')
             .eq('user_id', user.id);
 
-          if (dbError) {
-            console.error('Supabase DB Error:', dbError);
-          } else if (fetchedCards && fetchedCards.length > 0) {
+          if (!dbError && fetchedCards && fetchedCards.length > 0) {
             userCards = fetchedCards;
             cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
-            console.log(`Found ${userCards.length} cards for user`);
           }
-        } else {
-          console.log('No user session found, continuing with general advice');
         }
       } catch (authError) {
-        console.warn('Auth/DB error, continuing with general advice:', authError);
+        // Silent fail - continue with general advice
       }
     }
 
     // Format conversation history
-    const history = messages.map(msg => {
+    const history = sanitizedMessages.map(msg => {
       const roleName = (msg.role || msg.from) === 'user' ? 'User' : 'AI';
       const textContent = msg.content || msg.text || '';
       return `${roleName}: ${textContent}`;
@@ -207,7 +227,6 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.log('GEMINI_API_KEY not configured');
       return NextResponse.json({
         reply: "I'm here to help with your credit card questions! However, I need to be properly configured with AI services to provide personalized advice. For now, I can suggest checking your card benefits, comparing reward rates, and optimizing your spending categories."
       });
@@ -218,7 +237,6 @@ export async function POST(request: Request) {
       contents: [{ parts: [{ text: prompt }] }],
     };
 
-    console.log('Calling Gemini API...');
     // Call the Gemini API
     const geminiResponse = await fetch(API_URL, {
       method: 'POST',
@@ -227,8 +245,6 @@ export async function POST(request: Request) {
     });
 
     if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      console.error('Gemini API Error:', errorText);
       return NextResponse.json({ error: 'Failed to get a response from the AI model.' }, { status: 500 });
     }
 
@@ -240,18 +256,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'AI model returned an invalid response format.' }, { status: 500 });
     }
 
-    console.log('AI response received');
     return NextResponse.json({
       reply: responseText,
       debug: {
-        messageCount: messages.length,
+        messageCount: sanitizedMessages.length,
         cardsCount: userCards.length,
         timestamp: new Date().toISOString()
       }
     });
 
   } catch (error: unknown) {
-    console.error('API Route Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }

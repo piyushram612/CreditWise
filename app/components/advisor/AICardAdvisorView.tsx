@@ -44,7 +44,6 @@ export function AICardAdvisorView() {
       }
 
       const data = await response.json();
-      console.log('Chat API response:', data);
 
       if (data.error) {
         throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
@@ -53,7 +52,6 @@ export function AICardAdvisorView() {
       const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error(error);
       const errorMessage: ChatMessage = {
         from: 'ai',
         text: "Sorry, I'm having trouble connecting right now."

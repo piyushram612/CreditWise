@@ -71,7 +71,6 @@ export function TransactionConfirmModal({
           });
       } catch {
         // If transactions table doesn't exist, we'll continue without recording
-        console.log('Transactions table not available, continuing without recording transaction');
       }
 
       onTransactionConfirmed();

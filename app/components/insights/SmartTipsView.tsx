@@ -16,8 +16,11 @@ interface SmartTip {
   expiryDate?: string;
 }
 
+import type { Card } from '@/lib/types';
+
 interface SmartTipsViewProps {
   user: User | null;
+  cards?: Card[];
 }
 
 interface TipDetails {
@@ -28,18 +31,20 @@ interface TipDetails {
   relatedTips?: string[];
 }
 
-export function SmartTipsView({ user }: SmartTipsViewProps) {
-  const { userCards, isLoading } = useCards(user, 0);
+export function SmartTipsView({ user, cards = [] }: SmartTipsViewProps) {
   const [tips, setTips] = useState<SmartTip[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTip, setSelectedTip] = useState<SmartTip | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const isLoading = false;
 
   useEffect(() => {
-    if (userCards.length > 0) {
-      generateSmartTips(userCards);
+    if (cards.length > 0) {
+      generateSmartTips(cards as any[]);
+    } else {
+      setTips([]);
     }
-  }, [userCards]);
+  }, [cards]);
 
   const getTipDetails = (tipId: string): TipDetails => {
     const tipDetailsMap: { [key: string]: TipDetails } = {
@@ -538,7 +543,7 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           Analyzing your cards for smart tips...
         </div>
-      ) : userCards.length === 0 ? (
+      ) : cards.length === 0 ? (
         <div className="text-center py-16 bg-[#131622]/60 border border-[#1E2538] rounded-2xl select-none">
           <CreditCardIcon className="w-12 h-12 text-[#82889A] mx-auto mb-4" />
           <p className="text-white font-bold mb-1">
@@ -639,7 +644,7 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
             </div>
             <div className="bg-[#0E111A] border border-[#1E2538]/60 p-4 rounded-xl">
               <div className="font-semibold text-[#82889A] text-[10px] uppercase tracking-wider">Monitored Cards</div>
-              <div className="text-xl font-black text-emerald-400 mt-1">{userCards.length}</div>
+              <div className="text-xl font-black text-emerald-400 mt-1">{cards.length}</div>
             </div>
           </div>
         </div>

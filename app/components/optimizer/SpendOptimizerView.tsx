@@ -96,11 +96,6 @@ export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimi
     setCurrentSpend(spendData);
 
     try {
-      console.log('Making API call to optimize with data:', { 
-        cards: userCards,
-        spend: spendData
-      });
-
       const response = await apiCall('/api/optimize', {
         method: 'POST',
         body: JSON.stringify({ 
@@ -109,73 +104,39 @@ export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimi
         }),
       });
 
-      console.log('API Response status:', response.status);
-      console.log('API Response headers:', response.headers);
-
       if (!response.ok) {
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        let errorMessage = `Request failed. Please try again.`;
         try {
-          const errorText = await response.text();
-          console.log('Error response text:', errorText);
-          
-          // Try to parse as JSON
-          try {
-            const errorData = JSON.parse(errorText);
-            errorMessage = errorData.error || errorMessage;
-          } catch {
-            // If not JSON, use the text as is
-            errorMessage = errorText || errorMessage;
-          }
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
         } catch {
-          // If can't read response, use status text
-          errorMessage = response.statusText || errorMessage;
+          // Use default error message
         }
         throw new Error(errorMessage);
       }
 
-      const responseText = await response.text();
-      console.log('Success response text:', responseText);
+      const data = await response.json();
       
-      try {
-        const data = JSON.parse(responseText);
-        console.log('Parsed response data:', data);
-        
-        // Check if there's an error in the response
-        if (data.error) {
-          console.error('API returned error:', data.error);
-          if (data.details) {
-            console.error('Error details:', data.details);
-          }
-          throw new Error(data.error + (data.details ? ` (${data.details})` : ''));
-        }
-        
-        // The API returns { recommendation: "text" }, but we need to format it for display
-        if (data.recommendation) {
-          // Store the markdown recommendation directly
-          setResult({
-            bestCard: {
-              name: "AI Recommendation",
-              issuer: "Based on your cards"
-            },
-            reason: data.recommendation,
-            alternatives: []
-          });
-        } else {
-          console.error('No recommendation in response:', data);
-          throw new Error('No recommendation received from server');
-        }
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Raw response text:', responseText);
-        throw new Error('Invalid response format from server');
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      if (data.recommendation) {
+        setResult({
+          bestCard: {
+            name: "AI Recommendation",
+            issuer: "Based on your cards"
+          },
+          reason: data.recommendation,
+          alternatives: []
+        });
+      } else {
+        throw new Error('No recommendation received from server');
       }
     } catch (err: unknown) {
-      console.error('Spend Optimizer Error:', err);
       if (err instanceof Error) {
-        console.error('Error message:', err.message);
         setError(err.message);
       } else {
-        console.error('Unknown error:', err);
         setError("An unknown error occurred.");
       }
     } finally {

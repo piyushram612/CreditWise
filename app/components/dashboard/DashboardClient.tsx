@@ -20,10 +20,58 @@ interface DashboardClientProps {
   initialUserCards: Card[];
   allMasterCards: Card[];
 }
+const DemoLimitModal = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-sm shadow-2xl relative text-white text-center">
+        <div className="w-16 h-16 bg-gradient-to-tr from-amber-500/20 to-rose-500/20 border border-amber-500/30 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-400">
+          <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-bold text-white mb-2">Demo Trial Limit Reached</h3>
+        <p className="text-xs text-[#82889A] mb-6 leading-relaxed">
+          You have reached the maximum limit of 3 optimization trials allowed in demo mode. Please sign in or create an account to unlock unlimited access!
+        </p>
+        <div className="flex flex-col gap-2">
+          <button 
+            onClick={() => {
+              onClose();
+              window.location.href = '/';
+            }} 
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 transition-all cursor-pointer"
+          >
+            Sign In / Create Account
+          </button>
+          <button 
+            onClick={onClose} 
+            className="w-full py-2.5 rounded-xl border border-[#1E2538] hover:bg-gray-800/40 text-gray-400 hover:text-white text-sm font-semibold transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function DashboardClient({ user, initialUserCards, allMasterCards }: DashboardClientProps) {
   const [cards, setCards] = useState(initialUserCards);
+  const [showDemoLimitModal, setShowDemoLimitModal] = useState(false);
   const [activeView, setActiveView] = useState('optimizer');
+
+  const isDemo = user.id === 'demo-guest-user-id';
+
+  const checkDemoTrial = useCallback(() => {
+    if (!isDemo) return true;
+    const trials = parseInt(localStorage.getItem('cw_demo_trials') || '0', 10);
+    if (trials >= 3) {
+      setShowDemoLimitModal(true);
+      return false;
+    }
+    localStorage.setItem('cw_demo_trials', String(trials + 1));
+    return true;
+  }, [isDemo]);
   const [isWalletCollapsed, setIsWalletCollapsed] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
@@ -54,7 +102,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
     }
   }, []);
   
-  const isDemo = user.id === 'demo-guest-user-id';
   const [showDemoBanner, setShowDemoBanner] = useState(isDemo);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -87,7 +134,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
         alert("Profile updated successfully!");
       }
     } catch (err) {
-      console.error(err);
     } finally {
       setShowProfileModal(false);
     }
@@ -108,7 +154,6 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error fetching user cards:', error);
     } else if (data) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const formattedCards: Card[] = (data as any[]).map((item) => ({
@@ -150,15 +195,15 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const renderActiveView = () => {
     switch (activeView) {
       case 'optimizer':
-        return <SpendOptimizer cards={cards} />;
+        return <SpendOptimizer cards={cards} onTrialAction={checkDemoTrial} />;
       case 'tips':
-        return <SmartTipsView user={user} />;
+        return <SmartTipsView user={currentUser} cards={cards} />;
       case 'chat':
-        return <AiCardAdvisor cards={cards} />;
+        return <AiCardAdvisor cards={cards} onTrialAction={checkDemoTrial} />;
       case 'settings':
         return <Settings />;
       default:
-        return <SpendOptimizer cards={cards} />;
+        return <SpendOptimizer cards={cards} onTrialAction={checkDemoTrial} />;
     }
   };
 
@@ -337,6 +382,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           </div>
         </div>
       )}
+      {showDemoLimitModal && <DemoLimitModal onClose={() => setShowDemoLimitModal(false)} />}
     </div>
   );
 }

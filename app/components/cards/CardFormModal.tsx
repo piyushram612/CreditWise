@@ -113,8 +113,6 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
       
       // First try to get benefits from knowledge base (more detailed)
       if (detailedInfo) {
-        console.log('Found detailed info for:', template.card_name, 'from knowledge base');
-        
         // Add reward rates from knowledge base
         Object.entries(detailedInfo.reward_rates).forEach(([category, info]) => {
           const formattedCategory = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -134,16 +132,15 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
           });
         });
       } else {
-        console.log('No detailed info found for:', template.card_name, 'issuer:', template.issuer, 'falling back to template benefits');
+        // No detailed info found, falling back to template benefits
       }
 
       // Fallback to template benefits if knowledge base doesn't have info
       if (newBenefits.length === 0) {
-        console.log('Using template data for:', template.card_name);
+        // Using template data
         
         // Extract reward rates from template.reward_rates (jsonb field)
         if (template.reward_rates && typeof template.reward_rates === 'object') {
-          console.log('Found reward_rates in template:', template.reward_rates);
           const rewardRates = template.reward_rates as Record<string, unknown>;
           for (const [key, value] of Object.entries(rewardRates)) {
             const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -206,7 +203,6 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
 
         // Legacy support: Check if template.benefits is actually JSON (from old data)
         if (template.benefits && typeof template.benefits === 'object') {
-          console.log('Found legacy JSON benefits structure');
           const benefitsObj = template.benefits as Record<string, unknown>;
           
           // Extract reward rates if they exist in legacy format
@@ -266,8 +262,6 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
 
       // If no benefits were found, add some basic ones based on card type
       if (newBenefits.length === 0) {
-        console.log('No benefits found, adding basic benefits for:', template.card_name);
-        
         // Add basic benefits based on issuer or card name patterns
         if (template.card_name?.toLowerCase().includes('cashback')) {
           newBenefits.push({ key: 'Cashback', value: 'Cashback rewards on purchases' });

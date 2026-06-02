@@ -27,7 +27,6 @@ export function useCards(user: User | null, refreshKey: number) {
         .eq('user_id', user.id);
       
       if (error) {
-        console.error("Error fetching user cards:", error);
       } else {
         setUserCards(data as UserOwnedCard[]);
       }

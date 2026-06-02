@@ -669,8 +669,6 @@ export function getDetailedCardInfo(cardName: string, issuer: string): DetailedC
     return cleanKnowledgeName.includes(cleanCardName) || cleanCardName.includes(cleanKnowledgeName);
   });
   
-  console.log('Card matching attempt:', { cardName, issuer, found: !!match, matchedCard: match?.card_name });
-  
   return match || null;
 }
 

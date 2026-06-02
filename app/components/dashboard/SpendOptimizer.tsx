@@ -8,7 +8,7 @@ const spendCategories = [
     "Dining & Food", "Travel", "Groceries", "Utilities", "Fuel", "Online Shopping", "Entertainment", "Other"
 ];
 
-export default function SpendOptimizer({ cards }: { cards: Card[] }) {
+export default function SpendOptimizer({ cards, onTrialAction }: { cards: Card[]; onTrialAction?: () => boolean }) {
     const [amount, setAmount] = useState('');
     const [category, setCategory] = useState('');
     const [vendor, setVendor] = useState('');
@@ -21,6 +21,9 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
         e.preventDefault();
         if (!amount || !category) {
             alert("Please enter an amount and select a category.");
+            return;
+        }
+        if (onTrialAction && !onTrialAction()) {
             return;
         }
         setIsOptimizing(true);

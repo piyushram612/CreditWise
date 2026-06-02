@@ -21,7 +21,7 @@ export const initializeApp = async () => {
 
     // Handle app state changes
     App.addListener('appStateChange', ({ isActive }) => {
-      console.log('App state changed. Is active?', isActive);
+      // App state changed
     });
 
     // Handle back button on Android
@@ -34,7 +34,7 @@ export const initializeApp = async () => {
     });
 
   } catch (error) {
-    console.error('Error initializing native app:', error);
+    // Error initializing native app
   }
 };
 
@@ -44,7 +44,7 @@ export const hapticFeedback = async (style: ImpactStyle = ImpactStyle.Medium) =>
     try {
       await Haptics.impact({ style });
     } catch (error) {
-      console.error('Haptic feedback error:', error);
+      // Haptic feedback error
     }
   }
 };

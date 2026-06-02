@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { Card, Message } from '../../../lib/types';
 import { BotIcon, UserIcon } from '../icons';
 
-export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
+export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[]; onTrialAction?: () => boolean }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -29,6 +29,7 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
     const handleChatSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || isGenerating) return;
+        if (onTrialAction && !onTrialAction()) return;
 
         const userText = input;
         setInput('');
@@ -62,13 +63,78 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
 
     const handleSuggestionClick = (suggestion: string) => {
         if (isGenerating) return;
+        if (onTrialAction && !onTrialAction()) return;
         triggerChat(suggestion);
     };
 
-    const renderFormattedContent = (content: string) => {
+    const getCalculatedOutcome = (text: string) => {
+        const lower = text.toLowerCase();
+        
+        // Match which card is recommended in the text
+        let recommendedCard = null;
+        for (const card of cards) {
+            if (card.card_name && lower.includes(card.card_name.toLowerCase())) {
+                recommendedCard = card;
+                break;
+            }
+        }
+        
+        // If no full name match, try card name keywords
+        if (!recommendedCard) {
+            for (const card of cards) {
+                if (card.card_name) {
+                    const words = card.card_name.split(' ');
+                    const hasKeyword = words.some(w => w.length > 4 && lower.includes(w.toLowerCase()));
+                    if (hasKeyword) {
+                        recommendedCard = card;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!recommendedCard) return null;
+
+        // Try to match points/coins/miles patterns e.g., "900 points", "1,500 NeuCoins", "+900"
+        const pointsRegex = /\b([0-9,]+)\s*(?:points|reward points|miles|NeuCoins|coins)\b/i;
+        const match = text.match(pointsRegex);
+        
+        let displayValue = '';
+        let displayLabel = 'POINTS';
+        
+        if (match && match[1]) {
+            displayValue = `+${match[1]}`;
+            if (lower.includes('neucoins') || lower.includes('neu coin')) {
+                displayLabel = 'NEUCOINS';
+            } else if (lower.includes('miles')) {
+                displayLabel = 'MILES';
+            }
+        } else {
+            // Check for percentage e.g., "5% cashback"
+            const percentRegex = /\b([0-9.]+)\b%\s*(?:cashback|rewards|return)/i;
+            const percentMatch = text.match(percentRegex);
+            if (percentMatch && percentMatch[1]) {
+                displayValue = `${percentMatch[1]}%`;
+                displayLabel = 'CASHBACK';
+            } else {
+                // Return null if no specific numeric outcome/milestone is found in the text
+                return null;
+            }
+        }
+
+        return {
+            card: recommendedCard,
+            value: displayValue,
+            label: displayLabel
+        };
+    };
+
+    const renderFormattedContent = (content: string, isGreeting: boolean) => {
         // Standard markdown bold parser
         const parts = content.split(/(\*\*.*?\*\*)/g);
-        const lower = content.toLowerCase();
+        
+        // Dynamically parse calculated outcome from text if it's not the greeting message
+        const outcome = !isGreeting ? getCalculatedOutcome(content) : null;
         
         return (
             <div className="space-y-4">
@@ -81,10 +147,9 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
                     })}
                 </p>
                 
-                {/* Visual Card Recommendation Badge matches mockup */}
-                {(lower.includes('flight') || lower.includes('travel') || lower.includes('london')) && 
-                 (lower.includes('sapphire') || lower.includes('infinia') || lower.includes('regalia') || lower.includes('platinum')) && (
-                    <div className="bg-[#0E111A] border border-[#1E2538] p-4 rounded-xl flex items-center justify-between mt-3 select-none">
+                {/* Visual Card Recommendation Badge - parsed dynamically from AI response */}
+                {outcome && (
+                    <div className="bg-[#0E111A] border border-[#1E2538] p-4 rounded-xl flex items-center justify-between mt-3 select-none animate-fade-in">
                         <div className="flex items-center gap-3">
                             <div className="bg-blue-600/15 border border-blue-500/20 p-2.5 rounded-xl text-blue-400 shrink-0">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -93,18 +158,20 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
                             </div>
                             <div>
                                 <p className="font-bold text-white text-sm leading-snug">
-                                    {content.includes('Infinia') ? 'HDFC Infinia' : content.includes('Regalia') ? 'HDFC Regalia Gold' : content.includes('Platinum') ? 'AMEX Platinum Travel' : 'Sapphire Reserve'}
+                                    {outcome.card.card_name}
                                 </p>
                                 <p className="text-xs text-[#82889A] mt-0.5">
-                                    {content.includes('Infinia') ? '10x Reward Points on flights' : content.includes('Regalia') ? '5x Reward Points on travel' : content.includes('Platinum') ? '3x Membership Rewards' : '3x Points on Travel'}
+                                    Optimized card suggestion matched from your portfolio
                                 </p>
                              </div>
                         </div>
                         <div className="text-right shrink-0">
                             <span className="text-emerald-400 font-extrabold text-base leading-none block">
-                                {content.includes('Infinia') ? '+1,500' : content.includes('Regalia') ? '+900' : content.includes('Platinum') ? '+1,200' : '+4,350'}
+                                {outcome.value}
                             </span>
-                            <span className="text-[9px] text-[#82889A] font-extrabold tracking-wider block mt-1">POINTS</span>
+                            <span className="text-[9px] text-[#82889A] font-extrabold tracking-wider block mt-1">
+                                {outcome.label}
+                            </span>
                         </div>
                     </div>
                 )}
@@ -171,7 +238,7 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
                                     {msg.role === 'user' ? (
                                         <p className="text-sm leading-relaxed">{msg.content}</p>
                                     ) : (
-                                        renderFormattedContent(msg.content)
+                                        renderFormattedContent(msg.content, index === 0)
                                     )}
                                 </div>
 

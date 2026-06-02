@@ -151,14 +151,14 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
 
     return (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-md shadow-2xl relative text-white">
-                <div className="flex justify-between items-center mb-6 select-none">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-5 rounded-2xl w-full max-w-md shadow-2xl relative text-white max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                <div className="flex justify-between items-center mb-4 select-none">
                     <h2 className="text-lg font-bold text-white tracking-wide">Add Card</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white text-xl p-1 leading-none transition-colors">&times;</button>
                 </div>
                 
                 {/* Visual Card Preview matching mockup */}
-                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-5 h-44 flex flex-col justify-between shadow-inner relative overflow-hidden mb-6 select-none">
+                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-4 h-36 flex flex-col justify-between shadow-inner relative overflow-hidden mb-4 select-none">
                     <div className="flex justify-between items-start z-10">
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded tracking-wider bg-white/10 text-white border border-white/10 uppercase">
                             PREVIEW
@@ -194,11 +194,11 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                     <div className="absolute -right-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Bank Pill Buttons Filter */}
                     <div>
-                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2 select-none">Filter By Bank</label>
-                        <div className="flex flex-wrap gap-1.5 mb-2 select-none">
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-1.5 select-none">Filter By Bank</label>
+                        <div className="flex flex-wrap gap-1.5 mb-1 select-none">
                             {['All', 'HDFC', 'SBI', 'ICICI', 'AXIS', 'AMEX', 'Others'].map(bank => (
                                 <button
                                     key={bank}
@@ -207,7 +207,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                                         setSelectedBank(bank);
                                         setSelectedCardId(''); // Reset selected card
                                     }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border cursor-pointer ${
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all duration-200 border cursor-pointer ${
                                         selectedBank === bank
                                             ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.05)]'
                                             : 'bg-[#131622] border-[#1E2538] text-[#82889A] hover:text-white hover:bg-[#1E2538]'
@@ -220,8 +220,8 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Select Card</label>
-                        <div className="max-h-48 overflow-y-auto border border-[#1E2538] bg-[#131622] rounded-xl p-2 space-y-1.5 scrollbar-thin scrollbar-thumb-[#1E2538] scrollbar-track-transparent">
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-1.5">Select Card</label>
+                        <div className="max-h-36 overflow-y-auto border border-[#1E2538] bg-[#131622] rounded-xl p-2 space-y-1 scrollbar-thin scrollbar-thumb-[#1E2538] scrollbar-track-transparent">
                             {filteredMasterCards.map((card) => {
                                 const isSelected = selectedCardId === card.id;
                                 return (
@@ -229,7 +229,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                                         key={card.id}
                                         type="button"
                                         onClick={() => setSelectedCardId(card.id)}
-                                        className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left text-xs font-semibold transition-all cursor-pointer border ${
+                                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs font-semibold transition-all cursor-pointer border ${
                                             isSelected 
                                                 ? 'bg-blue-500/10 border-blue-500/30 text-white' 
                                                 : 'bg-[#0E111A] border-[#1E2538] text-[#82889A] hover:bg-[#1E2538] hover:text-white'
@@ -365,14 +365,14 @@ const EditCardModal = ({ card, onCardUpdated, onClose, isDemo = false, setCards 
 
     return (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-md shadow-2xl relative text-white">
-                <div className="flex justify-between items-center mb-6 select-none">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-5 rounded-2xl w-full max-w-md shadow-2xl relative text-white max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                <div className="flex justify-between items-center mb-4 select-none">
                     <h2 className="text-lg font-bold text-white tracking-wide">Edit {cardNamePreview}</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white text-xl p-1 leading-none transition-colors">&times;</button>
                 </div>
                 
                 {/* Visual Card Preview matching mockup */}
-                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-5 h-44 flex flex-col justify-between shadow-inner relative overflow-hidden mb-6 select-none">
+                <div className="bg-gradient-to-br from-[#1E2538] to-[#0A0D14] border border-[#2A334B] rounded-2xl p-4 h-36 flex flex-col justify-between shadow-inner relative overflow-hidden mb-4 select-none">
                     <div className="flex justify-between items-start z-10">
                         <span className="text-[9px] font-extrabold px-2 py-0.5 rounded tracking-wider bg-white/10 text-white border border-white/10 uppercase">
                             PREVIEW
@@ -408,7 +408,7 @@ const EditCardModal = ({ card, onCardUpdated, onClose, isDemo = false, setCards 
                     <div className="absolute -right-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
@@ -472,8 +472,44 @@ interface CardListProps {
     onCollapseToggle?: () => void;
 }
 
+const DemoRestrictionModal = ({ onClose }: { onClose: () => void }) => {
+    return (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-sm shadow-2xl relative text-white text-center">
+                <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-400">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Create an Account to Add Cards</h3>
+                <p className="text-xs text-[#82889A] mb-6 leading-relaxed">
+                    To add cards, you need to sign in and create an account. The demo mode is just to understand how the app works!
+                </p>
+                <div className="flex flex-col gap-2">
+                    <button 
+                        onClick={() => {
+                            onClose();
+                            window.location.href = '/';
+                        }} 
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 transition-all cursor-pointer"
+                    >
+                        Sign In / Create Account
+                    </button>
+                    <button 
+                        onClick={onClose} 
+                        className="w-full py-2.5 rounded-xl border border-[#1E2538] hover:bg-gray-800/40 text-gray-400 hover:text-white text-sm font-semibold transition-all cursor-pointer"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function CardList({ cards, onCardUpdate, allCards, isDemo = false, setCards, onCollapseToggle }: CardListProps) {
     const [showAddCardModal, setShowAddCardModal] = useState(false);
+    const [showDemoRestriction, setShowDemoRestriction] = useState(false);
     const [editingCard, setEditingCard] = useState<Card | null>(null);
     const [viewingCard, setViewingCard] = useState<Card | null>(null);
     const supabase = createBrowserClient<Database>(
@@ -519,6 +555,7 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
     return (
         <div className="bg-[#0E111A] border border-[#1E2538] rounded-2xl p-6 h-full flex flex-col overflow-hidden">
             {showAddCardModal && <AddCardModal allCards={allCards} onCardAdded={onCardUpdate} onClose={() => setShowAddCardModal(false)} isDemo={isDemo} setCards={setCards} />}
+            {showDemoRestriction && <DemoRestrictionModal onClose={() => setShowDemoRestriction(false)} />}
             {editingCard && <EditCardModal card={editingCard} onCardUpdated={onCardUpdate} onClose={() => setEditingCard(null)} isDemo={isDemo} setCards={setCards} />}
             {viewingCard && <CardDetailsModal card={viewingCard} onClose={() => setViewingCard(null)} />}
 
@@ -599,7 +636,13 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
 
             {/* Bottom Add Card dashed border pill button */}
             <button 
-                onClick={() => setShowAddCardModal(true)} 
+                onClick={() => {
+                    if (isDemo) {
+                        setShowDemoRestriction(true);
+                    } else {
+                        setShowAddCardModal(true);
+                    }
+                }} 
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-dashed border-[#1E2538] hover:border-blue-500/50 hover:bg-blue-500/5 text-sm font-bold text-[#82889A] hover:text-white transition-all duration-200 mt-4 select-none shrink-0 group"
             >
                 <PlusIcon className="h-4 w-4 text-[#82889A] group-hover:text-white transition-colors" />
