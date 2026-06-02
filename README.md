@@ -122,7 +122,7 @@ creditwise/
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/creditwise
+git clone https://github.com/piyushram612/creditwise
 cd creditwise
 npm install
 ```
@@ -162,8 +162,7 @@ Don't want to sign up? Click **"Try demo →"** on the landing page to explore t
 - [ ] Reward points expiry tracker and alerts
 - [ ] Monthly spend analytics and category breakdown
 - [ ] Card recommendation engine (suggest new cards based on spend patterns)
-- [ ] UPI integration for automatic transaction categorization
-- [ ] Mobile app release on Play Store (Capacitor build)
+- [ ] Mobile app release on Play Store
 - [ ] Bill payment reminders and due date tracking
 
 ---
@@ -182,7 +181,7 @@ The app is live, functional, and actively used. The card database, AI advisor, a
 
 Also building **TallyTap** — a frictionless expense logger for Android that lets you log spends instantly by triple-tapping the back of your phone.
 
-[LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/your-username)
+[LinkedIn](https://linkedin.com/in/piyushramkimidi) · [GitHub](https://github.com/piyushram612)
 
 ---
 

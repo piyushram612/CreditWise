@@ -14,6 +14,14 @@ export default function SpendOptimizer({ cards, onTrialAction }: { cards: Card[]
     const [vendor, setVendor] = useState('');
     const [optimizationResult, setOptimizationResult] = useState('');
     const [isOptimizing, setIsOptimizing] = useState(false);
+    const [trialsLeft, setTrialsLeft] = useState<number | null>(null);
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && onTrialAction) {
+            const trials = parseInt(localStorage.getItem('cw_demo_trials') || '0', 10);
+            setTrialsLeft(Math.max(0, 3 - trials));
+        }
+    }, [onTrialAction, optimizationResult]);
 
     const supabase = createClient();
 
@@ -236,6 +244,12 @@ export default function SpendOptimizer({ cards, onTrialAction }: { cards: Card[]
                         {isOptimizing ? 'Optimizing...' : 'Find Best Card'}
                         <SparklesIcon className="ml-2 h-5 w-5" />
                     </button>
+                    {trialsLeft !== null && (
+                        <div className="text-[11px] text-center text-[#82889A] mt-3 select-none font-semibold">
+                            ⚡ Demo Mode: <span className="text-blue-400">{trialsLeft}</span> of 3 trials remaining. 
+                            <a href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</a> for full features.
+                        </div>
+                    )}
                 </form>
             </div>
 

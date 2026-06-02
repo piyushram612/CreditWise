@@ -8,6 +8,14 @@ export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[];
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [trialsLeft, setTrialsLeft] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && onTrialAction) {
+            const trials = parseInt(localStorage.getItem('cw_demo_trials') || '0', 10);
+            setTrialsLeft(Math.max(0, 3 - trials));
+        }
+    }, [onTrialAction, messages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -67,66 +75,168 @@ export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[];
         triggerChat(suggestion);
     };
 
-    const getCalculatedOutcome = (text: string) => {
+    const getProximityOutcome = (text: string) => {
         const lower = text.toLowerCase();
         
-        // Match which card is recommended in the text
-        let recommendedCard = null;
+        const matchedCards: { card: Card; index: number }[] = [];
         for (const card of cards) {
-            if (card.card_name && lower.includes(card.card_name.toLowerCase())) {
-                recommendedCard = card;
-                break;
+            if (card.card_name) {
+                const nameLower = card.card_name.toLowerCase();
+                let pos = lower.indexOf(nameLower);
+                while (pos !== -1) {
+                    matchedCards.push({ card, index: pos });
+                    pos = lower.indexOf(nameLower, pos + 1);
+                }
             }
         }
         
-        // If no full name match, try card name keywords
-        if (!recommendedCard) {
-            for (const card of cards) {
-                if (card.card_name) {
-                    const words = card.card_name.split(' ');
-                    const hasKeyword = words.some(w => w.length > 4 && lower.includes(w.toLowerCase()));
-                    if (hasKeyword) {
-                        recommendedCard = card;
-                        break;
+        if (matchedCards.length === 0) return null;
+
+        const rewards: { value: string; label: string; index: number }[] = [];
+        
+        const pointsRegex = /\b([0-9,]+)\s*(?:points|reward points|miles|NeuCoins|coins)\b/ig;
+        let match;
+        while ((match = pointsRegex.exec(text)) !== null) {
+            let label = 'POINTS';
+            const matchLower = match[0].toLowerCase();
+            if (matchLower.includes('neucoins') || matchLower.includes('neu coin')) {
+                label = 'NEUCOINS';
+            } else if (matchLower.includes('miles')) {
+                label = 'MILES';
+            }
+            rewards.push({ value: `+${match[1]}`, label, index: match.index });
+        }
+
+        const rupeeRegex = /₹\s*([0-9,]+)\s*(?:cashback|savings|benefit|off|back|return|credited)?\b/ig;
+        while ((match = rupeeRegex.exec(text)) !== null) {
+            const valNum = parseInt(match[1].replace(/,/g, ''), 10);
+            const isSpendAmount = valNum >= 5000;
+            if (!isSpendAmount) {
+                rewards.push({ value: `₹${match[1]}`, label: 'CASHBACK', index: match.index });
+            }
+        }
+
+        const percentRegex = /\b([0-9.]+)\b%\s*(?:cashback|rewards|return)/ig;
+        while ((match = percentRegex.exec(text)) !== null) {
+            rewards.push({ value: `${match[1]}%`, label: 'CASHBACK', index: match.index });
+        }
+
+        if (rewards.length === 0) return null;
+
+        let bestPair: { card: Card; value: string; label: string; distance: number } | null = null;
+
+        for (const cardMatch of matchedCards) {
+            for (const r of rewards) {
+                const distance = Math.abs(cardMatch.index - r.index);
+                if (distance < 200) {
+                    if (!bestPair || distance < bestPair.distance) {
+                        bestPair = {
+                            card: cardMatch.card,
+                            value: r.value,
+                            label: r.label,
+                            distance
+                        };
                     }
                 }
             }
         }
 
-        if (!recommendedCard) return null;
+        if (bestPair) {
+            return {
+                card: bestPair.card,
+                value: bestPair.value,
+                label: bestPair.label
+            };
+        }
+        return null;
+    };
 
-        // Try to match points/coins/miles patterns e.g., "900 points", "1,500 NeuCoins", "+900"
+    const getCalculatedOutcome = (text: string) => {
+        const lower = text.toLowerCase();
+        
         const pointsRegex = /\b([0-9,]+)\s*(?:points|reward points|miles|NeuCoins|coins)\b/i;
-        const match = text.match(pointsRegex);
-        
-        let displayValue = '';
-        let displayLabel = 'POINTS';
-        
-        if (match && match[1]) {
-            displayValue = `+${match[1]}`;
-            if (lower.includes('neucoins') || lower.includes('neu coin')) {
-                displayLabel = 'NEUCOINS';
-            } else if (lower.includes('miles')) {
-                displayLabel = 'MILES';
+        const percentRegex = /\b([0-9.]+)\b%\s*(?:cashback|rewards|return)/i;
+        const rupeeRegex = /₹\s*([0-9,]+)\s*(?:cashback|savings|benefit|off|back|return|credited)?\b/i;
+
+        const sentences = text.split(/[.!\n]+/);
+        const candidates: { card: Card; value: string; label: string; score: number }[] = [];
+
+        for (const sentence of sentences) {
+            const sentenceLower = sentence.toLowerCase();
+            
+            let matchedCard = null;
+            for (const card of cards) {
+                if (card.card_name && sentenceLower.includes(card.card_name.toLowerCase())) {
+                    matchedCard = card;
+                    break;
+                }
             }
-        } else {
-            // Check for percentage e.g., "5% cashback"
-            const percentRegex = /\b([0-9.]+)\b%\s*(?:cashback|rewards|return)/i;
-            const percentMatch = text.match(percentRegex);
-            if (percentMatch && percentMatch[1]) {
-                displayValue = `${percentMatch[1]}%`;
-                displayLabel = 'CASHBACK';
-            } else {
-                // Return null if no specific numeric outcome/milestone is found in the text
-                return null;
+
+            if (!matchedCard) {
+                for (const card of cards) {
+                    if (card.card_name) {
+                        const words = card.card_name.split(' ');
+                        const hasKeyword = words.some(w => w.length > 4 && sentenceLower.includes(w.toLowerCase()));
+                        if (hasKeyword) {
+                            matchedCard = card;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (matchedCard) {
+                let value = '';
+                let label = 'POINTS';
+
+                const rupeeMatch = sentence.match(rupeeRegex);
+                const pointsMatch = sentence.match(pointsRegex);
+                const percentMatch = sentence.match(percentRegex);
+
+                if (rupeeMatch && rupeeMatch[1]) {
+                    const valNum = parseInt(rupeeMatch[1].replace(/,/g, ''), 10);
+                    const isTransactionAmount = valNum >= 5000;
+                    if (!isTransactionAmount) {
+                        value = `₹${rupeeMatch[1]}`;
+                        label = 'CASHBACK';
+                    }
+                }
+                
+                if (!value && pointsMatch && pointsMatch[1]) {
+                    value = `+${pointsMatch[1]}`;
+                    const matchLower = pointsMatch[0].toLowerCase();
+                    if (matchLower.includes('neucoins') || matchLower.includes('neu coin')) {
+                        label = 'NEUCOINS';
+                    } else if (matchLower.includes('miles')) {
+                        label = 'MILES';
+                    }
+                }
+
+                if (!value && percentMatch && percentMatch[1]) {
+                    value = `${percentMatch[1]}%`;
+                    label = 'CASHBACK';
+                }
+
+                if (value) {
+                    let score = 1;
+                    if (sentenceLower.includes('best') || sentenceLower.includes('recommend') || sentenceLower.includes('use') || sentenceLower.includes('save') || sentenceLower.includes('benefit')) {
+                        score += 2;
+                    }
+                    candidates.push({ card: matchedCard, value, label, score });
+                }
             }
         }
 
-        return {
-            card: recommendedCard,
-            value: displayValue,
-            label: displayLabel
-        };
+        if (candidates.length > 0) {
+            candidates.sort((a, b) => b.score - a.score);
+            return {
+                card: candidates[0].card,
+                value: candidates[0].value,
+                label: candidates[0].label
+            };
+        }
+
+        return getProximityOutcome(text);
     };
 
     const renderFormattedContent = (content: string, isGreeting: boolean) => {
@@ -295,6 +405,12 @@ export default function AiCardAdvisor({ cards, onTrialAction }: { cards: Card[];
                     </button>
                 </div>
             </form>
+            {trialsLeft !== null && (
+                <div className="text-[11px] text-center text-[#82889A] mt-1.5 select-none font-semibold">
+                    ⚡ Demo Mode: <span className="text-blue-400">{trialsLeft}</span> of 3 trials remaining. 
+                    <a href="/" className="text-blue-400 hover:text-blue-300 ml-1 underline">Create an account</a> for full features.
+                </div>
+            )}
         </div>
     );
 }
