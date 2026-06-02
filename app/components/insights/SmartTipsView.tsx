@@ -477,10 +477,10 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'high': return 'border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800';
-      case 'medium': return 'border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800';
-      case 'low': return 'border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800';
-      default: return 'border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700';
+      case 'high': return 'border-l-4 border-l-rose-500 border-[#1E2538] bg-[#1E1218]/40 hover:border-l-rose-400';
+      case 'medium': return 'border-l-4 border-l-amber-500 border-[#1E2538] bg-[#1E1A12]/40 hover:border-l-amber-400';
+      case 'low': return 'border-l-4 border-l-emerald-500 border-[#1E2538] bg-[#121E18]/40 hover:border-l-emerald-400';
+      default: return 'border-l-4 border-l-gray-500 border-[#1E2538] bg-[#131622]/40 hover:border-l-gray-400';
     }
   };
 
@@ -499,132 +499,114 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
 
   if (!user) {
     return (
-      <div>
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            🔥 Credit Card Hacks & Strategies
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400">
-            Smart tips and strategies to maximize your credit card rewards
-          </p>
-        </div>
-
-        <div className="text-center p-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div className="text-6xl mb-4">💳</div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            🚀 Get Personalized Smart Tips
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Log in to get interactive tips and strategies tailored to your credit cards
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            We&apos;ll analyze your portfolio and provide clickable tips with detailed guides to maximize your rewards
-          </p>
-        </div>
+      <div className="text-center p-12 bg-[#131622]/90 border border-[#1E2538] rounded-2xl select-none">
+        <div className="text-6xl mb-4">💳</div>
+        <h3 className="text-xl font-bold text-white mb-2">
+          🚀 Get Personalized Smart Tips
+        </h3>
+        <p className="text-sm text-[#82889A] max-w-md mx-auto leading-relaxed">
+          Log in to get interactive tips and strategies tailored to your credit cards. We will analyze your portfolio and provide detailed guides to maximize your rewards.
+        </p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          🔥 Credit Card Hacks & Strategies
-        </h2>
-        <p className="text-gray-500 dark:text-gray-400">
-          Smart tips and strategies to maximize your credit card rewards
-        </p>
-      </div>
-
+    <div className="space-y-6">
       {/* Category Filter */}
-      <div className="mb-6">
-        <div className="flex flex-wrap gap-2">
+      <div className="shrink-0">
+        <div className="flex flex-wrap gap-2 select-none">
           {categories.map(category => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 border cursor-pointer ${
                 selectedCategory === category.id
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.1)]'
+                  : 'bg-[#131622] border-[#1E2538] text-[#82889A] hover:text-white hover:bg-[#1E2538]'
               }`}
             >
-              <span className="mr-2">{category.icon}</span>
-              {category.name}
+              <span className="text-base leading-none">{category.icon}</span>
+              <span>{category.name}</span>
             </button>
           ))}
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-10 text-gray-600 dark:text-gray-400">
+        <div className="text-center py-16 text-[#82889A]">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           Analyzing your cards for smart tips...
         </div>
       ) : userCards.length === 0 ? (
-        <div className="text-center py-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <CreditCardIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Add your credit cards to get personalized tips and insights
+        <div className="text-center py-16 bg-[#131622]/60 border border-[#1E2538] rounded-2xl select-none">
+          <CreditCardIcon className="w-12 h-12 text-[#82889A] mx-auto mb-4" />
+          <p className="text-white font-bold mb-1">
+            Add your credit cards to get personalized tips
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            We&apos;ll analyze your cards and suggest the best ways to maximize rewards
+          <p className="text-xs text-[#82889A] max-w-xs mx-auto leading-relaxed">
+            We will analyze your cards and suggest the best ways to maximize rewards.
           </p>
         </div>
       ) : filteredTips.length === 0 ? (
-        <div className="text-center py-10 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <p className="text-gray-600 dark:text-gray-400">
-            No tips available for the selected category
+        <div className="text-center py-16 bg-[#131622]/60 border border-[#1E2538] rounded-2xl select-none">
+          <p className="text-sm text-[#82889A]">
+            No tips available for the selected category.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredTips.map(tip => (
             <div
               key={tip.id}
               onClick={() => handleTipClick(tip)}
-              className={`p-6 rounded-lg border-2 ${getUrgencyColor(tip.urgency)} transition-all duration-200 hover:shadow-lg cursor-pointer hover:scale-105 transform hover:border-blue-300 dark:hover:border-blue-600`}
+              className={`p-6 rounded-2xl border ${getUrgencyColor(tip.urgency)} transition-all duration-200 hover:shadow-xl cursor-pointer hover:-translate-y-0.5 group flex flex-col justify-between`}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{getCategoryIcon(tip.category)}</span>
-                  <div>
-                    <h3 className="font-bold text-gray-900 dark:text-gray-100">
-                      {tip.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {tip.cardName}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-green-600 dark:text-green-400">
-                    {tip.value}
-                  </div>
-                  {tip.urgency === 'high' && (
-                    <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
-                      <BellIcon className="w-3 h-3" />
-                      High Priority
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl select-none leading-none">{getCategoryIcon(tip.category)}</span>
+                    <div>
+                      <h3 className="font-bold text-white text-base leading-snug group-hover:text-blue-400 transition-colors">
+                        {tip.title}
+                      </h3>
+                      <p className="text-xs text-[#82889A] mt-0.5 font-medium">
+                        {tip.cardName}
+                      </p>
                     </div>
-                  )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-sm font-extrabold text-emerald-400 leading-none">
+                      {tip.value}
+                    </div>
+                    {tip.urgency === 'high' && (
+                      <div className="flex items-center gap-1 text-[9px] font-extrabold text-rose-400 mt-1.5 select-none tracking-wider">
+                        <BellIcon className="w-3 h-3 text-rose-400" />
+                        HIGH PRIORITY
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                <p className="text-[#D1D5DB] text-sm leading-relaxed mb-4">
+                  {tip.description}
+                </p>
               </div>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-3">
-                {tip.description}
-              </p>
-
-              <div className="bg-white dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  💡 Action: {tip.actionText}
+              <div className="bg-[#0E111A] border border-[#1E2538]/80 p-4 rounded-xl space-y-2 mt-auto">
+                <p className="text-xs font-semibold text-white">
+                  <span className="text-[#FBBF24]">💡 Action:</span> {tip.actionText}
                 </p>
                 {tip.expiryDate && (
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                  <p className="text-[10px] text-rose-400 font-bold">
                     ⏰ Valid until: {tip.expiryDate}
                   </p>
                 )}
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
-                  👆 Click for detailed guide
+                <p className="text-[11px] font-bold text-blue-400 group-hover:text-blue-300 transition-colors pt-1 flex items-center gap-1.5 select-none">
+                  <span>Explore detailed guide</span>
+                  <svg className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </p>
               </div>
             </div>
@@ -634,30 +616,30 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
 
       {/* Summary Stats */}
       {tips.length > 0 && (
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            📊 Your Optimization Summary
+        <div className="mt-8 p-6 bg-[#131622]/85 border border-[#1E2538] rounded-2xl select-none shrink-0">
+          <h4 className="font-bold text-xs text-white tracking-wider uppercase mb-4 flex items-center gap-2">
+            <span>📊 Portfolio Optimization Analytics</span>
           </h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <div className="font-medium text-blue-800 dark:text-blue-200">Total Tips</div>
-              <div className="text-blue-600 dark:text-blue-400">{tips.length}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div className="bg-[#0E111A] border border-[#1E2538]/60 p-4 rounded-xl">
+              <div className="font-semibold text-[#82889A] text-[10px] uppercase tracking-wider">Total Hacks</div>
+              <div className="text-xl font-black text-white mt-1">{tips.length}</div>
             </div>
-            <div>
-              <div className="font-medium text-blue-800 dark:text-blue-200">High Priority</div>
-              <div className="text-red-600 dark:text-red-400">
+            <div className="bg-[#0E111A] border border-[#1E2538]/60 p-4 rounded-xl">
+              <div className="font-semibold text-[#82889A] text-[10px] uppercase tracking-wider">High Priority</div>
+              <div className="text-xl font-black text-rose-400 mt-1">
                 {tips.filter(t => t.urgency === 'high').length}
               </div>
             </div>
-            <div>
-              <div className="font-medium text-blue-800 dark:text-blue-200">Point Transfers</div>
-              <div className="text-blue-600 dark:text-blue-400">
+            <div className="bg-[#0E111A] border border-[#1E2538]/60 p-4 rounded-xl">
+              <div className="font-semibold text-[#82889A] text-[10px] uppercase tracking-wider">Points Sweet Spots</div>
+              <div className="text-xl font-black text-blue-400 mt-1">
                 {tips.filter(t => t.category === 'points_transfer').length}
               </div>
             </div>
-            <div>
-              <div className="font-medium text-blue-800 dark:text-blue-200">Active Cards</div>
-              <div className="text-blue-600 dark:text-blue-400">{userCards.length}</div>
+            <div className="bg-[#0E111A] border border-[#1E2538]/60 p-4 rounded-xl">
+              <div className="font-semibold text-[#82889A] text-[10px] uppercase tracking-wider">Monitored Cards</div>
+              <div className="text-xl font-black text-emerald-400 mt-1">{userCards.length}</div>
             </div>
           </div>
         </div>
@@ -666,87 +648,92 @@ export function SmartTipsView({ user }: SmartTipsViewProps) {
       {/* Tip Details Modal */}
       {showModal && selectedTip && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{getCategoryIcon(selectedTip.category)}</span>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                      {selectedTip.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {selectedTip.cardName}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="space-y-6">
+          <div className="bg-[#0E111A] border border-[#1E2538] rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+            <div className="p-6 border-b border-[#1E2538] flex items-center justify-between shrink-0 select-none">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{getCategoryIcon(selectedTip.category)}</span>
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Overview</h4>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {getTipDetails(selectedTip.id).fullDescription}
+                  <h3 className="text-lg font-bold text-white leading-tight">
+                    {selectedTip.title}
+                  </h3>
+                  <p className="text-xs text-[#82889A] mt-0.5">
+                    {selectedTip.cardName}
                   </p>
                 </div>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-white transition-colors text-2xl p-1"
+              >
+                &times;
+              </button>
+            </div>
 
-                <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">How to Execute</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
-                    {getTipDetails(selectedTip.id).steps.map((step, index) => (
-                      <li key={index} className="text-sm">{step}</li>
-                    ))}
-                  </ol>
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 scrollbar-thin scrollbar-thumb-gray-800">
+              <div>
+                <h4 className="text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Overview & Strategy</h4>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {getTipDetails(selectedTip.id).fullDescription}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Execution Protocol</h4>
+                <ol className="space-y-2 text-gray-300">
+                  {getTipDetails(selectedTip.id).steps.map((step, index) => (
+                    <li key={index} className="text-sm flex items-start gap-2.5">
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold shrink-0 mt-0.5 select-none">
+                        {index + 1}
+                      </span>
+                      <span className="leading-snug">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Calculations & Value Proof</h4>
+                <div className="space-y-2.5">
+                  {getTipDetails(selectedTip.id).examples.map((example, index) => (
+                    <div key={index} className="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-xl flex items-start gap-3">
+                      <span className="text-base select-none mt-0.5">📈</span>
+                      <p className="text-sm text-emerald-400/90 font-medium leading-relaxed">{example}</p>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
+              {getTipDetails(selectedTip.id).warnings && getTipDetails(selectedTip.id).warnings!.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Examples & Calculations</h4>
-                  <div className="space-y-2">
-                    {getTipDetails(selectedTip.id).examples.map((example, index) => (
-                      <div key={index} className="bg-green-50 dark:bg-green-900/20 p-3 rounded-md border border-green-200 dark:border-green-800">
-                        <p className="text-sm text-green-800 dark:text-green-200">{example}</p>
+                  <h4 className="text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Important Caveats</h4>
+                  <div className="space-y-2.5">
+                    {getTipDetails(selectedTip.id).warnings!.map((warning, index) => (
+                      <div key={index} className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-xl flex items-start gap-3">
+                        <span className="text-base select-none mt-0.5">⚠️</span>
+                        <p className="text-sm text-amber-400/90 font-medium leading-relaxed">{warning}</p>
                       </div>
                     ))}
                   </div>
                 </div>
+              )}
 
-                {getTipDetails(selectedTip.id).warnings && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Important Notes</h4>
-                    <div className="space-y-2">
-                      {getTipDetails(selectedTip.id).warnings!.map((warning, index) => (
-                        <div key={index} className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800">
-                          <p className="text-sm text-yellow-800 dark:text-yellow-200">⚠️ {warning}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md border border-blue-200 dark:border-blue-800">
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Expected Value</h4>
-                  <p className="text-blue-800 dark:text-blue-200 font-medium">{selectedTip.value}</p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">{selectedTip.actionText}</p>
-                </div>
+              <div className="bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border border-blue-500/20 p-5 rounded-xl">
+                <h4 className="text-xs font-bold text-blue-400 tracking-wider uppercase mb-1.5">Projected Yield</h4>
+                <p className="text-lg font-black text-white">{selectedTip.value}</p>
+                <p className="text-xs text-gray-300 leading-relaxed mt-1">{selectedTip.actionText}</p>
               </div>
+            </div>
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Got it!
-                </button>
-              </div>
+            <div className="p-6 border-t border-[#1E2538] flex justify-end shrink-0 select-none">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              >
+                Acknowledge Strategy
+              </button>
             </div>
           </div>
         </div>
