@@ -200,11 +200,15 @@ export function SpendOptimizerView({ user, onTransactionProcessed }: SpendOptimi
             </label>
             <input 
               name="amount" 
-              type="number" 
+              type="text" 
+              inputMode="decimal"
               id="amount" 
               placeholder="e.g., 2500" 
               required 
-              onWheel={(e) => e.currentTarget.blur()} 
+              onChange={(e) => {
+                const val = e.target.value;
+                e.target.value = val.replace(/[^0-9.]/g, '');
+              }}
               className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500 dark:placeholder-gray-400" 
             />
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
@@ -24,9 +24,73 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const [cards, setCards] = useState(initialUserCards);
   const [activeView, setActiveView] = useState('optimizer');
   const [isWalletCollapsed, setIsWalletCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Profile and display name state management
+  const [currentUser, setCurrentUser] = useState<User>(user);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const userMetadata = currentUser?.user_metadata || {};
+  const userFullName = userMetadata.full_name || userMetadata.name || currentUser?.email || 'Guest User';
+  const userAvatarUrl = userMetadata.avatar_url || userMetadata.picture || null;
+  const [editingName, setEditingName] = useState(userFullName);
+
+  // Sync edit name state when user metadata loads
+  useEffect(() => {
+    setEditingName(userFullName);
+  }, [userFullName]);
+
+  // Automatically collapse wallet panel on mobile/tablet on load to keep screen space clean
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handleResize = () => {
+        if (window.innerWidth < 1024) {
+          setIsWalletCollapsed(true);
+        }
+      };
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
   
   const isDemo = user.id === 'demo-guest-user-id';
   const [showDemoBanner, setShowDemoBanner] = useState(isDemo);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingName.trim()) return;
+
+    // Update local state first to immediately refresh UI elements
+    const updatedUser = {
+      ...currentUser,
+      user_metadata: {
+        ...userMetadata,
+        full_name: editingName
+      }
+    };
+    setCurrentUser(updatedUser as any);
+
+    if (isDemo) {
+      alert("Profile updated successfully (demo mode)!");
+      setShowProfileModal(false);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: editingName }
+      });
+      if (error) {
+        alert("Error saving profile: " + error.message);
+      } else {
+        alert("Profile updated successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setShowProfileModal(false);
+    }
+  };
 
   const supabase = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -98,33 +162,72 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   };
 
   return (
-    <div className="flex h-screen bg-[#090B10] text-white overflow-hidden font-sans">
-      <Sidebar 
-        user={user} 
-        onLogout={handleLogout}
-        activeView={activeView}
-        setActiveView={setActiveView}
-      />
+    <div className="flex h-screen bg-[#090B10] text-white overflow-hidden font-sans relative">
+      {/* Collapsible Mobile Sidebar Drawer */}
+      <div 
+        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } flex`}
+      >
+        <Sidebar 
+          user={currentUser} 
+          onLogout={handleLogout}
+          activeView={activeView}
+          setActiveView={(view) => {
+            setActiveView(view);
+            setIsSidebarOpen(false); // Auto-close drawer on mobile navigation click
+          }}
+          onClose={() => setIsSidebarOpen(false)}
+          userFullName={userFullName}
+          userAvatarUrl={userAvatarUrl}
+          onProfileClick={() => setShowProfileModal(true)}
+        />
+      </div>
+
+      {/* Backdrop overlay for mobile sidebar drawer */}
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+        />
+      )}
+
       <main className="flex-1 p-6 flex flex-col h-full overflow-hidden">
         {/* Main Content Header Utility Row */}
         <div className="flex justify-between items-center mb-6 shrink-0">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight tracking-tight">
-            {activeView === 'optimizer' ? 'Optimize Your Spend' : activeView === 'tips' ? 'Smart Tips & Hacks' : activeView === 'chat' ? 'AI Card Advisor' : 'Settings'}
-          </h1>
-          <div className="flex items-center gap-2 text-[#82889A]">
-            <button className="p-2 hover:text-white transition-colors hover:bg-gray-800/20 rounded-lg select-none" title="Notifications">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9a6 6 0 00-6-6 6 6 0 00-6 6v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          <div className="flex items-center gap-3">
+            {/* Hamburger Icon Menu Button - Visible on Mobile only */}
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2 text-gray-400 hover:text-white transition-colors bg-[#131622] border border-[#1E2538] rounded-xl cursor-pointer"
+              title="Open Menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </button>
-            <button className="p-2 hover:text-white transition-colors hover:bg-gray-800/20 rounded-lg select-none" title="Help">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-              </svg>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-[#1E2538] border border-[#2A334B] flex items-center justify-center text-xs font-bold text-blue-400 select-none shadow-sm cursor-pointer ml-1 hover:border-blue-400/50 transition-colors" title={user?.email || 'Guest User'}>
-              {user?.email ? user.email.slice(0, 2).toUpperCase() : 'GU'}
-            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight tracking-tight">
+              {activeView === 'optimizer' ? 'Optimize Your Spend' : activeView === 'tips' ? 'Smart Tips & Hacks' : activeView === 'chat' ? 'AI Card Advisor' : 'Settings'}
+            </h1>
+          </div>
+          <div className="flex items-center text-[#82889A]">
+            {userAvatarUrl ? (
+              <img 
+                src={userAvatarUrl} 
+                alt="Profile" 
+                onClick={() => setShowProfileModal(true)}
+                className="w-8 h-8 rounded-full border border-[#2A334B] hover:border-blue-500/50 object-cover cursor-pointer transition-colors shadow-sm"
+                title={userFullName}
+              />
+            ) : (
+              <div 
+                onClick={() => setShowProfileModal(true)}
+                className="w-8 h-8 rounded-full bg-[#1E2538] border border-[#2A334B] flex items-center justify-center text-xs font-bold text-blue-400 select-none shadow-sm cursor-pointer hover:border-blue-400/50 transition-colors" 
+                title={userFullName}
+              >
+                {userFullName.slice(0, 2).toUpperCase()}
+              </div>
+            )}
           </div>
         </div>
 
@@ -175,6 +278,64 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
           </button>
         )}
       </main>
+
+      {/* Edit Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0E111A] border border-[#1E2538] p-6 rounded-2xl w-full max-w-sm shadow-2xl relative text-white">
+            <div className="flex justify-between items-center mb-6 select-none">
+              <h2 className="text-lg font-bold text-white tracking-wide">Edit Profile</h2>
+              <button 
+                onClick={() => setShowProfileModal(false)} 
+                className="text-gray-400 hover:text-white text-xl p-1 leading-none transition-colors cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-5">
+              <div className="flex flex-col items-center gap-3 mb-4 select-none">
+                {userAvatarUrl ? (
+                  <img src={userAvatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover border-2 border-blue-500/20 shadow-sm" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-[#1E2538] border-2 border-blue-500/20 flex items-center justify-center text-lg font-bold text-blue-400">
+                    {userFullName.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <p className="text-xs text-[#82889A]">{currentUser?.email}</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Display Name</label>
+                <input 
+                  type="text" 
+                  value={editingName} 
+                  onChange={(e) => setEditingName(e.target.value)} 
+                  className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                  placeholder="Your Name" 
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-3 border-t border-[#1E2538] select-none">
+                <button 
+                  type="button" 
+                  onClick={() => setShowProfileModal(false)} 
+                  className="px-5 py-2.5 rounded-xl border border-[#1E2538] hover:bg-gray-800/40 text-gray-400 hover:text-white text-sm font-semibold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

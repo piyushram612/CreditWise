@@ -61,10 +61,27 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
     const [selectedCardId, setSelectedCardId] = useState('');
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
+    const [selectedBank, setSelectedBank] = useState('All');
+
     const supabase = createBrowserClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
+
+    const getBankCategory = (issuer: string) => {
+        const iss = issuer.toLowerCase();
+        if (iss.includes('hdfc')) return 'HDFC';
+        if (iss.includes('sbi') || iss.includes('state bank')) return 'SBI';
+        if (iss.includes('icici')) return 'ICICI';
+        if (iss.includes('axis')) return 'AXIS';
+        if (iss.includes('amex') || iss.includes('american')) return 'AMEX';
+        return 'Others';
+    };
+
+    const filteredMasterCards = allCards.filter(c => {
+        if (selectedBank === 'All') return true;
+        return getBankCategory(c.issuer || '') === selectedBank;
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -178,26 +195,81 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Bank Pill Buttons Filter */}
                     <div>
-                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Select Bank & Card</label>
-                        <select 
-                            value={selectedCardId} 
-                            onChange={(e) => setSelectedCardId(e.target.value)} 
-                            className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200 cursor-pointer"
-                        >
-                            <option value="">Select a card from the database</option>
-                            {allCards.map((card) => (
-                                <option key={card.id} value={card.id}>{card.card_name}</option>
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2 select-none">Filter By Bank</label>
+                        <div className="flex flex-wrap gap-1.5 mb-2 select-none">
+                            {['All', 'HDFC', 'SBI', 'ICICI', 'AXIS', 'AMEX', 'Others'].map(bank => (
+                                <button
+                                    key={bank}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedBank(bank);
+                                        setSelectedCardId(''); // Reset selected card
+                                    }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border cursor-pointer ${
+                                        selectedBank === bank
+                                            ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.05)]'
+                                            : 'bg-[#131622] border-[#1E2538] text-[#82889A] hover:text-white hover:bg-[#1E2538]'
+                                    }`}
+                                >
+                                    {bank}
+                                </button>
                             ))}
-                        </select>
+                        </div>
                     </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Select Card</label>
+                        <div className="max-h-48 overflow-y-auto border border-[#1E2538] bg-[#131622] rounded-xl p-2 space-y-1.5 scrollbar-thin scrollbar-thumb-[#1E2538] scrollbar-track-transparent">
+                            {filteredMasterCards.map((card) => {
+                                const isSelected = selectedCardId === card.id;
+                                return (
+                                    <button
+                                        key={card.id}
+                                        type="button"
+                                        onClick={() => setSelectedCardId(card.id)}
+                                        className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left text-xs font-semibold transition-all cursor-pointer border ${
+                                            isSelected 
+                                                ? 'bg-blue-500/10 border-blue-500/30 text-white' 
+                                                : 'bg-[#0E111A] border-[#1E2538] text-[#82889A] hover:bg-[#1E2538] hover:text-white'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-white text-sm">{card.card_name}</span>
+                                            <span className="text-[10px] text-gray-500 font-medium">{card.issuer}</span>
+                                        </div>
+                                        {isSelected && (
+                                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                </svg>
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                            {filteredMasterCards.length === 0 && (
+                                <div className="text-center py-8 text-xs text-[#82889A]">
+                                    No cards available for this bank.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
                             <input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 value={creditLimit} 
-                                onChange={(e) => setCreditLimit(e.target.value)} 
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                                        setCreditLimit(val);
+                                    }
+                                }}
                                 className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
                                 placeholder="₹ 0.00" 
                             />
@@ -205,9 +277,15 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                         <div>
                             <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount</label>
                             <input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 value={amountUsed} 
-                                onChange={(e) => setAmountUsed(e.target.value)} 
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                                        setAmountUsed(val);
+                                    }
+                                }}
                                 className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
                                 placeholder="₹ 0.00"
                             />
@@ -335,19 +413,31 @@ const EditCardModal = ({ card, onCardUpdated, onClose, isDemo = false, setCards 
                         <div>
                             <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
                             <input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 value={creditLimit} 
-                                onChange={(e) => setCreditLimit(e.target.value)} 
-                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                                        setCreditLimit(val);
+                                    }
+                                }}
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-[#1E2538] text-sm font-semibold transition-all duration-200" 
                             />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount</label>
                             <input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 value={amountUsed} 
-                                onChange={(e) => setAmountUsed(e.target.value)} 
-                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/50 text-sm font-semibold transition-all duration-200" 
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                                        setAmountUsed(val);
+                                    }
+                                }}
+                                className="w-full bg-[#131622] border border-[#1E2538] text-white p-3 rounded-xl focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-[#1E2538] text-sm font-semibold transition-all duration-200" 
                             />
                         </div>
                     </div>

@@ -9,8 +9,10 @@ import { getCardNetwork } from '@/app/types';
 export const runtime = 'nodejs';
 
 interface ChatMessage {
-  from: 'ai' | 'user';
-  text: string;
+  from?: 'ai' | 'user';
+  text?: string;
+  role?: 'user' | 'assistant';
+  content?: string;
 }
 
 // Defines the expected structure of the response from the Gemini API
@@ -131,7 +133,11 @@ export async function POST(request: Request) {
     }
 
     // Format conversation history
-    const history = messages.map(msg => `${msg.from === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
+    const history = messages.map(msg => {
+      const roleName = (msg.role || msg.from) === 'user' ? 'User' : 'AI';
+      const textContent = msg.content || msg.text || '';
+      return `${roleName}: ${textContent}`;
+    }).join('\n');
 
     // Generate detailed optimization advice for user's cards
     let optimizationAdvice = "";
@@ -183,12 +189,12 @@ export async function POST(request: Request) {
       - American Express: Premium benefits but limited merchant acceptance in India
       
       RESPONSE GUIDELINES:
-      1. ONLY answer credit card related questions
-      2. For greetings: "Hello! I'm CreditWise AI, your personal credit card advisor. I can help optimize your existing cards or suggest new ones. How can I assist you today?"
-      3. For optimization questions: Provide specific, actionable advice with exact reward rates and strategies
-      4. For card-specific questions: Give detailed optimization tips including payment methods, apps to use, and pro tips
-      5. Keep responses 120-150 words - detailed but concise
-      6. Always include specific reward rates and actionable steps
+      1. ONLY answer credit card related questions.
+      2. Strictly check the user's last message. If it is a simple greeting (e.g., "hi", "hello", "hey", "greetings"), respond exactly with: "Hello! I'm CreditWise AI, your personal credit card advisor. I can help optimize your existing cards or suggest new ones. How can I assist you today?"
+      3. If the user's message is a specific question (e.g., about dining, travel, fuel, or specific cards in their wallet), DO NOT output the default greeting template. Directly answer the question using the user's actual cards listed in the "User's Current Cards" section.
+      4. Be extremely accurate to the user's actual cards. Do not mention or hallucinate other cards (like Amex, Tata Neu, etc.) unless they are actually in the "User's Current Cards" list. If the user asks about a category and doesn't have a specific card for it, recommend a new card they should get (e.g., SBI Cashback for online shopping, HDFC Infinia/Regalia for dining and travel) and explain why.
+      5. Keep responses detailed, professional, and concise (under 200 words).
+      6. Always include specific reward rates, calculations, and actionable steps.
       7. For non-credit card questions: "I'm your credit card advisor! I can help with card optimization, rewards strategies, or new card recommendations. What would you like to know about your cards?"
       
       SPECIAL FOCUS AREAS:

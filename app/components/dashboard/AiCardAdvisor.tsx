@@ -13,6 +13,17 @@ export default function AiCardAdvisor({ cards }: { cards: Card[] }) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    useEffect(() => {
+        if (messages.length === 0) {
+            const cardNames = cards.map(c => c.card_name).filter(Boolean);
+            let welcomeContent = "Hello! I'm CreditWise AI, your personal credit card advisor. I can help optimize your existing cards or suggest new ones. How can I assist you today?";
+            if (cardNames.length > 0) {
+                welcomeContent += `\n\nI notice you have an excellent card portfolio: **${cardNames.join(', ')}**.\n\nWhether you want to optimize your point transfer strategies, plan your milestone spends, or find the best card for specific categories (like dining, travel, or fuel), I am here to guide you. What shall we optimize first?`;
+            }
+            setMessages([{ role: 'assistant', content: welcomeContent }]);
+        }
+    }, [cards, messages.length]);
+
     useEffect(scrollToBottom, [messages]);
 
     const handleChatSubmit = async (e: React.FormEvent) => {

@@ -187,10 +187,16 @@ export default function SpendOptimizer({ cards }: { cards: Card[] }) {
                         <div>
                             <label htmlFor="amount" className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Amount</label>
                             <input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 id="amount" 
                                 value={amount} 
-                                onChange={(e) => setAmount(e.target.value)} 
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                                        setAmount(val);
+                                    }
+                                }} 
                                 className="w-full bg-[#131622] border border-[#1E2538] text-white placeholder-gray-500 font-semibold text-base px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                                 placeholder="₹ 0.00" 
                             />

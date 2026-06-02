@@ -495,10 +495,15 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Credit Limit</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={creditLimit}
-                onWheel={(e) => e.currentTarget.blur()}
-                onChange={e => setCreditLimit(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                    setCreditLimit(val);
+                  }
+                }}
                 className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md"
               />
             </div>
@@ -506,10 +511,15 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             <div className="md:col-span-2 lg:col-span-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Used Amount (Current Statement)</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={usedAmount}
-                onWheel={(e) => e.currentTarget.blur()}
-                onChange={e => setUsedAmount(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                    setUsedAmount(val);
+                  }
+                }}
                 className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md"
               />
             </div>
