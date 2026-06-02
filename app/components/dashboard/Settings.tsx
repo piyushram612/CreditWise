@@ -18,7 +18,7 @@ export default function Settings() {
             setFeedback('');
             setShowSuccessMessage('Feedback submitted successfully!');
             setTimeout(() => setShowSuccessMessage(''), 3000);
-        } catch (error) {
+        } catch {
             alert('Failed to submit feedback.');
         }
     };
@@ -35,7 +35,7 @@ export default function Settings() {
             setRequestedCard('');
             setShowSuccessMessage('Card request submitted successfully!');
             setTimeout(() => setShowSuccessMessage(''), 3000);
-        } catch (error) {
+        } catch {
             alert('Failed to submit card request.');
         }
     };

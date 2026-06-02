@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ recommendation: responseText });
 
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to get recommendation.' }, { status: 500 });
   }
 }

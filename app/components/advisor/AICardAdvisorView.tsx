@@ -51,7 +51,7 @@ export function AICardAdvisorView() {
 
       const aiMessage: ChatMessage = { from: 'ai', text: data.reply };
       setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
+    } catch {
       const errorMessage: ChatMessage = {
         from: 'ai',
         text: "Sorry, I'm having trouble connecting right now."

@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
             cardsInfo = userCards.map(formatCardForPrompt).join('\n---\n');
           }
         }
-      } catch (authError) {
+      } catch {
         // Silent fail - continue with general advice
       }
     }

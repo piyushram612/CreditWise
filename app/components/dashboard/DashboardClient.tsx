@@ -133,7 +133,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
       } else {
         alert("Profile updated successfully!");
       }
-    } catch (err) {
+    } catch {
     } finally {
       setShowProfileModal(false);
     }
