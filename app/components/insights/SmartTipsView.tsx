@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { User, UserOwnedCard } from '@/app/types';
-import { useCards } from '@/app/hooks/useCards';
 // import { getDetailedCardInfo } from '@/app/utils/cardKnowledgeBase';
 import { CreditCardIcon, BellIcon } from '@/app/components/shared/Icons';
 
@@ -40,7 +39,7 @@ export function SmartTipsView({ user, cards = [] }: SmartTipsViewProps) {
 
   useEffect(() => {
     if (cards.length > 0) {
-      generateSmartTips(cards as any[]);
+      generateSmartTips(cards as unknown as UserOwnedCard[]);
     } else {
       setTips([]);
     }
