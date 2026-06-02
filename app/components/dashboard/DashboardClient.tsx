@@ -195,15 +195,15 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   const renderActiveView = () => {
     switch (activeView) {
       case 'optimizer':
-        return <SpendOptimizer cards={cards} onTrialAction={checkDemoTrial} />;
+        return <SpendOptimizer cards={cards} onTrialAction={isDemo ? checkDemoTrial : undefined} />;
       case 'tips':
         return <SmartTipsView user={currentUser} cards={cards} />;
       case 'chat':
-        return <AiCardAdvisor cards={cards} onTrialAction={checkDemoTrial} />;
+        return <AiCardAdvisor cards={cards} onTrialAction={isDemo ? checkDemoTrial : undefined} />;
       case 'settings':
         return <Settings />;
       default:
-        return <SpendOptimizer cards={cards} onTrialAction={checkDemoTrial} />;
+        return <SpendOptimizer cards={cards} onTrialAction={isDemo ? checkDemoTrial : undefined} />;
     }
   };
 

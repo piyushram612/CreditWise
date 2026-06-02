@@ -15,9 +15,14 @@ interface PageProps {
 
 export default async function DashboardPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
-  const isDemo = resolvedSearchParams.demo === 'true';
+  const isDemoParam = resolvedSearchParams.demo === 'true';
 
   const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // Prioritize active login session: only enter demo mode if the parameter is true AND user is not logged in.
+  const isDemo = isDemoParam && !session;
+  
   let sessionUser: User | null = null;
   let userCardsData: UserCardFromDB[] = [];
   let userCardsError = null;
@@ -29,8 +34,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       user_metadata: { full_name: 'Guest User' }
     } as unknown as User;
   } else {
-    const { data: { session } } = await supabase.auth.getSession();
-
     if (!session) {
       redirect('/');
     }
