@@ -97,7 +97,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-[#090B10] text-white overflow-hidden font-sans">
       <Sidebar 
         user={user} 
         onLogout={handleLogout}
@@ -105,15 +105,37 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
         setActiveView={setActiveView}
       />
       <main className="flex-1 p-6 flex flex-col h-full overflow-hidden">
+        {/* Main Content Header Utility Row */}
+        <div className="flex justify-between items-center mb-6 shrink-0">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight tracking-tight">
+            {activeView === 'optimizer' ? 'Optimize Your Spend' : activeView === 'tips' ? 'Smart Tips & Hacks' : activeView === 'chat' ? 'AI Card Advisor' : 'Settings'}
+          </h1>
+          <div className="flex items-center gap-2 text-[#82889A]">
+            <button className="p-2 hover:text-white transition-colors hover:bg-gray-800/20 rounded-lg select-none" title="Notifications">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9a6 6 0 00-6-6 6 6 0 00-6 6v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+              </svg>
+            </button>
+            <button className="p-2 hover:text-white transition-colors hover:bg-gray-800/20 rounded-lg select-none" title="Help">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+            </button>
+            <div className="w-8 h-8 rounded-full bg-[#1E2538] border border-[#2A334B] flex items-center justify-center text-xs font-bold text-blue-400 select-none shadow-sm cursor-pointer ml-1 hover:border-blue-400/50 transition-colors" title={user?.email || 'Guest User'}>
+              {user?.email ? user.email.slice(0, 2).toUpperCase() : 'GU'}
+            </div>
+          </div>
+        </div>
+
         {showDemoBanner && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-lg shadow-md mb-6 flex justify-between items-center transition-all duration-200 shrink-0">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-xl shadow-md mb-6 flex justify-between items-center transition-all duration-200 shrink-0">
             <div className="flex items-center gap-2">
-              <span className="bg-white/20 text-white text-xs font-semibold px-2 py-0.5 rounded uppercase">Demo Mode</span>
+              <span className="bg-white/20 text-white text-xs font-semibold px-2 py-0.5 rounded uppercase select-none">Demo Mode</span>
               <p className="text-sm font-medium">You&apos;re in demo mode — sign up to save your cards.</p>
             </div>
             <button 
               onClick={() => setShowDemoBanner(false)}
-              className="text-white/80 hover:text-white hover:bg-white/10 rounded p-1 transition-colors"
+              className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg p-1 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
