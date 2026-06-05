@@ -305,7 +305,7 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
             {renderActiveView()}
           </div>
           {!isWalletCollapsed && (
-            <div className="h-full overflow-y-auto pr-1 transition-all duration-300">
+            <div className="fixed inset-0 z-40 bg-[#090B10] p-4 pb-8 lg:relative lg:inset-auto lg:z-0 lg:h-full lg:w-auto lg:bg-transparent lg:p-0 lg:overflow-visible transition-all duration-300">
               <CardList 
                 cards={cards}
                 allCards={allMasterCards}

@@ -97,7 +97,14 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (selectedCardIds.length === 0 || !creditLimit) return;
+        if (selectedCardIds.length === 0) {
+            alert("Please select at least one card to add.");
+            return;
+        }
+        if (!creditLimit) {
+            alert("Total Limit is necessary. Used amount is fine even if not entered, but you must enter a Total Limit.");
+            return;
+        }
         
         const selectedMasterCards = allCards.filter(c => selectedCardIds.includes(c.id));
 
@@ -298,7 +305,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                     
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit</label>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Total Limit *</label>
                             <input 
                                 type="text" 
                                 inputMode="decimal"
@@ -314,7 +321,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount</label>
+                            <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-2">Used Amount (Optional)</label>
                             <input 
                                 type="text" 
                                 inputMode="decimal"

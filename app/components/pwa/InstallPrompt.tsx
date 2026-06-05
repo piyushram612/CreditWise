@@ -50,6 +50,16 @@ export default function InstallPrompt() {
     };
   }, []);
 
+  // Auto-dismiss the prompt after 10 seconds
+  useEffect(() => {
+    if (showInstallButton) {
+      const timer = setTimeout(() => {
+        setShowInstallButton(false);
+      }, 10000); // 10 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [showInstallButton]);
+
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       // Android
