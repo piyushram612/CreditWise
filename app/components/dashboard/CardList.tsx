@@ -58,7 +58,7 @@ interface AddCardModalProps {
 }
 
 const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards }: AddCardModalProps) => {
-    const [selectedCardId, setSelectedCardId] = useState('');
+    const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
     const [creditLimit, setCreditLimit] = useState('');
     const [amountUsed, setAmountUsed] = useState('');
     const [selectedBank, setSelectedBank] = useState('All');
@@ -83,40 +83,52 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
         return getBankCategory(c.issuer || '') === selectedBank;
     });
 
+    const sortedFilteredMasterCards = [...filteredMasterCards].sort((a, b) => 
+        (a.card_name || '').localeCompare(b.card_name || '')
+    );
+
+    const toggleCardSelection = (cardId: string) => {
+        setSelectedCardIds(prev => 
+            prev.includes(cardId) 
+                ? prev.filter(id => id !== cardId) 
+                : [...prev, cardId]
+        );
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedCardId || !creditLimit) return;
+        if (selectedCardIds.length === 0 || !creditLimit) return;
         
-        const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
+        const selectedMasterCards = allCards.filter(c => selectedCardIds.includes(c.id));
 
         if (isDemo) {
-            const newCard: Card = {
-                id: `demo-card-${Date.now()}`,
+            const newCards: Card[] = selectedMasterCards.map((selectedMasterCard, index) => ({
+                id: `demo-card-${Date.now()}-${index}`,
                 user_id: 'demo-guest-user-id',
-                card_id: selectedCardId,
+                card_id: selectedMasterCard.id,
                 credit_limit: parseFloat(creditLimit),
                 used_amount: parseFloat(amountUsed) || 0,
-                card_name: selectedMasterCard?.card_name || 'Demo Card',
-                issuer: selectedMasterCard?.issuer || 'Unknown',
-                benefits: selectedMasterCard?.benefits || null,
-                fees: selectedMasterCard?.fees || null,
-                network: selectedMasterCard?.network || null,
-                annual_fee: selectedMasterCard?.annual_fee || null,
-                reward_rates: selectedMasterCard?.reward_rates || null,
-                card_type: selectedMasterCard?.card_type || null,
-                joining_fee: selectedMasterCard?.joining_fee || null,
-                fee_waiver: selectedMasterCard?.fee_waiver || null,
-                welcome_benefits: selectedMasterCard?.welcome_benefits || null,
-                milestone_benefits: selectedMasterCard?.milestone_benefits || null,
-                lounge_access: selectedMasterCard?.lounge_access || null,
-                other_benefits: selectedMasterCard?.other_benefits || null,
-                suitability: selectedMasterCard?.suitability || null,
-            };
+                card_name: selectedMasterCard.card_name || 'Demo Card',
+                issuer: selectedMasterCard.issuer || 'Unknown',
+                benefits: selectedMasterCard.benefits || null,
+                fees: selectedMasterCard.fees || null,
+                network: selectedMasterCard.network || null,
+                annual_fee: selectedMasterCard.annual_fee || null,
+                reward_rates: selectedMasterCard.reward_rates || null,
+                card_type: selectedMasterCard.card_type || null,
+                joining_fee: selectedMasterCard.joining_fee || null,
+                fee_waiver: selectedMasterCard.fee_waiver || null,
+                welcome_benefits: selectedMasterCard.welcome_benefits || null,
+                milestone_benefits: selectedMasterCard.milestone_benefits || null,
+                lounge_access: selectedMasterCard.lounge_access || null,
+                other_benefits: selectedMasterCard.other_benefits || null,
+                suitability: selectedMasterCard.suitability || null,
+            }));
 
             if (setCards) {
-                setCards(prev => [...prev, newCard]);
+                setCards(prev => [...prev, ...newCards]);
             }
-            alert('Card added successfully (demo mode)!');
+            alert(`${selectedCardIds.length} card(s) added successfully (demo mode)!`);
             onClose();
             return;
         }
@@ -124,30 +136,40 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any).from('user_owned_cards').insert({
+        const insertData = selectedMasterCards.map(selectedMasterCard => ({
             user_id: user.id,
-            card_id: selectedCardId,
+            card_id: selectedMasterCard.id,
             credit_limit: parseFloat(creditLimit),
             used_amount: parseFloat(amountUsed) || 0,
-            card_name: selectedMasterCard?.card_name,
-            issuer: selectedMasterCard?.issuer,
-            benefits: selectedMasterCard?.benefits,
-            fees: selectedMasterCard?.fees,
-        });
+            card_name: selectedMasterCard.card_name,
+            issuer: selectedMasterCard.issuer,
+            benefits: selectedMasterCard.benefits,
+            fees: selectedMasterCard.fees,
+        }));
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from('user_owned_cards').insert(insertData);
 
         if (error) {
-            alert('Error adding card: ' + error.message);
+            alert('Error adding cards: ' + error.message);
         } else {
-            alert('Card added successfully!');
+            alert(`${selectedCardIds.length} card(s) added successfully!`);
             onCardAdded();
             onClose();
         }
     };
 
-    const selectedMasterCard = allCards.find(c => c.id === selectedCardId);
-    const cardNamePreview = selectedMasterCard?.card_name || 'Select Bank & Card';
-    const cardIssuerPreview = selectedMasterCard?.issuer || 'BANK';
+    const selectedMasterCards = allCards.filter(c => selectedCardIds.includes(c.id));
+    const cardNamePreview = selectedMasterCards.length === 1 
+        ? (selectedMasterCards[0].card_name || 'Select Bank & Card')
+        : selectedMasterCards.length > 1 
+            ? `${selectedMasterCards.length} Cards Selected`
+            : 'Select Bank & Card';
+    const cardIssuerPreview = selectedMasterCards.length === 1 
+        ? (selectedMasterCards[0].issuer || 'BANK')
+        : selectedMasterCards.length > 1 
+            ? 'MULTIPLE'
+            : 'BANK';
 
     return (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -194,6 +216,24 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                     <div className="absolute -right-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
                 </div>
 
+                {/* Selected Cards Badges List */}
+                {selectedMasterCards.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4 max-h-24 overflow-y-auto p-2 bg-[#131622] rounded-xl border border-[#1E2538] scrollbar-thin scrollbar-thumb-gray-800">
+                        {selectedMasterCards.map(c => (
+                            <span key={c.id} className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">
+                                {c.card_name}
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedCardIds(prev => prev.filter(id => id !== c.id))}
+                                    className="text-blue-400 hover:text-white font-extrabold text-xs ml-1 cursor-pointer focus:outline-none"
+                                >
+                                    &times;
+                                </button>
+                            </span>
+                        ))}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Bank Pill Buttons Filter */}
                     <div>
@@ -205,7 +245,6 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                                     type="button"
                                     onClick={() => {
                                         setSelectedBank(bank);
-                                        setSelectedCardId(''); // Reset selected card
                                     }}
                                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all duration-200 border cursor-pointer ${
                                         selectedBank === bank
@@ -220,15 +259,15 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-1.5">Select Card</label>
+                        <label className="block text-xs font-bold text-[#82889A] tracking-wider uppercase mb-1.5">Select Card(s)</label>
                         <div className="max-h-36 overflow-y-auto border border-[#1E2538] bg-[#131622] rounded-xl p-2 space-y-1 scrollbar-thin scrollbar-thumb-[#1E2538] scrollbar-track-transparent">
-                            {filteredMasterCards.map((card) => {
-                                const isSelected = selectedCardId === card.id;
+                            {sortedFilteredMasterCards.map((card) => {
+                                const isSelected = selectedCardIds.includes(card.id);
                                 return (
                                     <button
                                         key={card.id}
                                         type="button"
-                                        onClick={() => setSelectedCardId(card.id)}
+                                        onClick={() => toggleCardSelection(card.id)}
                                         className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs font-semibold transition-all cursor-pointer border ${
                                             isSelected 
                                                 ? 'bg-blue-500/10 border-blue-500/30 text-white' 
@@ -249,7 +288,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                                     </button>
                                 );
                             })}
-                            {filteredMasterCards.length === 0 && (
+                            {sortedFilteredMasterCards.length === 0 && (
                                 <div className="text-center py-8 text-xs text-[#82889A]">
                                     No cards available for this bank.
                                 </div>
@@ -304,7 +343,7 @@ const AddCardModal = ({ allCards, onCardAdded, onClose, isDemo = false, setCards
                             type="submit" 
                             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold shadow-lg shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                         >
-                            Add Card
+                            Add Card(s)
                         </button>
                     </div>
                 </form>
@@ -584,7 +623,7 @@ export default function CardList({ cards, onCardUpdate, allCards, isDemo = false
 
             {/* Scrollable Card List Container */}
             <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-gray-800">
-                {cards.length > 0 ? cards.map(card => {
+                {cards.length > 0 ? [...cards].sort((a, b) => (a.card_name || '').localeCompare(b.card_name || '')).map(card => {
                     const styleInfo = getIssuerStyles(card.issuer);
                     const usagePercentage = Math.min(100, Math.max(0, ((card.used_amount ?? 0) / (card.credit_limit ?? 1)) * 100));
                     

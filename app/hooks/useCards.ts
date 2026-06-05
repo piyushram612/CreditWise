@@ -28,7 +28,10 @@ export function useCards(user: User | null, refreshKey: number) {
       
       if (error) {
       } else {
-        setUserCards(data as UserOwnedCard[]);
+        const sortedData = (data as UserOwnedCard[] || []).sort((a, b) => 
+          (a.card_name || '').localeCompare(b.card_name || '')
+        );
+        setUserCards(sortedData);
       }
       setIsLoading(false);
     };

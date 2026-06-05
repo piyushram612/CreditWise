@@ -91,12 +91,19 @@ export default function DashboardClient({ user, initialUserCards, allMasterCards
   // Automatically collapse wallet panel on mobile/tablet on load to keep screen space clean
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      let prevWidth = window.innerWidth;
       const handleResize = () => {
-        if (window.innerWidth < 1024) {
-          setIsWalletCollapsed(true);
+        const currentWidth = window.innerWidth;
+        if (currentWidth !== prevWidth) {
+          if (currentWidth < 1024 && prevWidth >= 1024) {
+            setIsWalletCollapsed(true);
+          }
+          prevWidth = currentWidth;
         }
       };
-      handleResize();
+      if (window.innerWidth < 1024) {
+        setIsWalletCollapsed(true);
+      }
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
     }

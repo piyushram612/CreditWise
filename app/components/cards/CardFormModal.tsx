@@ -417,7 +417,7 @@ export function CardFormModal({ isOpen, onClose, user, onCardSaved, existingCard
             className="w-full p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4"
           >
             <option value="">Or select a template to start...</option>
-            {allCards.map(card => (
+            {[...allCards].sort((a, b) => (a.card_name || '').localeCompare(b.card_name || '')).map(card => (
               <option key={card.id} value={card.id}>{card.card_name}</option>
             ))}
           </select>
